@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Logging;
+using SkyVault.WebApp.Proxies;
+
+const string fallbackBaseUri = "https://localhost/api"; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,14 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddHttpClient<AuthorityProxy>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
+});
+builder.Services.AddHttpClient<CustomerProxy>(client => {
+    client.BaseAddress = new Uri(builder.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
 });
 
 var app = builder.Build();
