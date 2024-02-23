@@ -15,7 +15,7 @@ namespace SkyVault.WebApp.Pages
             if (User.Identity is not { IsAuthenticated: true })
                 HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
             
-            base.Username = "";
+            base.Username = User.Identity!.Name;
             base.FullName = "";
             base.Email = "";
         }
