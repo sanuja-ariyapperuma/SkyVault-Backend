@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SkyVault.Payloads.RequestPayloads;
+using SkyVault.Payloads.ResponsePayloads;
+using SkyVault.WebApp.Proxies;
 
 namespace SkyVault.WebApp.Pages
 {
     [Authorize]
-    public class IndexModel(IConfiguration configuration, IAntiforgery antiForgery) 
-        : Models.SkyVaultPageModel(antiForgery)
+    internal class IndexModel(
+        IConfiguration configuration,
+        IAntiforgery antiForgery,
+        AuthorityProxy authorityProxy) : Models.SkyVaultPageModel(antiForgery)
     {
         public override void OnGet()
         {
@@ -14,10 +19,17 @@ namespace SkyVault.WebApp.Pages
 
             if (User.Identity is not { IsAuthenticated: true })
                 HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            
-            base.Username = User.Identity!.Name;
-            base.FullName = "";
-            base.Email = "";
+
+            //Get user information from database
+            var userRequest = new ValidateUserRequest("ayub@hsenidbiz.com", "Ayub",
+                "Sourjah", "ayub@hsenidbiz.com");
+
+            var welcomeUser = authorityProxy.GetUserInfo(userRequest).Result ?? 
+                              throw new ArgumentNullException("authorityProxy.GetUserInfo(userRequest).Result");
+
+            base.Username = welcomeUser.Username;
+            base.FullName = welcomeUser.FullName;
+            base.Email = welcomeUser.Email;
         }
 
         public RedirectResult OnGetSignOut()
