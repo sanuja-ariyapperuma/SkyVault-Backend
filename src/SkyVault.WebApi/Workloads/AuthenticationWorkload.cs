@@ -8,6 +8,10 @@ internal static class AuthenticationWorkload
 {
     public static IResult AuthenticateUser([FromBody] ValidateUserRequest request, HttpContext context)
     {
-        return Results.Ok(new WelcomeUserResponse("Test", "Today @ 9.30am"));
+        //If the user does not exist, user needs to be created or else information about the user needs to be returned.
+        //Access to the portal is granted through the Azure portal for this sites app registration.
+        
+        return Results.Ok(new WelcomeUserResponse("ayub@hsenidbiz.com", "Ayub Sourjah", 
+            "Today", "Super-Admin", "ayub@hsenidbiz.com"));
     }
 }
