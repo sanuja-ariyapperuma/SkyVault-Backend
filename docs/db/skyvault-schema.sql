@@ -44,17 +44,6 @@ CREATE  TABLE skyvault.notification_templates (
 	CONSTRAINT unq_notification_templates_notification_type UNIQUE ( notification_type ) 
  ) engine=InnoDB;
 
-CREATE  TABLE skyvault.jobs ( 
-	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
-	date_time            DATE    NOT NULL   ,
-	`status`             CHAR(1)    NOT NULL   ,
-	customer_id          INT    NOT NULL   ,
-	template_id          INT    NOT NULL   ,
-	log                  TEXT       ,
-	CONSTRAINT unq_jobs_customer_id UNIQUE ( customer_id ) ,
-	CONSTRAINT unq_jobs_template_id UNIQUE ( template_id ) 
- ) engine=InnoDB;
-
 CREATE  TABLE skyvault.customers ( 
 	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
 	salutation_id        INT    NOT NULL   ,
@@ -71,6 +60,17 @@ CREATE  TABLE skyvault.flights (
 	flight_number        VARCHAR(50)    NOT NULL   ,
 	customer_id          INT    NOT NULL   ,
 	CONSTRAINT unq_flights_customer_id UNIQUE ( customer_id ) 
+ ) engine=InnoDB;
+
+CREATE  TABLE skyvault.jobs ( 
+	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
+	date_time            DATE    NOT NULL   ,
+	`status`             CHAR(1)    NOT NULL   ,
+	customer_id          INT    NOT NULL   ,
+	template_id          INT    NOT NULL   ,
+	log                  TEXT       ,
+	CONSTRAINT unq_jobs_customer_id UNIQUE ( customer_id ) ,
+	CONSTRAINT unq_jobs_template_id UNIQUE ( template_id ) 
  ) engine=InnoDB;
 
 CREATE  TABLE skyvault.passports ( 
@@ -114,6 +114,8 @@ ALTER TABLE skyvault.customers ADD CONSTRAINT fk_customers_salutations FOREIGN K
 ALTER TABLE skyvault.flights ADD CONSTRAINT fk_flights_customers FOREIGN KEY ( customer_id ) REFERENCES skyvault.customers( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE skyvault.jobs ADD CONSTRAINT fk_jobs_notification_templates FOREIGN KEY ( template_id ) REFERENCES skyvault.notification_templates( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE skyvault.jobs ADD CONSTRAINT fk_jobs_customers FOREIGN KEY ( customer_id ) REFERENCES skyvault.customers( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE skyvault.notification_templates ADD CONSTRAINT fk_notification_templates_notification_types FOREIGN KEY ( notification_type ) REFERENCES skyvault.notification_types( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
