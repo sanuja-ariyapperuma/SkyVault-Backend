@@ -10,11 +10,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Backend\" />
+      <ProjectReference Include="..\SkyVault\SkyVault.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SkyVault\SkyVault.csproj" />
+      <Folder Include="Backend\Models\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
     </ItemGroup>
 
 </Project>

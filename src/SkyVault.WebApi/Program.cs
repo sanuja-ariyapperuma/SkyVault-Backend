@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using SkyVault.WebApi.Authentication;
+using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
 
 namespace SkyVault.WebApi;
@@ -9,7 +11,11 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddHealthChecks();
-        
+        builder.Services.AddDbContext<SkyvaultContext>(options =>
+        {
+            options.UseMySql(builder.Configuration.GetConnectionString("MySQLConnection"), new MySqlServerVersion(new Version(8, 0)));
+        });
+
         var app = builder.Build();
         app.UseMiddleware<BasicAuthMiddleware>();
         app.MapLoginEndpoints();
