@@ -1,5 +1,8 @@
 namespace SkyVault.Payloads.ResponsePayloads;
 
 public sealed record WelcomeUserResponse(
-    string Username,
-    string LastLogin);
+    string Upn,
+    string FullName,
+    string LastLogin,
+    string Role,
+    string Email);
