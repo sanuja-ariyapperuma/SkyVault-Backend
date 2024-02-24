@@ -1,40 +1,34 @@
 CREATE SCHEMA skyvault;
 
-CREATE  TABLE skyvault.customers ( 
+CREATE  TABLE skyvault.customer_profiles ( 
 	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
 	salutation_id        INT    NOT NULL   ,
 	preferred_comm_id    INT    NOT NULL   ,
 	system_user_id       INT    NOT NULL   ,
-	parent_id            INT       ,
-	CONSTRAINT unq_customers_system_user UNIQUE ( system_user_id ) ,
-	CONSTRAINT unq_customers_salutation_id UNIQUE ( salutation_id ) ,
-	CONSTRAINT unq_customers_preferred_comm_id UNIQUE ( preferred_comm_id ) 
+	parent_id            INT
  ) engine=InnoDB;
 
-CREATE  TABLE skyvault.flights ( 
+CREATE  TABLE skyvault.frequent_flyer_numbers ( 
 	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
-	flight_number        VARCHAR(50)    NOT NULL   ,
-	customer_id          INT    NOT NULL   ,
-	CONSTRAINT unq_flights_customer_id UNIQUE ( customer_id ) 
+	flyer_number        VARCHAR(50)    NOT NULL   ,
+	customer_profile_id          INT    NOT NULL  
  ) engine=InnoDB;
 
 CREATE  TABLE skyvault.jobs ( 
 	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
 	date_time            DATE    NOT NULL   ,
 	`status`             CHAR(1)    NOT NULL   ,
-	customer_id          INT    NOT NULL   ,
+	customer_profile_id          INT    NOT NULL   ,
 	template_id          INT    NOT NULL   ,
-	log                  TEXT       ,
-	CONSTRAINT unq_jobs_customer_id UNIQUE ( customer_id ) ,
-	CONSTRAINT unq_jobs_template_id UNIQUE ( template_id ) 
+	log                  TEXT 
  ) engine=InnoDB;
+
 
 CREATE  TABLE skyvault.notification_templates ( 
 	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
 	content              LONGTEXT       ,
 	notification_type    INT    NOT NULL   ,
-	file                 LONGTEXT       ,
-	CONSTRAINT unq_notification_templates_notification_type UNIQUE ( notification_type ) 
+	file                 LONGTEXT
  ) engine=InnoDB;
 
 CREATE  TABLE skyvault.notification_types ( 
@@ -44,8 +38,7 @@ CREATE  TABLE skyvault.notification_types (
 
 CREATE  TABLE skyvault.passports ( 
 	id                   INT    NOT NULL AUTO_INCREMENT  PRIMARY KEY,
-	customer_id          INT    NOT NULL   ,
-	first_name           VARCHAR(100)    NOT NULL   ,
+	customer_profile_id          INT    NOT NULL   ,
 	last_name            VARCHAR(100)    NOT NULL   ,
 	other_names          VARCHAR(100)       ,
 	passport_number      VARCHAR(100)    NOT NULL   ,
@@ -53,8 +46,7 @@ CREATE  TABLE skyvault.passports (
 	date_of_birth        DATE    NOT NULL   ,
 	place_of_birth       VARCHAR(100)       ,
 	nationality_id       INT    NOT NULL   ,
-	is_primary           CHAR(1)  DEFAULT (0)  NOT NULL   ,
-	CONSTRAINT unq_passports_nationality_id UNIQUE ( nationality_id ) 
+	is_primary           CHAR(1)  DEFAULT (0)  NOT NULL
  ) engine=InnoDB;
 
 CREATE  TABLE skyvault.salutations ( 
@@ -79,9 +71,7 @@ CREATE  TABLE skyvault.visas (
 	issued_date          DATE    NOT NULL   ,
 	expire_date          DATE    NOT NULL   ,
 	country_id           INT    NOT NULL   ,
-	passport_id          INT    NOT NULL   ,
-	CONSTRAINT unq_visas_passport_id UNIQUE ( passport_id ) ,
-	CONSTRAINT unq_visas_country_id UNIQUE ( country_id ) 
+	passport_id          INT    NOT NULL
  ) engine=InnoDB;
 
 CREATE  TABLE skyvault.communication_methods ( 
@@ -100,26 +90,26 @@ CREATE  TABLE skyvault.nationalities (
 	nationality_name     VARCHAR(100)    NOT NULL   
  ) engine=InnoDB;
 
-ALTER TABLE skyvault.communication_methods ADD CONSTRAINT fk_communication_methods_customers FOREIGN KEY ( id ) REFERENCES skyvault.customers( preferred_comm_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.customer_profiles ADD CONSTRAINT fk_customer_profiles_communication_methods FOREIGN KEY ( preferred_comm_id ) REFERENCES skyvault.communication_methods( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.countries ADD CONSTRAINT fk_countries_visas FOREIGN KEY ( id ) REFERENCES skyvault.visas( country_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.visas ADD CONSTRAINT fk_visas_countries FOREIGN KEY ( country_id ) REFERENCES skyvault.countries( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.customers ADD CONSTRAINT fk_customers_customers FOREIGN KEY ( parent_id ) REFERENCES skyvault.customers( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.customer_profiles ADD CONSTRAINT fk_customer_profiles_customer_profiles FOREIGN KEY ( parent_id ) REFERENCES skyvault.customer_profiles( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.flights ADD CONSTRAINT fk_flights_customers FOREIGN KEY ( customer_id ) REFERENCES skyvault.customers( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.frequent_flyer_numbers ADD CONSTRAINT fk_frequent_flyer_numbers_customer_profiles FOREIGN KEY ( customer_profile_id ) REFERENCES skyvault.customer_profiles( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.jobs ADD CONSTRAINT fk_jobs_customers FOREIGN KEY ( customer_id ) REFERENCES skyvault.customers( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.jobs ADD CONSTRAINT fk_jobs_customer_profiles FOREIGN KEY ( customer_profile_id ) REFERENCES skyvault.customer_profiles( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.nationalities ADD CONSTRAINT fk_nationalities_passports FOREIGN KEY ( id ) REFERENCES skyvault.passports( nationality_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.passports ADD CONSTRAINT fk_passports_nationalities FOREIGN KEY ( nationality_id ) REFERENCES skyvault.nationalities( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.notification_templates ADD CONSTRAINT fk_notification_templates_jobs FOREIGN KEY ( id ) REFERENCES skyvault.jobs( template_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.jobs ADD CONSTRAINT fk_jobs_notification_templates FOREIGN KEY ( template_id ) REFERENCES skyvault.notification_templates( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.notification_types ADD CONSTRAINT fk_notification_types_notification_templates FOREIGN KEY ( id ) REFERENCES skyvault.notification_templates( notification_type ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.notification_templates ADD CONSTRAINT fk_notification_templates_notification_types FOREIGN KEY ( notification_type ) REFERENCES skyvault.notification_types( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.passports ADD CONSTRAINT fk_passports_customers FOREIGN KEY ( customer_id ) REFERENCES skyvault.customers( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.passports ADD CONSTRAINT fk_passports_customer_profiles FOREIGN KEY ( customer_profile_id ) REFERENCES skyvault.customer_profiles( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.salutations ADD CONSTRAINT fk_salutations_customers FOREIGN KEY ( id ) REFERENCES skyvault.customers( salutation_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.customer_profiles ADD CONSTRAINT fk_customer_profiles_salutations FOREIGN KEY ( salutation_id ) REFERENCES skyvault.salutations( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.system_users ADD CONSTRAINT fk_system_users_customers FOREIGN KEY ( id ) REFERENCES skyvault.customers( system_user_id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.customer_profiles ADD CONSTRAINT fk_customer_profiles_system_users FOREIGN KEY ( system_user_id ) REFERENCES skyvault.system_users( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE skyvault.visas ADD CONSTRAINT fk_visas_passports FOREIGN KEY ( passport_id ) REFERENCES skyvault.passports( id ) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE skyvault.visas ADD CONSTRAINT fk_visas_passports FOREIGN KEY ( passport_id ) REFERENCES skyvault.passports( id ) ON DELETE RESTRICT ON UPDATE RESTRICT;
