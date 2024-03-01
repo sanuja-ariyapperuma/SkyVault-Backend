@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Logging;
+using SkyVault.Exceptions;
 using SkyVault.WebApp.Proxies;
 
 const string fallbackBaseUri = "https://localhost/api";
@@ -52,5 +53,7 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
+
+SkyExceptionHandler.Initialize();
 
 app.Run();
