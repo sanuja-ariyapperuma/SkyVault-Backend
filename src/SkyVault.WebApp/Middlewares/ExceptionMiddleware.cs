@@ -1,7 +1,5 @@
 using System.Net;
-using Newtonsoft.Json;
 using SkyVault.Exceptions;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SkyVault.WebApp.Middlewares;
 
