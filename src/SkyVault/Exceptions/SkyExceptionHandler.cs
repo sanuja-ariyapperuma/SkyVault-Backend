@@ -1,5 +1,6 @@
 namespace SkyVault.Exceptions;
 
+//Written for my reference and this class should be used for console applications
 public static class SkyExceptionHandler
 {
     public static void Initialize()
@@ -11,6 +12,6 @@ public static class SkyExceptionHandler
     {
         if (e.ExceptionObject is not Exception exception) return;
         
-        exception.SendToLog();
+        exception.LogException();
     }
 }

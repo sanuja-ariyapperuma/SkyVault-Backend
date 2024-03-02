@@ -10,9 +10,11 @@ public static class SkyExceptionExtension
         return _telemetryClient ??= new object();
     }
 
-    public static void SendToLog(this Exception exception)
+    public static string LogException(this Exception exception)
     {
         //Need to implement connectivity to Azure Application Insights for central log management
         Console.WriteLine(exception.Message);
+
+        return "<trace id>";
     }
 }
