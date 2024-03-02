@@ -4,7 +4,7 @@ using SkyVault.WebApp.Models;
 
 namespace SkyVault.WebApp.Pages
 {
-    internal class ClaimsPageModel() : PageModel
+    public class ClaimsPageModel() : PageModel
     {
         public void OnGet()
         {

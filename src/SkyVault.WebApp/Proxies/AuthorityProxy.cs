@@ -3,7 +3,7 @@ using SkyVault.Payloads.ResponsePayloads;
 
 namespace SkyVault.WebApp.Proxies;
 
-internal sealed class AuthorityProxy(HttpClient httpClient)
+public sealed class AuthorityProxy(HttpClient httpClient)
 {
     public async Task<WelcomeUserResponse?> GetUserInfo(ValidateUserRequest validateUserRequest)
     {

@@ -1,6 +1,6 @@
 namespace SkyVault.WebApp.Models;
 
-internal sealed record SkyVaultUser(
+public sealed record SkyVaultUser(
     string? Upn, 
     string? FirstName, 
     string? LastName, 
