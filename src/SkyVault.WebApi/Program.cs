@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SkyVault.WebApi.Authentication;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
+using SkyVault.WebApi.Middlewares;
 
 namespace SkyVault.WebApi;
 
@@ -21,7 +22,7 @@ public class Program
         app.MapLoginEndpoints();
         app.MapCustomerEndpoints();
         app.MapHealthChecks("health");
-
+        app.UseMiddleware<ExceptionMiddleware>();
         app.Run();
     }
 }
