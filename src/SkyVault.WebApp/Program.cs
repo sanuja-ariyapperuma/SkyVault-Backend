@@ -23,7 +23,23 @@ builder.Services.AddAuthentication(azureOptions =>
         azureOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         azureOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     })
-    .AddCookie().AddOpenIdConnect(options => builder.Configuration.Bind("AzureAD", options));
+    .AddCookie().AddOpenIdConnect(options =>
+    {
+        builder.Configuration.Bind("AzureAD", options);
+        options.Events = new OpenIdConnectEvents
+        {
+            OnRedirectToIdentityProvider = context =>
+            {
+                if (context.HttpContext.User.Identity == null || context.HttpContext.User.Identity.IsAuthenticated)
+                    return Task.CompletedTask;
+                
+                context.Response.Redirect("/login");
+                context.HandleResponse();
+
+                return Task.CompletedTask;
+            }
+        };
+    });
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20);
