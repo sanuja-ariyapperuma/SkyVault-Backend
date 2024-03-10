@@ -25,7 +25,7 @@ public class ExceptionMiddleware(RequestDelegate next)
         context.Response.ContentType = "text/plain";
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        return context.Response.WriteAsync("An expected exception had occured. " +
+        return context.Response.WriteAsync("An unexpected exception had occured. " +
                                            "Details of the exception has been sent to the developers for further investigation.");
     }
     
