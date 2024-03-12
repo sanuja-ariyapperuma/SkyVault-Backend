@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Logging;
-using SkyVault.Exceptions;
 using SkyVault.WebApp.Middlewares;
+using SkyVault.WebApp.Pages;
 using SkyVault.WebApp.Proxies;
 
 const string fallbackBaseUri = "https://localhost/api";
@@ -32,6 +32,8 @@ builder.Services.AddAuthentication(azureOptions =>
             {
                 if (context.HttpContext.User.Identity == null || context.HttpContext.User.Identity.IsAuthenticated)
                     return Task.CompletedTask;
+
+                if (LoginModel.RedirectToSso == true) return Task.CompletedTask;
                 
                 context.Response.Redirect("/login");
                 context.HandleResponse();
