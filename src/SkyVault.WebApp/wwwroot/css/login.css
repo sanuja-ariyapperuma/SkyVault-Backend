@@ -1,0 +1,46 @@
+﻿body {
+    font-family: Inter, 'Source Sans Pro';
+    font-size: 16px;
+}
+.container {
+    max-width: 700px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    
+}
+.loginbackground{
+    margin-top: -150px;
+    opacity: 0.7;
+}
+.logocontainer {
+    margin-top: -200px; 
+}
+.logindescriptionarea {
+    text-align: center;
+}
+.linecontainer {
+    margin-right: 1rem;
+    width: 0.1rem;
+    height: 2rem;
+    background-color: #ffffff;
+    flex-shrink: 0;
+}
+.loginbtn {
+    display: flex;
+    align-items: center;
+    background-color: #DB3B01;
+    font-size: 1rem;
+    color: #ffffff;
+}
+.loginbtn:hover {
+    color: #ffffff;
+    background-color: #C04100;
+}
+.o365logo{
+    width: 20px;
+    margin-right: 10px;
+}
