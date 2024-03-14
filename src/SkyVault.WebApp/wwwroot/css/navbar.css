@@ -1,0 +1,139 @@
+﻿.navbarcontainer {
+    height: 100vh;
+    width: 300px;
+    margin-right: 2.6rem;
+    position: relative;
+    flex-shrink: 0;
+}
+.navbarcard {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    left: 0;
+    top: 0;
+    /*align-items: center;*/
+    padding-left: 17px;
+    padding-right: 17px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1rem 0 3.47rem rgba(0, 0, 0, 0.1000000015);
+    background-color: #ffffff;
+    border-radius: 0 3rem 3rem 0;
+}
+.navbarlogocontainer {
+    margin-top: 2rem;
+    width: calc(100% - 2.5rem);
+    height: 7.2rem;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+.navbarlogo {
+    width: 7rem;
+    object-fit: cover;
+    vertical-align: top;
+    flex-shrink: 0;
+}
+.navbarbranding {
+    margin-left: 1rem;
+    height: calc(100% - 3.5rem);
+    position: relative;
+    flex-shrink: 0;
+}
+.brandtitle {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #000000;
+    font-family: Inter, 'Source Sans Pro';
+    white-space: nowrap;
+}
+.versionnumber {
+    position: absolute;
+    left: 0;
+    top: 2rem;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #717171;
+    font-family: Inter, 'Source Sans Pro';
+    white-space: nowrap;
+}
+.navbarhr {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    height: 0.05rem;
+    background-color: #dbdbdb;
+    flex-shrink: 0;
+}
+nav ul{
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+    
+}
+nav ul ul{
+    padding-left: 1rem;
+}
+nav a {
+    display: block;
+    text-decoration: none;
+    color: #444444;
+    box-sizing: border-box;
+    padding: 0.5rem;
+    font-family: Inter, 'Source Sans Pro';
+    border-radius: 10px;
+    font-weight: 500;
+    width: 100%;
+    margin-bottom: 20px;
+}
+nav a.active {
+    color: #ffffff;
+    background-color: #08577e;
+    border-radius: 10px;
+    padding: 0.7rem 1.6rem;
+}
+    nav a:hover {
+        color: #ffffff;
+        background-color: #08577e;
+        border-radius: 10px;
+        padding: 0.7rem 1.6rem;
+    }
+nav #profilemanagement.active .navitemicon,
+nav #profilemanagement:hover .navitemicon {
+    content: url('/img/icons/pf_icon_active.png');
+}
+nav #notifications.active .navitemicon,
+nav #notifications:hover .navitemicon {
+    content: url('/img/icons/pf_icon_active.png'); /*Todo: add white icon here*/
+}
+nav #birthdayntf.active .navitemicon,
+nav #birthdayntf:hover .navitemicon {
+    content: url('/img/icons/bd_icon_active.png'); 
+}
+nav #passportexpntf.active .navitemicon,
+nav #passportexpntf:hover .navitemicon {
+    content: url('/img/icons/psprt_icon_active.png');
+}
+nav #visaexpntf.active .navitemicon,
+nav #visaexpntf:hover .navitemicon {
+    content: url('/img/icons/visa_icon_active.png');
+}
+nav #sendntf.active .navitemicon,
+nav #sendntf:hover .navitemicon {
+    content: url('/img/icons/sendnoti_icon_active.png');
+}
+nav #histntf.active .navitemicon,
+nav #histntf:hover .navitemicon {
+    content: url('/img/icons/hstry_icon_active.png');
+}
+.navitemicon {
+    width: 30px;
+    margin-right: 5px;
+}
+
+
+
+
+
