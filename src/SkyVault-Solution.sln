@@ -1,10 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyVault.WebApp", "SkyVault.WebApp\SkyVault.WebApp.csproj", "{D4F6BF6C-F6AB-4564-8A0D-C6CBFA4D7A6B}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyVault.WebApp", "SkyVault.WebApp\SkyVault.WebApp.csproj", "{D4F6BF6C-F6AB-4564-8A0D-C6CBFA4D7A6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyVault", "SkyVault\SkyVault.csproj", "{A79CF2C0-E3AF-4C59-A46F-66F92505CC41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyVault", "SkyVault\SkyVault.csproj", "{A79CF2C0-E3AF-4C59-A46F-66F92505CC41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyVault.WebApi", "SkyVault.WebApi\SkyVault.WebApi.csproj", "{92B6E0AE-AA43-41D8-BF81-0F3D7AF2101F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyVault.WebApi", "SkyVault.WebApi\SkyVault.WebApi.csproj", "{92B6E0AE-AA43-41D8-BF81-0F3D7AF2101F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +27,8 @@ Global
 		{92B6E0AE-AA43-41D8-BF81-0F3D7AF2101F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92B6E0AE-AA43-41D8-BF81-0F3D7AF2101F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92B6E0AE-AA43-41D8-BF81-0F3D7AF2101F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

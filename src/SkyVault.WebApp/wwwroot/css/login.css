@@ -4,7 +4,6 @@
 }
 .container {
     max-width: 700px;
-    margin: auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,11 +12,7 @@
     
 }
 .loginbackground{
-    margin-top: -150px;
     opacity: 0.7;
-}
-.logocontainer {
-    margin-top: -200px; 
 }
 .logindescriptionarea {
     text-align: center;
