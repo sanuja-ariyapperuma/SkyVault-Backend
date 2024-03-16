@@ -16,11 +16,11 @@
             <div class="navbarcontainer">
                 <div class="navbarcard">
                     <div class="navbarlogocontainer">
-                    <img class="navbarlogo" src="~/img/brand_logo.png" alt="logo" />
-                    <div class="navbarbranding">
-                        <p class="brandtitle">Sky Vault</p>
-                        <p class="versionnumber">v1.0.0</p>
-                    </div>
+                        <img class="navbarlogo" src="~/img/brand_logo.png" alt="logo" />
+                        <div class="navbarbranding">
+                            <p class="brandtitle">Sky Vault</p>
+                            <p class="versionnumber">v1.0.0</p>
+                        </div>
                     </div>
                     <div class="navbarhr"></div>
                     <nav>
@@ -31,13 +31,14 @@
                                     Profile Management
                                 </a>
                             </li>
-                            <li>
+                            @* following lines for on phase 2 *@
+                            @* <li>
                                 <a href="#" id="notifications">
                                     <img class="navitemicon" src="~/img/icons/noti_icon.png" alt="notification icon" />
                                     Notifications
                                 </a>
                             </li>
-                        <li>
+                            <li>
                                 <ul>
                                     <li>
                                     <a href="#" id="birthdayntf">
@@ -78,9 +79,24 @@
                                 Transfer Profiles
                             </a>
                                 
-                           </li>
+                           </li> *@
                         </ul>
                     </nav>
+                <div class="navbarhr"></div>
+                <div class="userprofilecontainer">
+                    <div>
+                        <img class="userlogo" src="~/img/icons/default_profile_icon.png" alt="profile logo" />
+                    </div>
+                    <div class="userdetail">
+                        <div>
+                            <p class="username">John Doe</p>
+                        </div>
+                        <div>
+                            <p class="userrole">Super Admin</p>
+                        </div>
+                        
+                    </div>
+                </div>
                 </div>
             </div>
             <div class="contentcontainer">
