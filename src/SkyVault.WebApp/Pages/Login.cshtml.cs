@@ -20,7 +20,6 @@ namespace SkyVault.WebApp.Pages
             LoginModel.RedirectToSso = true;
             
             return Challenge(new AuthenticationProperties { RedirectUri = "/" });
-        } 
-            
+        }
     }
 }

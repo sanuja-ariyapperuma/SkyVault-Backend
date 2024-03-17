@@ -1,10 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SkyVault.Payloads.RequestPayloads;
-using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApp.Models;
 using SkyVault.WebApp.Proxies;
 
@@ -32,9 +30,12 @@ namespace SkyVault.WebApp.Pages
                 claimDictionary.GetValueOrDefault(ClaimTypes.Email),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Name),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Surname),
-                claimDictionary.GetValueOrDefault(ClaimTypes.Email));
+                claimDictionary.GetValueOrDefault(ClaimTypes.Email),
+                claimDictionary.GetValueOrDefault(SkyVaultConfigurationKeys.SkyVaultUserRoleClaimKey));
            
-            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, skyUser.LastName, skyUser.Email);
+            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
+                skyUser.LastName, skyUser.Email, skyUser.Role);
+            
             var welcomeUser = authorityProxy.GetUserInfo(userRequest).Result ??
                               throw new ArgumentNullException("authorityProxy.GetUserInfo(userRequest).Result");
 
@@ -42,6 +43,10 @@ namespace SkyVault.WebApp.Pages
             base.Upn = welcomeUser.Upn;
             base.FullName = welcomeUser.FullName;
             base.Email = welcomeUser.Email;
+            base.Role = welcomeUser.Role;
+            
+            //Get menus as per the assigned role.
+            ViewData["UserMenus"] = authorityProxy.GetMenus(Role);
         }
 
         public RedirectResult OnGetSignOut()

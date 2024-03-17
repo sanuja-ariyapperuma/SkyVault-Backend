@@ -1,0 +1,35 @@
+﻿@using SkyVault.WebApp.Models
+@{
+}
+<nav>
+    <ul>
+        @foreach (var parent in (ViewBag.UserMenus as IEnumerable<SkyVaultMenuItem>)!)
+        {
+            if (parent.Children == null)
+            {
+                <li>
+                    <a href="@parent.MenuUri" class="active">
+                        <img class="navitemicon" src="@parent.MenuIconUri" alt="@parent.MenuName"/>
+                        @parent.MenuName
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <ul>
+                        @foreach (var child in parent.Children)
+                        {
+                            <li>
+                                <a href="@child.MenuUri" class="active">
+                                    <img class="navitemicon" src="@child.MenuIconUri" alt="@child.MenuName"/>
+                                    @child.MenuName
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        }
+    </ul>
+</nav>
