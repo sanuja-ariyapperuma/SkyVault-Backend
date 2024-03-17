@@ -14,10 +14,12 @@ namespace SkyVault.WebApp.Pages
                 claimDictionary.GetValueOrDefault(ClaimTypes.Upn),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Name),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Surname),
-                claimDictionary.GetValueOrDefault(ClaimTypes.Email));
+                claimDictionary.GetValueOrDefault(ClaimTypes.Email),
+                claimDictionary.GetValueOrDefault(SkyVaultConfigurationKeys.SkyVaultUserRoleClaimKey));
 
-            if (SkyUser.Upn == null || SkyUser.FirstName == null || SkyUser.LastName == null || SkyUser.Email == null) return;
-            
+            if (SkyUser.Upn == null || SkyUser.FirstName == null || SkyUser.LastName == null ||
+                SkyUser.Email == null) return;
+
             HttpContext.Session.SetString(StateKeys.ClaimsCheckSessionKey, "true");
             HttpContext.Response.Redirect("index", true);
         }

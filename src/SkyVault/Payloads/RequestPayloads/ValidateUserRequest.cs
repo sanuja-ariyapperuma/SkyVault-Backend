@@ -5,4 +5,5 @@ public sealed record ValidateUserRequest(
     string? Upn, 
     string? FirstName,
     string? LastName,
-    string? Email);
+    string? Email,
+    string? Role);
