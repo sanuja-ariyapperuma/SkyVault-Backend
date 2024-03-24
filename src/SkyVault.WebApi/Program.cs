@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SkyVault.WebApi.Authentication;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
+using SkyVault.WebApi.MappingProfiles;
 using SkyVault.WebApi.Middlewares;
 
 namespace SkyVault.WebApi;
@@ -16,6 +17,7 @@ public class Program
         {
             options.UseMySql(builder.Configuration.GetConnectionString("MySQLConnection"), new MySqlServerVersion(new Version(8, 0)));
         });
+        builder.Services.AddAutoMapper(typeof(Program).Assembly,typeof(MappingProfile).Assembly);
 
         var app = builder.Build();
         app.UseMiddleware<BasicAuthMiddleware>();

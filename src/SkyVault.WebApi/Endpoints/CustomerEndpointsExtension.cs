@@ -6,5 +6,9 @@ internal static class CustomerEndpointExtension
     {
         app.MapGet("/c-check", () => Task.FromResult("Health Check!"))
             .Produces(StatusCodes.Status200OK);
+
+        app.MapGet("/profilepage-commondata", Workloads.CustomWorkload.GetProfilePageDefinitionData)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
     }
 }
