@@ -68,971 +68,1309 @@ namespace SkyVault.WebApi.Migrations
                         new
                         {
                             Id = 1,
+                            CountryCode = "AFG",
                             CountryName = "Afghanistan"
                         },
                         new
                         {
                             Id = 2,
+                            CountryCode = "ALA",
                             CountryName = "Albania"
                         },
                         new
                         {
                             Id = 3,
+                            CountryCode = "ALB",
                             CountryName = "Algeria"
                         },
                         new
                         {
                             Id = 4,
+                            CountryCode = "AND",
                             CountryName = "Andorra"
                         },
                         new
                         {
                             Id = 5,
+                            CountryCode = "AGO",
                             CountryName = "Angola"
                         },
                         new
                         {
                             Id = 6,
-                            CountryName = "Antigua and Barbuda"
+                            CountryCode = "AIA",
+                            CountryName = "Anguilla"
                         },
                         new
                         {
                             Id = 7,
-                            CountryName = "Argentina"
+                            CountryCode = "ATA",
+                            CountryName = "Antarctica"
                         },
                         new
                         {
                             Id = 8,
-                            CountryName = "Armenia"
+                            CountryCode = "ATG",
+                            CountryName = "Antigua and Barbuda"
                         },
                         new
                         {
                             Id = 9,
-                            CountryName = "Australia"
+                            CountryCode = "ARG",
+                            CountryName = "Argentina"
                         },
                         new
                         {
                             Id = 10,
-                            CountryName = "Austria"
+                            CountryCode = "ARM",
+                            CountryName = "Armenia"
                         },
                         new
                         {
                             Id = 11,
-                            CountryName = "Azerbaijan"
+                            CountryCode = "ABW",
+                            CountryName = "Aruba"
                         },
                         new
                         {
                             Id = 12,
-                            CountryName = "Bahamas"
+                            CountryCode = "AUS",
+                            CountryName = "Australia"
                         },
                         new
                         {
                             Id = 13,
-                            CountryName = "Bahrain"
+                            CountryCode = "AUT",
+                            CountryName = "Austria"
                         },
                         new
                         {
                             Id = 14,
-                            CountryName = "Bangladesh"
+                            CountryCode = "AZE",
+                            CountryName = "Azerbaijan"
                         },
                         new
                         {
                             Id = 15,
-                            CountryName = "Barbados"
+                            CountryCode = "BHS",
+                            CountryName = "Bahamas"
                         },
                         new
                         {
                             Id = 16,
-                            CountryName = "Belarus"
+                            CountryCode = "BHR",
+                            CountryName = "Bahrain"
                         },
                         new
                         {
                             Id = 17,
-                            CountryName = "Belgium"
+                            CountryCode = "BGD",
+                            CountryName = "Bangladesh"
                         },
                         new
                         {
                             Id = 18,
-                            CountryName = "Belize"
+                            CountryCode = "BRB",
+                            CountryName = "Barbados"
                         },
                         new
                         {
                             Id = 19,
-                            CountryName = "Benin"
+                            CountryCode = "BLR",
+                            CountryName = "Belarus"
                         },
                         new
                         {
                             Id = 20,
-                            CountryName = "Bhutan"
+                            CountryCode = "BEL",
+                            CountryName = "Belgium"
                         },
                         new
                         {
                             Id = 21,
-                            CountryName = "Bolivia"
+                            CountryCode = "BLZ",
+                            CountryName = "Belize"
                         },
                         new
                         {
                             Id = 22,
-                            CountryName = "Bosnia and Herzegovina"
+                            CountryCode = "BEN",
+                            CountryName = "Benin"
                         },
                         new
                         {
                             Id = 23,
-                            CountryName = "Botswana"
+                            CountryCode = "BMU",
+                            CountryName = "Bermuda"
                         },
                         new
                         {
                             Id = 24,
-                            CountryName = "Brazil"
+                            CountryCode = "BTN",
+                            CountryName = "Bhutan"
                         },
                         new
                         {
                             Id = 25,
-                            CountryName = "Brunei"
+                            CountryCode = "BOL",
+                            CountryName = "Bolivia"
                         },
                         new
                         {
                             Id = 26,
-                            CountryName = "Bulgaria"
+                            CountryCode = "BES",
+                            CountryName = "Bonaire, Sint Eustatius and Saba"
                         },
                         new
                         {
                             Id = 27,
-                            CountryName = "Burkina Faso"
+                            CountryCode = "BIH",
+                            CountryName = "Bosnia and Herzegovina"
                         },
                         new
                         {
                             Id = 28,
-                            CountryName = "Burundi"
+                            CountryCode = "BWA",
+                            CountryName = "Botswana"
                         },
                         new
                         {
                             Id = 29,
-                            CountryName = "Cabo Verde"
+                            CountryCode = "BVT",
+                            CountryName = "Bouvet Island"
                         },
                         new
                         {
                             Id = 30,
-                            CountryName = "Cambodia"
+                            CountryCode = "BRA",
+                            CountryName = "Brazil"
                         },
                         new
                         {
                             Id = 31,
-                            CountryName = "Cameroon"
+                            CountryCode = "IOT",
+                            CountryName = "British Indian Ocean Territory"
                         },
                         new
                         {
                             Id = 32,
-                            CountryName = "Canada"
+                            CountryCode = "BRN",
+                            CountryName = "Brunei Darussalam"
                         },
                         new
                         {
                             Id = 33,
-                            CountryName = "Central African Republic"
+                            CountryCode = "BGR",
+                            CountryName = "Bulgaria"
                         },
                         new
                         {
                             Id = 34,
-                            CountryName = "Chad"
+                            CountryCode = "BFA",
+                            CountryName = "Burkina Faso"
                         },
                         new
                         {
                             Id = 35,
-                            CountryName = "Chile"
+                            CountryCode = "BDI",
+                            CountryName = "Burundi"
                         },
                         new
                         {
                             Id = 36,
-                            CountryName = "China"
+                            CountryCode = "CPV",
+                            CountryName = "Cabo Verde"
                         },
                         new
                         {
                             Id = 37,
-                            CountryName = "Colombia"
+                            CountryCode = "KHM",
+                            CountryName = "Cambodia"
                         },
                         new
                         {
                             Id = 38,
-                            CountryName = "Comoros"
+                            CountryCode = "CMR",
+                            CountryName = "Cameroon"
                         },
                         new
                         {
                             Id = 39,
-                            CountryName = "Congo (Congo-Brazzaville)"
+                            CountryCode = "CAN",
+                            CountryName = "Canada"
                         },
                         new
                         {
                             Id = 40,
-                            CountryName = "Costa Rica"
+                            CountryCode = "CYM",
+                            CountryName = "Cayman Islands"
                         },
                         new
                         {
                             Id = 41,
-                            CountryName = "Croatia"
+                            CountryCode = "CAF",
+                            CountryName = "Central African Republic"
                         },
                         new
                         {
                             Id = 42,
-                            CountryName = "Cuba"
+                            CountryCode = "TCD",
+                            CountryName = "Chad"
                         },
                         new
                         {
                             Id = 43,
-                            CountryName = "Cyprus"
+                            CountryCode = "CHL",
+                            CountryName = "Chile"
                         },
                         new
                         {
                             Id = 44,
-                            CountryName = "Czechia (Czech Republic)"
+                            CountryCode = "CHN",
+                            CountryName = "China"
                         },
                         new
                         {
                             Id = 45,
-                            CountryName = "Democratic Republic of the Congo"
+                            CountryCode = "CXR",
+                            CountryName = "Christmas Island"
                         },
                         new
                         {
                             Id = 46,
-                            CountryName = "Denmark"
+                            CountryCode = "CCK",
+                            CountryName = "Cocos (Keeling) Islands"
                         },
                         new
                         {
                             Id = 47,
-                            CountryName = "Djibouti"
+                            CountryCode = "COL",
+                            CountryName = "Colombia"
                         },
                         new
                         {
                             Id = 48,
-                            CountryName = "Dominica"
+                            CountryCode = "COM",
+                            CountryName = "Comoros"
                         },
                         new
                         {
                             Id = 49,
-                            CountryName = "Dominican Republic"
+                            CountryCode = "COG",
+                            CountryName = "Congo"
                         },
                         new
                         {
                             Id = 50,
-                            CountryName = "Ecuador"
+                            CountryCode = "COD",
+                            CountryName = "Congo, Democratic Republic of the"
                         },
                         new
                         {
                             Id = 51,
-                            CountryName = "Egypt"
+                            CountryCode = "COK",
+                            CountryName = "Cook Islands"
                         },
                         new
                         {
                             Id = 52,
-                            CountryName = "El Salvador"
+                            CountryCode = "CRI",
+                            CountryName = "Costa Rica"
                         },
                         new
                         {
                             Id = 53,
-                            CountryName = "Equatorial Guinea"
+                            CountryCode = "HRV",
+                            CountryName = "Croatia"
                         },
                         new
                         {
                             Id = 54,
-                            CountryName = "Eritrea"
+                            CountryCode = "CUB",
+                            CountryName = "Cuba"
                         },
                         new
                         {
                             Id = 55,
-                            CountryName = "Estonia"
+                            CountryCode = "CUW",
+                            CountryName = "Curaçao"
                         },
                         new
                         {
                             Id = 56,
-                            CountryName = "Swaziland"
+                            CountryCode = "CYP",
+                            CountryName = "Cyprus"
                         },
                         new
                         {
                             Id = 57,
-                            CountryName = "Ethiopia"
+                            CountryCode = "CZE",
+                            CountryName = "Czech Republic"
                         },
                         new
                         {
                             Id = 58,
-                            CountryName = "Fiji"
+                            CountryCode = "DNK",
+                            CountryName = "Denmark"
                         },
                         new
                         {
                             Id = 59,
-                            CountryName = "Finland"
+                            CountryCode = "DJI",
+                            CountryName = "Djibouti"
                         },
                         new
                         {
                             Id = 60,
-                            CountryName = "France"
+                            CountryCode = "DMA",
+                            CountryName = "Dominica"
                         },
                         new
                         {
                             Id = 61,
-                            CountryName = "Gabon"
+                            CountryCode = "DOM",
+                            CountryName = "Dominican Republic"
                         },
                         new
                         {
                             Id = 62,
-                            CountryName = "Gambia"
+                            CountryCode = "ECU",
+                            CountryName = "Ecuador"
                         },
                         new
                         {
                             Id = 63,
-                            CountryName = "Georgia"
+                            CountryCode = "EGY",
+                            CountryName = "Egypt"
                         },
                         new
                         {
                             Id = 64,
-                            CountryName = "Germany"
+                            CountryCode = "SLV",
+                            CountryName = "El Salvador"
                         },
                         new
                         {
                             Id = 65,
-                            CountryName = "Ghana"
+                            CountryCode = "GNQ",
+                            CountryName = "Equatorial Guinea"
                         },
                         new
                         {
                             Id = 66,
-                            CountryName = "Greece"
+                            CountryCode = "ERI",
+                            CountryName = "Eritrea"
                         },
                         new
                         {
                             Id = 67,
-                            CountryName = "Grenada"
+                            CountryCode = "EST",
+                            CountryName = "Estonia"
                         },
                         new
                         {
                             Id = 68,
-                            CountryName = "Guatemala"
+                            CountryCode = "SWZ",
+                            CountryName = "Eswatini"
                         },
                         new
                         {
                             Id = 69,
-                            CountryName = "Guinea"
+                            CountryCode = "ETH",
+                            CountryName = "Ethiopia"
                         },
                         new
                         {
                             Id = 70,
-                            CountryName = "Guinea-Bissau"
+                            CountryCode = "FLK",
+                            CountryName = "Falkland Islands (Malvinas)"
                         },
                         new
                         {
                             Id = 71,
-                            CountryName = "Guyana"
+                            CountryCode = "FRO",
+                            CountryName = "Faroe Islands"
                         },
                         new
                         {
                             Id = 72,
-                            CountryName = "Haiti"
+                            CountryCode = "FJI",
+                            CountryName = "Fiji"
                         },
                         new
                         {
                             Id = 73,
-                            CountryName = "Holy See"
+                            CountryCode = "FIN",
+                            CountryName = "Finland"
                         },
                         new
                         {
                             Id = 74,
-                            CountryName = "Honduras"
+                            CountryCode = "FRA",
+                            CountryName = "France"
                         },
                         new
                         {
                             Id = 75,
-                            CountryName = "Hungary"
+                            CountryCode = "GUF",
+                            CountryName = "French Guiana"
                         },
                         new
                         {
                             Id = 76,
-                            CountryName = "Iceland"
+                            CountryCode = "PYF",
+                            CountryName = "French Polynesia"
                         },
                         new
                         {
                             Id = 77,
-                            CountryName = "India"
+                            CountryCode = "ATF",
+                            CountryName = "French Southern Territories"
                         },
                         new
                         {
                             Id = 78,
-                            CountryName = "Indonesia"
+                            CountryCode = "GAB",
+                            CountryName = "Gabon"
                         },
                         new
                         {
                             Id = 79,
-                            CountryName = "Iran"
+                            CountryCode = "GMB",
+                            CountryName = "Gambia"
                         },
                         new
                         {
                             Id = 80,
-                            CountryName = "Iraq"
+                            CountryCode = "GEO",
+                            CountryName = "Georgia"
                         },
                         new
                         {
                             Id = 81,
-                            CountryName = "Ireland"
+                            CountryCode = "DEU",
+                            CountryName = "Germany"
                         },
                         new
                         {
                             Id = 82,
-                            CountryName = "Israel"
+                            CountryCode = "GHA",
+                            CountryName = "Ghana"
                         },
                         new
                         {
                             Id = 83,
-                            CountryName = "Italy"
+                            CountryCode = "GIB",
+                            CountryName = "Gibraltar"
                         },
                         new
                         {
                             Id = 84,
-                            CountryName = "Jamaica"
+                            CountryCode = "GRC",
+                            CountryName = "Greece"
                         },
                         new
                         {
                             Id = 85,
-                            CountryName = "Japan"
+                            CountryCode = "GRL",
+                            CountryName = "Greenland"
                         },
                         new
                         {
                             Id = 86,
-                            CountryName = "Jordan"
+                            CountryCode = "GRD",
+                            CountryName = "Grenada"
                         },
                         new
                         {
                             Id = 87,
-                            CountryName = "Kazakhstan"
+                            CountryCode = "GLP",
+                            CountryName = "Guadeloupe"
                         },
                         new
                         {
                             Id = 88,
-                            CountryName = "Kenya"
+                            CountryCode = "GUM",
+                            CountryName = "Guam"
                         },
                         new
                         {
                             Id = 89,
-                            CountryName = "Kiribati"
+                            CountryCode = "GTM",
+                            CountryName = "Guatemala"
                         },
                         new
                         {
                             Id = 90,
-                            CountryName = "Kuwait"
+                            CountryCode = "GGY",
+                            CountryName = "Guernsey"
                         },
                         new
                         {
                             Id = 91,
-                            CountryName = "Kyrgyzstan"
+                            CountryCode = "GIN",
+                            CountryName = "Guinea"
                         },
                         new
                         {
                             Id = 92,
-                            CountryName = "Laos"
+                            CountryCode = "GNB",
+                            CountryName = "Guinea-Bissau"
                         },
                         new
                         {
                             Id = 93,
-                            CountryName = "Latvia"
+                            CountryCode = "GUY",
+                            CountryName = "Guyana"
                         },
                         new
                         {
                             Id = 94,
-                            CountryName = "Lebanon"
+                            CountryCode = "HTI",
+                            CountryName = "Haiti"
                         },
                         new
                         {
                             Id = 95,
-                            CountryName = "Lesotho"
+                            CountryCode = "HMD",
+                            CountryName = "Heard Island and McDonald Islands"
                         },
                         new
                         {
                             Id = 96,
-                            CountryName = "Liberia"
+                            CountryCode = "VAT",
+                            CountryName = "Holy See"
                         },
                         new
                         {
                             Id = 97,
-                            CountryName = "Libya"
+                            CountryCode = "HND",
+                            CountryName = "Honduras"
                         },
                         new
                         {
                             Id = 98,
-                            CountryName = "Liechtenstein"
+                            CountryCode = "HKG",
+                            CountryName = "Hong Kong"
                         },
                         new
                         {
                             Id = 99,
-                            CountryName = "Lithuania"
+                            CountryCode = "HUN",
+                            CountryName = "Hungary"
                         },
                         new
                         {
                             Id = 100,
-                            CountryName = "Luxembourg"
+                            CountryCode = "ISL",
+                            CountryName = "Iceland"
                         },
                         new
                         {
                             Id = 101,
-                            CountryName = "Madagascar"
+                            CountryCode = "IND",
+                            CountryName = "India"
                         },
                         new
                         {
                             Id = 102,
-                            CountryName = "Malawi"
+                            CountryCode = "IDN",
+                            CountryName = "Indonesia"
                         },
                         new
                         {
                             Id = 103,
-                            CountryName = "Malaysia"
+                            CountryCode = "IRN",
+                            CountryName = "Iran"
                         },
                         new
                         {
                             Id = 104,
-                            CountryName = "Maldives"
+                            CountryCode = "IRQ",
+                            CountryName = "Iraq"
                         },
                         new
                         {
                             Id = 105,
-                            CountryName = "Mali"
+                            CountryCode = "IRL",
+                            CountryName = "Ireland"
                         },
                         new
                         {
                             Id = 106,
-                            CountryName = "Malta"
+                            CountryCode = "ISR",
+                            CountryName = "Israel"
                         },
                         new
                         {
                             Id = 107,
-                            CountryName = "Marshall Islands"
+                            CountryCode = "ITA",
+                            CountryName = "Italy"
                         },
                         new
                         {
                             Id = 108,
-                            CountryName = "Mauritania"
+                            CountryCode = "JAM",
+                            CountryName = "Jamaica"
                         },
                         new
                         {
                             Id = 109,
-                            CountryName = "Mauritius"
+                            CountryCode = "JPN",
+                            CountryName = "Japan"
                         },
                         new
                         {
                             Id = 110,
-                            CountryName = "Mexico"
+                            CountryCode = "JOR",
+                            CountryName = "Jordan"
                         },
                         new
                         {
                             Id = 111,
-                            CountryName = "Micronesia"
+                            CountryCode = "KAZ",
+                            CountryName = "Kazakhstan"
                         },
                         new
                         {
                             Id = 112,
-                            CountryName = "Moldova"
+                            CountryCode = "KEN",
+                            CountryName = "Kenya"
                         },
                         new
                         {
                             Id = 113,
-                            CountryName = "Monaco"
+                            CountryCode = "KIR",
+                            CountryName = "Kiribati"
                         },
                         new
                         {
                             Id = 114,
-                            CountryName = "Mongolia"
+                            CountryCode = "KWT",
+                            CountryName = "Kuwait"
                         },
                         new
                         {
                             Id = 115,
-                            CountryName = "Montenegro"
+                            CountryCode = "KGZ",
+                            CountryName = "Kyrgyzstan"
                         },
                         new
                         {
                             Id = 116,
-                            CountryName = "Morocco"
+                            CountryCode = "LAO",
+                            CountryName = "Laos"
                         },
                         new
                         {
                             Id = 117,
-                            CountryName = "Mozambique"
+                            CountryCode = "LVA",
+                            CountryName = "Latvia"
                         },
                         new
                         {
                             Id = 118,
-                            CountryName = "Myanmar"
+                            CountryCode = "LBN",
+                            CountryName = "Lebanon"
                         },
                         new
                         {
                             Id = 119,
-                            CountryName = "Namibia"
+                            CountryCode = "LSO",
+                            CountryName = "Lesotho"
                         },
                         new
                         {
                             Id = 120,
-                            CountryName = "Nauru"
+                            CountryCode = "LBR",
+                            CountryName = "Liberia"
                         },
                         new
                         {
                             Id = 121,
-                            CountryName = "Nepal"
+                            CountryCode = "LBY",
+                            CountryName = "Libya"
                         },
                         new
                         {
                             Id = 122,
-                            CountryName = "Netherlands"
+                            CountryCode = "LIE",
+                            CountryName = "Liechtenstein"
                         },
                         new
                         {
                             Id = 123,
-                            CountryName = "New Zealand"
+                            CountryCode = "LTU",
+                            CountryName = "Lithuania"
                         },
                         new
                         {
                             Id = 124,
-                            CountryName = "Nicaragua"
+                            CountryCode = "LUX",
+                            CountryName = "Luxembourg"
                         },
                         new
                         {
                             Id = 125,
-                            CountryName = "Niger"
+                            CountryCode = "MDG",
+                            CountryName = "Madagascar"
                         },
                         new
                         {
                             Id = 126,
-                            CountryName = "Nigeria"
+                            CountryCode = "MWI",
+                            CountryName = "Malawi"
                         },
                         new
                         {
                             Id = 127,
-                            CountryName = "North Korea"
+                            CountryCode = "MYS",
+                            CountryName = "Malaysia"
                         },
                         new
                         {
                             Id = 128,
-                            CountryName = "North Macedonia"
+                            CountryCode = "MDV",
+                            CountryName = "Maldives"
                         },
                         new
                         {
                             Id = 129,
-                            CountryName = "Norway"
+                            CountryCode = "MLI",
+                            CountryName = "Mali"
                         },
                         new
                         {
                             Id = 130,
-                            CountryName = "Oman"
+                            CountryCode = "MLT",
+                            CountryName = "Malta"
                         },
                         new
                         {
                             Id = 131,
-                            CountryName = "Pakistan"
+                            CountryCode = "MHL",
+                            CountryName = "Marshall Islands"
                         },
                         new
                         {
                             Id = 132,
-                            CountryName = "Palau"
+                            CountryCode = "MRT",
+                            CountryName = "Mauritania"
                         },
                         new
                         {
                             Id = 133,
-                            CountryName = "Palestine State"
+                            CountryCode = "MUS",
+                            CountryName = "Mauritius"
                         },
                         new
                         {
                             Id = 134,
-                            CountryName = "Panama"
+                            CountryCode = "MEX",
+                            CountryName = "Mexico"
                         },
                         new
                         {
                             Id = 135,
-                            CountryName = "Papua New Guinea"
+                            CountryCode = "FSM",
+                            CountryName = "Micronesia"
                         },
                         new
                         {
                             Id = 136,
-                            CountryName = "Paraguay"
+                            CountryCode = "MDA",
+                            CountryName = "Moldova"
                         },
                         new
                         {
                             Id = 137,
-                            CountryName = "Peru"
+                            CountryCode = "MCO",
+                            CountryName = "Monaco"
                         },
                         new
                         {
                             Id = 138,
-                            CountryName = "Philippines"
+                            CountryCode = "MNG",
+                            CountryName = "Mongolia"
                         },
                         new
                         {
                             Id = 139,
-                            CountryName = "Poland"
+                            CountryCode = "MNE",
+                            CountryName = "Montenegro"
                         },
                         new
                         {
                             Id = 140,
-                            CountryName = "Portugal"
+                            CountryCode = "MAR",
+                            CountryName = "Morocco"
                         },
                         new
                         {
                             Id = 141,
-                            CountryName = "Qatar"
+                            CountryCode = "MOZ",
+                            CountryName = "Mozambique"
                         },
                         new
                         {
                             Id = 142,
-                            CountryName = "Romania"
+                            CountryCode = "MMR",
+                            CountryName = "Myanmar"
                         },
                         new
                         {
                             Id = 143,
-                            CountryName = "Russia"
+                            CountryCode = "NAM",
+                            CountryName = "Namibia"
                         },
                         new
                         {
                             Id = 144,
-                            CountryName = "Rwanda"
+                            CountryCode = "NRU",
+                            CountryName = "Nauru"
                         },
                         new
                         {
                             Id = 145,
-                            CountryName = "Saint Kitts and Nevis"
+                            CountryCode = "NPL",
+                            CountryName = "Nepal"
                         },
                         new
                         {
                             Id = 146,
-                            CountryName = "Saint Lucia"
+                            CountryCode = "NLD",
+                            CountryName = "Netherlands"
                         },
                         new
                         {
                             Id = 147,
-                            CountryName = "Saint Vincent and the Grenadines"
+                            CountryCode = "NZL",
+                            CountryName = "New Zealand"
                         },
                         new
                         {
                             Id = 148,
-                            CountryName = "Samoa"
+                            CountryCode = "NIC",
+                            CountryName = "Nicaragua"
                         },
                         new
                         {
                             Id = 149,
-                            CountryName = "San Marino"
+                            CountryCode = "NER",
+                            CountryName = "Niger"
                         },
                         new
                         {
                             Id = 150,
-                            CountryName = "Sao Tome and Principe"
+                            CountryCode = "NGA",
+                            CountryName = "Nigeria"
                         },
                         new
                         {
                             Id = 151,
-                            CountryName = "Saudi Arabia"
+                            CountryCode = "PRK",
+                            CountryName = "North Korea"
                         },
                         new
                         {
                             Id = 152,
-                            CountryName = "Senegal"
+                            CountryCode = "MKD",
+                            CountryName = "North Macedonia"
                         },
                         new
                         {
                             Id = 153,
-                            CountryName = "Serbia"
+                            CountryCode = "NOR",
+                            CountryName = "Norway"
                         },
                         new
                         {
                             Id = 154,
-                            CountryName = "Seychelles"
+                            CountryCode = "OMN",
+                            CountryName = "Oman"
                         },
                         new
                         {
                             Id = 155,
-                            CountryName = "Sierra Leone"
+                            CountryCode = "PAK",
+                            CountryName = "Pakistan"
                         },
                         new
                         {
                             Id = 156,
-                            CountryName = "Singapore"
+                            CountryCode = "PLW",
+                            CountryName = "Palau"
                         },
                         new
                         {
                             Id = 157,
-                            CountryName = "Slovakia"
+                            CountryCode = "PSE",
+                            CountryName = "Palestine State"
                         },
                         new
                         {
                             Id = 158,
-                            CountryName = "Slovenia"
+                            CountryCode = "PAN",
+                            CountryName = "Panama"
                         },
                         new
                         {
                             Id = 159,
-                            CountryName = "Solomon Islands"
+                            CountryCode = "PNG",
+                            CountryName = "Papua New Guinea"
                         },
                         new
                         {
                             Id = 160,
-                            CountryName = "Somalia"
+                            CountryCode = "PRY",
+                            CountryName = "Paraguay"
                         },
                         new
                         {
                             Id = 161,
-                            CountryName = "South Africa"
+                            CountryCode = "PER",
+                            CountryName = "Peru"
                         },
                         new
                         {
                             Id = 162,
-                            CountryName = "South Korea"
+                            CountryCode = "PHL",
+                            CountryName = "Philippines"
                         },
                         new
                         {
                             Id = 163,
-                            CountryName = "South Sudan"
+                            CountryCode = "POL",
+                            CountryName = "Poland"
                         },
                         new
                         {
                             Id = 164,
-                            CountryName = "Spain"
+                            CountryCode = "PRT",
+                            CountryName = "Portugal"
                         },
                         new
                         {
                             Id = 165,
-                            CountryName = "Sri Lanka"
+                            CountryCode = "QAT",
+                            CountryName = "Qatar"
                         },
                         new
                         {
                             Id = 166,
-                            CountryName = "Sudan"
+                            CountryCode = "ROU",
+                            CountryName = "Romania"
                         },
                         new
                         {
                             Id = 167,
-                            CountryName = "Suriname"
+                            CountryCode = "RUS",
+                            CountryName = "Russia"
                         },
                         new
                         {
                             Id = 168,
-                            CountryName = "Sweden"
+                            CountryCode = "RWA",
+                            CountryName = "Rwanda"
                         },
                         new
                         {
                             Id = 169,
-                            CountryName = "Switzerland"
+                            CountryCode = "KNA",
+                            CountryName = "Saint Kitts and Nevis"
                         },
                         new
                         {
                             Id = 170,
-                            CountryName = "Syria"
+                            CountryCode = "LCA",
+                            CountryName = "Saint Lucia"
                         },
                         new
                         {
                             Id = 171,
-                            CountryName = "Tajikistan"
+                            CountryCode = "VCT",
+                            CountryName = "Saint Vincent and the Grenadines"
                         },
                         new
                         {
                             Id = 172,
-                            CountryName = "Tanzania"
+                            CountryCode = "WSM",
+                            CountryName = "Samoa"
                         },
                         new
                         {
                             Id = 173,
-                            CountryName = "Thailand"
+                            CountryCode = "SMR",
+                            CountryName = "San Marino"
                         },
                         new
                         {
                             Id = 174,
-                            CountryName = "Timor-Leste"
+                            CountryCode = "STP",
+                            CountryName = "Sao Tome and Principe"
                         },
                         new
                         {
                             Id = 175,
-                            CountryName = "Togo"
+                            CountryCode = "SAU",
+                            CountryName = "Saudi Arabia"
                         },
                         new
                         {
                             Id = 176,
-                            CountryName = "Tonga"
+                            CountryCode = "SEN",
+                            CountryName = "Senegal"
                         },
                         new
                         {
                             Id = 177,
-                            CountryName = "Trinidad and Tobago"
+                            CountryCode = "SRB",
+                            CountryName = "Serbia"
                         },
                         new
                         {
                             Id = 178,
-                            CountryName = "Tunisia"
+                            CountryCode = "SYC",
+                            CountryName = "Seychelles"
                         },
                         new
                         {
                             Id = 179,
-                            CountryName = "Turkey"
+                            CountryCode = "SLE",
+                            CountryName = "Sierra Leone"
                         },
                         new
                         {
                             Id = 180,
-                            CountryName = "Turkmenistan"
+                            CountryCode = "SGP",
+                            CountryName = "Singapore"
                         },
                         new
                         {
                             Id = 181,
-                            CountryName = "Tuvalu"
+                            CountryCode = "SVK",
+                            CountryName = "Slovakia"
                         },
                         new
                         {
                             Id = 182,
-                            CountryName = "Uganda"
+                            CountryCode = "SVN",
+                            CountryName = "Slovenia"
                         },
                         new
                         {
                             Id = 183,
-                            CountryName = "Ukraine"
+                            CountryCode = "SLB",
+                            CountryName = "Solomon Islands"
                         },
                         new
                         {
                             Id = 184,
-                            CountryName = "United Arab Emirates"
+                            CountryCode = "SOM",
+                            CountryName = "Somalia"
                         },
                         new
                         {
                             Id = 185,
-                            CountryName = "United Kingdom"
+                            CountryCode = "ZAF",
+                            CountryName = "South Africa"
                         },
                         new
                         {
                             Id = 186,
-                            CountryName = "United States of America"
+                            CountryCode = "KOR",
+                            CountryName = "South Korea"
                         },
                         new
                         {
                             Id = 187,
-                            CountryName = "Uruguay"
+                            CountryCode = "SSD",
+                            CountryName = "South Sudan"
                         },
                         new
                         {
                             Id = 188,
-                            CountryName = "Uzbekistan"
+                            CountryCode = "ESP",
+                            CountryName = "Spain"
                         },
                         new
                         {
                             Id = 189,
-                            CountryName = "Vanuatu"
+                            CountryCode = "LKA",
+                            CountryName = "Sri Lanka"
                         },
                         new
                         {
                             Id = 190,
-                            CountryName = "Venezuela"
+                            CountryCode = "SDN",
+                            CountryName = "Sudan"
                         },
                         new
                         {
                             Id = 191,
-                            CountryName = "Vietnam"
+                            CountryCode = "SUR",
+                            CountryName = "Suriname"
                         },
                         new
                         {
                             Id = 192,
-                            CountryName = "Yemen"
+                            CountryCode = "SWE",
+                            CountryName = "Sweden"
                         },
                         new
                         {
                             Id = 193,
-                            CountryName = "Zambia"
+                            CountryCode = "CHE",
+                            CountryName = "Switzerland"
                         },
                         new
                         {
                             Id = 194,
+                            CountryCode = "SYR",
+                            CountryName = "Syria"
+                        },
+                        new
+                        {
+                            Id = 195,
+                            CountryCode = "TJK",
+                            CountryName = "Tajikistan"
+                        },
+                        new
+                        {
+                            Id = 196,
+                            CountryCode = "TZA",
+                            CountryName = "Tanzania"
+                        },
+                        new
+                        {
+                            Id = 197,
+                            CountryCode = "THA",
+                            CountryName = "Thailand"
+                        },
+                        new
+                        {
+                            Id = 198,
+                            CountryCode = "TLS",
+                            CountryName = "Timor-Leste"
+                        },
+                        new
+                        {
+                            Id = 199,
+                            CountryCode = "TGO",
+                            CountryName = "Togo"
+                        },
+                        new
+                        {
+                            Id = 200,
+                            CountryCode = "TON",
+                            CountryName = "Tonga"
+                        },
+                        new
+                        {
+                            Id = 201,
+                            CountryCode = "TTO",
+                            CountryName = "Trinidad and Tobago"
+                        },
+                        new
+                        {
+                            Id = 202,
+                            CountryCode = "TUN",
+                            CountryName = "Tunisia"
+                        },
+                        new
+                        {
+                            Id = 203,
+                            CountryCode = "TUR",
+                            CountryName = "Turkey"
+                        },
+                        new
+                        {
+                            Id = 204,
+                            CountryCode = "TKM",
+                            CountryName = "Turkmenistan"
+                        },
+                        new
+                        {
+                            Id = 205,
+                            CountryCode = "TUV",
+                            CountryName = "Tuvalu"
+                        },
+                        new
+                        {
+                            Id = 206,
+                            CountryCode = "UGA",
+                            CountryName = "Uganda"
+                        },
+                        new
+                        {
+                            Id = 207,
+                            CountryCode = "UKR",
+                            CountryName = "Ukraine"
+                        },
+                        new
+                        {
+                            Id = 208,
+                            CountryCode = "ARE",
+                            CountryName = "United Arab Emirates"
+                        },
+                        new
+                        {
+                            Id = 209,
+                            CountryCode = "GBR",
+                            CountryName = "United Kingdom"
+                        },
+                        new
+                        {
+                            Id = 210,
+                            CountryCode = "USA",
+                            CountryName = "United States of America"
+                        },
+                        new
+                        {
+                            Id = 211,
+                            CountryCode = "URY",
+                            CountryName = "Uruguay"
+                        },
+                        new
+                        {
+                            Id = 212,
+                            CountryCode = "UZB",
+                            CountryName = "Uzbekistan"
+                        },
+                        new
+                        {
+                            Id = 213,
+                            CountryCode = "VUT",
+                            CountryName = "Vanuatu"
+                        },
+                        new
+                        {
+                            Id = 214,
+                            CountryCode = "VEN",
+                            CountryName = "Venezuela"
+                        },
+                        new
+                        {
+                            Id = 215,
+                            CountryCode = "VNM",
+                            CountryName = "Vietnam"
+                        },
+                        new
+                        {
+                            Id = 216,
+                            CountryCode = "YEM",
+                            CountryName = "Yemen"
+                        },
+                        new
+                        {
+                            Id = 217,
+                            CountryCode = "ZMB",
+                            CountryName = "Zambia"
+                        },
+                        new
+                        {
+                            Id = 218,
+                            CountryCode = "ZWE",
                             CountryName = "Zimbabwe"
                         });
                 });
