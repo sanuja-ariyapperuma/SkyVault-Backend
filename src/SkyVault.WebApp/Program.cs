@@ -50,14 +50,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddHttpClient<AuthorityProxy>(client =>
+builder.Services.AddHttpClient("BaseClient", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
 });
-builder.Services.AddHttpClient<CustomerProxy>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
-});
+builder.Services.AddHttpClient<AuthorityProxy>();
+builder.Services.AddHttpClient<CustomerProxy>();
 
 var app = builder.Build();
 
