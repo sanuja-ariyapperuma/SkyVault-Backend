@@ -27,9 +27,13 @@ public partial class Passport
 
     public string IsPrimary { get; set; } = null!;
 
+    public int CountryId { get; set; }
+
     public virtual CustomerProfile CustomerProfile { get; set; } = null!;
 
     public virtual Nationality Nationality { get; set; } = null!;
+
+    public virtual Country Country { get; set; } = null!;
 
     public virtual ICollection<Visa> Visas { get; set; } = new List<Visa>();
 }
