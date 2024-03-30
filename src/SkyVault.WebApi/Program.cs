@@ -23,6 +23,7 @@ public class Program
         app.UseMiddleware<BasicAuthMiddleware>();
         app.MapLoginEndpoints();
         app.MapCustomerEndpoints();
+        app.MapProfileEndpoints();
         app.MapHealthChecks("health");
         app.UseMiddleware<ExceptionMiddleware>();
         app.Run();
