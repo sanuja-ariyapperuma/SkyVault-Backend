@@ -7,7 +7,7 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class CustomWorkload
     {
-        public static async Task<IResult> GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper)
+        public static async Task<SkyResult<ProfileDefinitionResponse>> GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper)
         {
 
             var salutations = await dbContext.Salutations.ToListAsync();
@@ -23,11 +23,15 @@ namespace SkyVault.WebApi.Workloads
                 }
             };
 
-            return Results.Ok(new ProfileDefinitionResponse(
+            var profdef = new ProfileDefinitionResponse(
                 mapper.Map<List<Payloads.ResponsePayloads.Salutation>>(salutations),
                 mapper.Map<List<Payloads.ResponsePayloads.Nationality>>(nationalities),
                 genders,
-                mapper.Map<List<Payloads.ResponsePayloads.Country>>(countries)));
+                mapper.Map<List<Payloads.ResponsePayloads.Country>>(countries));
+
+            var result = new SkyResult<ProfileDefinitionResponse>();
+
+            return result.SucceededWithValue(profdef);
 
         }   
     }
