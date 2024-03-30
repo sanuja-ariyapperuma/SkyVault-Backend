@@ -19,15 +19,21 @@ public partial class Passport
 
     public DateOnly DateOfBirth { get; set; }
 
+    public DateOnly? ExpiryDate { get; set; }
+
     public string? PlaceOfBirth { get; set; }
 
     public int NationalityId { get; set; }
 
     public string IsPrimary { get; set; } = null!;
 
+    public int CountryId { get; set; }
+
     public virtual CustomerProfile CustomerProfile { get; set; } = null!;
 
     public virtual Nationality Nationality { get; set; } = null!;
+
+    public virtual Country Country { get; set; } = null!;
 
     public virtual ICollection<Visa> Visas { get; set; } = new List<Visa>();
 }

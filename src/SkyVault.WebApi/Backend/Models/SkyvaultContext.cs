@@ -62,6 +62,7 @@ public partial class SkyvaultContext : DbContext
             modelBuilder.Entity<Country>().HasData(CountrySeedData.countries);
             modelBuilder.Entity<Salutation>().HasData(SalutationSeedData.salutations);
             modelBuilder.Entity<Nationality>().HasData(NationalitySeedData.nationalities);
+            modelBuilder.Entity<CommunicationMethod>().HasData(ComMethodSeedData.comMethod);
 
         });
 

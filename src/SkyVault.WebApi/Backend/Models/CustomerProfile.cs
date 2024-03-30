@@ -21,7 +21,7 @@ public partial class CustomerProfile
 
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
-    public virtual CustomerProfile? Parent { get; set; }
+    public virtual CustomerProfile? Parent { get; set; } = null!;
 
     public virtual ICollection<Passport> Passports { get; set; } = new List<Passport>();
 

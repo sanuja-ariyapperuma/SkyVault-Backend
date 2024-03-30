@@ -13,24 +13,6 @@ namespace SkyVault.Payloads.ResponsePayloads
     List<Country>? Countries
     );
 
-    //public record BasicInfo(string Id, string Name);
-
-    //public record Salutation: BasicInfo 
-    //{
-    //    public Salutation(string id, string name) : base(id, name) { }
-    //}
-    //public record Nationality : BasicInfo { 
-    //    public Nationality(string id, string name) : base(id, name) { }
-    //}
-    //public record Gender : BasicInfo
-    //{
-    //    public Gender(string id, string name) : base(id, name) { }
-    //}
-    //public record Country : BasicInfo
-    //{
-    //    public Country(string id, string name) : base(id, name) { }
-    //}
-
     public class Salutation 
     {
         public string Id { get; set; }
