@@ -38,5 +38,19 @@ namespace SkyVault.WebApi.Workloads
                 result.SucceededWithValue(customerProfile);
         }
 
+        public static async Task<SkyResult<List<ProfileSearchResponse>>> GetAllProfiles(
+                [FromRoute] string SysUserId,
+                [FromRoute] string RoleId,
+                [FromRoute] string SearchQuery,
+                SkyvaultContext dbContext
+            ) 
+        {
+            var searchResult = await dbContext.CustomerProfiles.GetAllProfiles(SysUserId, RoleId, SearchQuery, dbContext);
+            
+            var result = new SkyResult<List<ProfileSearchResponse>>();
+
+            return result.SucceededWithValue(searchResult);
+        }
+
     }
 }

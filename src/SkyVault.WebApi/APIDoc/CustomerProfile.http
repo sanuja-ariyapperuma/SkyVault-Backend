@@ -38,3 +38,7 @@ Content-Type: application/json
         "parentId": "",
         "SystemUserId": "1"
 }
+
+###
+//Search by any name or passport number
+GET {{rootURL}}/profile/Amali/1/1

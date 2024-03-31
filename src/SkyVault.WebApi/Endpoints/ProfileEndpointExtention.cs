@@ -11,6 +11,10 @@
             app.MapGet("/profile/{Id}/{sysUserId}", Workloads.ProfileWorkload.GetProfile)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapGet("/profile/{SearchQuery}/{SysUserId}/{RoleId}", Workloads.ProfileWorkload.GetAllProfiles)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
         }
     }
 }
