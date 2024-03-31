@@ -1,0 +1,3 @@
+@rootURL=https://localhost:7199
+
+GET {{rootURL}}/profilepage-commondata
