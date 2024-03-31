@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+using SkyVault.WebApi.Backend.Seeds;
 
 namespace SkyVault.WebApi.Backend.Models;
 
@@ -56,6 +57,13 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.CommTitle)
                 .HasMaxLength(50)
                 .HasColumnName("comm_title");
+
+            // Seed data
+            modelBuilder.Entity<Country>().HasData(CountrySeedData.countries);
+            modelBuilder.Entity<Salutation>().HasData(SalutationSeedData.salutations);
+            modelBuilder.Entity<Nationality>().HasData(NationalitySeedData.nationalities);
+            modelBuilder.Entity<CommunicationMethod>().HasData(ComMethodSeedData.comMethod);
+
         });
 
         modelBuilder.Entity<Country>(entity =>
