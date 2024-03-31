@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyVault.WebApi.Backend.Models;
 
@@ -10,9 +11,11 @@ using SkyVault.WebApi.Backend.Models;
 namespace SkyVault.WebApi.Migrations
 {
     [DbContext(typeof(SkyvaultContext))]
-    partial class SkyvaultContextModelSnapshot : ModelSnapshot
+    [Migration("20240325204310_InitialTableCreate-DataSeed")]
+    partial class InitialTableCreateDataSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,23 +42,6 @@ namespace SkyVault.WebApi.Migrations
                         .HasName("PRIMARY");
 
                     b.ToTable("communication_methods", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CommTitle = "Non"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CommTitle = "Email"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CommTitle = "WhatsApp"
-                        });
                 });
 
             modelBuilder.Entity("SkyVault.WebApi.Backend.Models.Country", b =>
@@ -2533,9 +2519,6 @@ namespace SkyVault.WebApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CustomerProfileId")
                         .HasColumnType("int")
                         .HasColumnName("customer_profile_id");
@@ -2543,9 +2526,6 @@ namespace SkyVault.WebApi.Migrations
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date")
                         .HasColumnName("date_of_birth");
-
-                    b.Property<DateOnly?>("ExpiryDate")
-                        .HasColumnType("date");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -2590,8 +2570,6 @@ namespace SkyVault.WebApi.Migrations
 
                     b.HasKey("Id")
                         .HasName("PRIMARY");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex(new[] { "CustomerProfileId" }, "fk_passports_customerprofiles");
 
@@ -2827,12 +2805,6 @@ namespace SkyVault.WebApi.Migrations
 
             modelBuilder.Entity("SkyVault.WebApi.Backend.Models.Passport", b =>
                 {
-                    b.HasOne("SkyVault.WebApi.Backend.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SkyVault.WebApi.Backend.Models.CustomerProfile", "CustomerProfile")
                         .WithMany("Passports")
                         .HasForeignKey("CustomerProfileId")
@@ -2844,8 +2816,6 @@ namespace SkyVault.WebApi.Migrations
                         .HasForeignKey("NationalityId")
                         .IsRequired()
                         .HasConstraintName("fk_passports_nationalities");
-
-                    b.Navigation("Country");
 
                     b.Navigation("CustomerProfile");
 
