@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend.Models;
@@ -106,6 +107,42 @@ namespace SkyVault.WebApi.Backend
             await dbContext.SaveChangesAsync();
 
             return ToProfilePayload(newProfile);
+        }
+
+        public static async Task<List<ProfileSearchResponse>> GetAllProfiles(
+                this DbSet<CustomerProfile> customerProfile,
+                string sysUserId,
+                string roleId,
+                string searchQuery,
+                SkyvaultContext dbContext
+            ) 
+        {
+            var customerProfiles = await dbContext.CustomerProfiles.Include(p => p.Passports).Where(profile => 
+            profile.SystemUserId == Convert.ToInt32(sysUserId)
+            &&
+            profile.Passports.Any(passport =>
+                passport.LastName.ToLower().Contains(searchQuery.ToLower()) ||
+                passport.OtherNames.ToLower().Contains(searchQuery.ToLower()) ||
+                passport.PassportNumber.Contains(searchQuery)
+            )
+            ).ToListAsync();
+
+            var resultsProfiles = new List<ProfileSearchResponse>();
+
+            foreach (var profile in customerProfiles) 
+            {
+                foreach(var passport in profile.Passports) 
+                {
+                    var resultProfile = new ProfileSearchResponse(
+                        profile.Id.ToString(),
+                        $"{passport.LastName} {passport.OtherNames}",
+                        passport.PassportNumber
+                    );
+                    resultsProfiles.Add(resultProfile);
+                }
+            }
+
+            return resultsProfiles;
         }
 
         private static ProfilePayload ToProfilePayload(CustomerProfile customerProfile) 
