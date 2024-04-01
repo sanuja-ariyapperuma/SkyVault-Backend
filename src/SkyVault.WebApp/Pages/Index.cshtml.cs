@@ -35,11 +35,18 @@ namespace SkyVault.WebApp.Pages
            
             var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
                 skyUser.LastName, skyUser.Email, skyUser.Role);
-            
-            var welcomeUser = authorityProxy.GetUserInfo(userRequest).Result ??
-                              throw new ArgumentNullException("authorityProxy.GetUserInfo(userRequest).Result");
 
+            var skyResult = authorityProxy.GetUserInfo(userRequest).Result;
+
+            if (skyResult!.Succeeded == false)
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
+            }
+            
             //Bind only what was processed by the API and not what was received by the claims.
+            var welcomeUser = skyResult.Value;
+            
             base.Upn = welcomeUser.Upn;
             base.FullName = welcomeUser.FullName;
             base.Email = welcomeUser.Email;

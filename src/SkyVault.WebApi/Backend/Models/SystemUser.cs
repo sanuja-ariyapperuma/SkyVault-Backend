@@ -7,13 +7,13 @@ public partial class SystemUser
 {
     public int Id { get; set; }
 
-    public string FirstName { get; set; } = null!;
+    public string? FirstName { get; set; } = null!;
 
-    public string LastName { get; set; } = null!;
+    public string? LastName { get; set; } = null!;
 
-    public string UserRole { get; set; } = null!;
+    public string? UserRole { get; set; } = null!;
 
-    public string SamProfileId { get; set; } = null!;
+    public string? SamProfileId { get; set; } = null!;
 
     public string? ProfilePicture { get; set; }
 
