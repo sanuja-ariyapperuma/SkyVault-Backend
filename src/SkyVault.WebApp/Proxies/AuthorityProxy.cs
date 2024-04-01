@@ -6,17 +6,18 @@ namespace SkyVault.WebApp.Proxies;
 
 public sealed class AuthorityProxy(HttpClient httpClient)
 {
-    public async Task<SkyResult<WelcomeUserResponse>?> GetUserInfo(ValidateUserRequest validateUserRequest)
+    public SkyResult<WelcomeUserResponse>? GetUserInfo(ValidateUserRequest validateUserRequest)
     {
         //Get user information from API
-        using var responseMessage = await httpClient.PostAsJsonAsync<ValidateUserRequest>("/auth/user",
-            validateUserRequest);
+        var response = httpClient.PostAsJsonAsync("/auth/user", validateUserRequest).Result;
 
         //At all times a user will exist or be created if NOT!
         //Access is dictated through Azure AD App Registration IAM Access to this application
-        responseMessage.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
-        return await responseMessage.Content.ReadFromJsonAsync<SkyResult<WelcomeUserResponse>>();
+        var result = response.Content.ReadFromJsonAsync<SkyResult<WelcomeUserResponse>>().Result;
+
+        return result;
     }
 
     public IEnumerable<SkyVaultMenuItem> GetMenus(string role)
