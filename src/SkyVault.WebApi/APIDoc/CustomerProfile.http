@@ -1,0 +1,44 @@
+@rootURL=https://localhost:7199
+
+GET {{rootURL}}/profile/20/1
+
+###
+
+POST {{rootURL}}/profile
+Content-Type: application/json
+
+{
+        "SalutationId": "2",
+        "passports": [
+            {
+                "lastName": "Ranaweera",
+                "otherNames": "Amali Lanz",
+                "passportNumber": "84478546",
+                "gender": "F",
+                "dateOfBirth": "01/01/1995",
+                "placeOfBirth": "Colombo",
+                "expiryDate": "01/01/2024",
+                "nationalityId": "1",
+                "countryId": "1",
+                "isPrimary": "1",
+                "visa": [
+                    {
+                        "visaNumber": "43234",
+                        "countryId": "2",
+                        "issuedPlace": "Colombo",
+                        "issuedDate": "01/01/2021",
+                        "expireDate": "01/01/2022",
+                        "assignWithPrimary": "1"
+                    }
+                ]
+            }
+        ],
+        "frequentFlyerNumbers": ["AAA2321232","BBBewr3reee"],
+        "PreffdComMth": "1",
+        "parentId": "",
+        "SystemUserId": "1"
+}
+
+###
+//Search by any name or passport number
+GET {{rootURL}}/profile/Amali/1/1

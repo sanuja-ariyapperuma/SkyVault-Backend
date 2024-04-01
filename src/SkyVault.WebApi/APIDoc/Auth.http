@@ -1,0 +1,12 @@
+﻿@rootURL=https://localhost:7199
+
+POST {{rootURL}}/auth/user
+Content-Type: application/json
+
+{
+  "Upn": "test@gmail.com",
+  "FirstName": "Test",
+  "LastName": "Test",
+  "Email": "test@gmail.com",
+  "Role": "1"
+}
