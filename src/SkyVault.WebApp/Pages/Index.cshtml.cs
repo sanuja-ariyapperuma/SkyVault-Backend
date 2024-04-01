@@ -26,6 +26,7 @@ namespace SkyVault.WebApp.Pages
                 HttpContext.Response.Redirect("/claimspage", true);
             
             var claimDictionary = User.Claims.ToDictionary(c => c.Type, c => c.Value);
+            
             var skyUser = new SkyVaultUser(
                 claimDictionary.GetValueOrDefault(ClaimTypes.Email),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Name),
@@ -36,7 +37,7 @@ namespace SkyVault.WebApp.Pages
             var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
                 skyUser.LastName, skyUser.Email, skyUser.Role);
 
-            var skyResult = authorityProxy.GetUserInfo(userRequest).Result;
+            var skyResult = authorityProxy.GetUserInfo(userRequest);
 
             if (skyResult!.Succeeded == false)
             {
