@@ -8,31 +8,24 @@ namespace SkyVault.WebApi.Workloads;
 
 internal static class AuthenticationWorkload
 {
-    public static IResult AuthenticateUser([FromBody] ValidateUserRequest request, HttpContext context, SkyvaultContext dbContext)
+    public static IResult AuthenticateUser([FromBody] ValidateUserRequest request, 
+        HttpContext context, SkyvaultContext dbContext)
     {
-        var result = new SkyResult<WelcomeUserResponse>();
+        var propertiesToCheck = new[] {request.Upn, request.Email, 
+            request.LastName, request.FirstName, request.Role};
 
-        if (string.IsNullOrWhiteSpace(request.Upn) ||
-            string.IsNullOrWhiteSpace(request.Email) ||
-            string.IsNullOrWhiteSpace(request.LastName) ||
-            string.IsNullOrWhiteSpace(request.FirstName) ||
-            string.IsNullOrWhiteSpace(request.Role)
-           )
+        if (propertiesToCheck.Any(string.IsNullOrWhiteSpace))
         {
-            result.Fail("Invalid user information", "400", "0");
-            
-            return Results.BadRequest(result);
+            return Results.BadRequest(request);
         }
         
         var sysUser =  dbContext.SystemUsers.CreateOrGetUser(request, dbContext);
         
-        result.SucceededWithValue(new WelcomeUserResponse(sysUser.SamProfileId, 
+        return Results.Ok(new WelcomeUserResponse(sysUser.SamProfileId, 
             $"{sysUser.FirstName} {sysUser.LastName}", 
-            "",
+            DateTime.Today.ToLongDateString(),
             sysUser.UserRole,
             sysUser.SamProfileId
         ));
-
-        return Results.Ok(sysUser);
     }
 }
