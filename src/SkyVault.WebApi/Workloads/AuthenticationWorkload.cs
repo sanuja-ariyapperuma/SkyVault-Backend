@@ -20,19 +20,18 @@ internal static class AuthenticationWorkload
            )
         {
             result.Fail("Invalid user information", "400", "0");
-            
+
             return Results.BadRequest(result);
         }
         
-        var sysUser =  dbContext.SystemUsers.CreateOrGetUser(request, dbContext);
+        var SystemUserData = new SystemUserData(dbContext);
+        var sysUser = SystemUserData.CreateOrGetUser(request);
         
-        result.SucceededWithValue(new WelcomeUserResponse(sysUser.SamProfileId, 
-            $"{sysUser.FirstName} {sysUser.LastName}", 
+        return Results.Ok(result.SucceededWithValue(new WelcomeUserResponse(sysUser.SamProfileId,
+            $"{sysUser.FirstName} {sysUser.LastName}",
             "",
             sysUser.UserRole,
             sysUser.SamProfileId
-        ));
-
-        return Results.Ok(sysUser);
+        )));
     }
 }

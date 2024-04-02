@@ -19,6 +19,8 @@ namespace SkyVault.WebApi.MappingProfiles
             CreateMap<Backend.Models.Country, Payloads.ResponsePayloads.Country>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CountryName));
+
+            CreateMap<Backend.Gender, Payloads.ResponsePayloads.Gender>();
         }
     }
 }
