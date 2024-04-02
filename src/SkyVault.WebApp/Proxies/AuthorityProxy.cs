@@ -8,16 +8,14 @@ public sealed class AuthorityProxy(HttpClient httpClient)
 {
     public SkyResult<WelcomeUserResponse>? GetUserInfo(ValidateUserRequest validateUserRequest)
     {
-        //Get user information from API
         var response = httpClient.PostAsJsonAsync("/auth/user", validateUserRequest).Result;
 
-        //At all times a user will exist or be created if NOT!
-        //Access is dictated through Azure AD App Registration IAM Access to this application
-        response.EnsureSuccessStatusCode();
-
-        var result = response.Content.ReadFromJsonAsync<SkyResult<WelcomeUserResponse>>().Result;
-
-        return result;
+        if (!response.IsSuccessStatusCode)
+            return new SkyResult<WelcomeUserResponse>().Fail("Failed to get user info",
+                "AUTH-0001", "000-000");
+        
+        var payload = response.Content.ReadFromJsonAsync<WelcomeUserResponse>().Result;
+        return new SkyResult<WelcomeUserResponse>().SucceededWithValue(payload!);
     }
 
     public IEnumerable<SkyVaultMenuItem> GetMenus(string role)
