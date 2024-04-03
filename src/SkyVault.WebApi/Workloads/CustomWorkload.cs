@@ -8,13 +8,37 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class CustomWorkload
     {
-        public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper)
+        public static async Task<IResult> GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper,
+                       IConfiguration configuration)
         {
-            var commonData = new CommonData(dbContext);
+            //var commonData = new CommonData(CreateDbContext());
 
-            var salutations = commonData.Salutations();
-            var nationalities = commonData.GetNationalities();
-            var countries = commonData.GetCountries();
+            //var salutations = commonData.Salutations();
+            //var nationalities = commonData.GetNationalities();
+            //var countries = commonData.GetCountries();
+            List<Backend.Models.Salutation> salutations = new();
+            List<Backend.Models.Nationality> nationalities = new();
+            List<Backend.Models.Country> countries = new();
+
+            var tasks = new Task[] 
+            {
+                Task.Run(() => {
+                    var commonData = new CommonData(CreateDbContext());
+                    salutations = commonData.Salutations();
+                }),
+                Task.Run(() => {
+                    var commonData = new CommonData(CreateDbContext());
+                    nationalities = commonData.GetNationalities();
+                }),
+                Task.Run(() => {
+                    var commonData = new CommonData(CreateDbContext());
+                    countries = commonData.GetCountries();
+                })
+            };
+
+            Task.WaitAll(tasks);
+
+            var commonData = new CommonData(dbContext);
             var genders = commonData.GetGender();
 
             var profdef = new ProfileDefinitionResponse(
@@ -27,6 +51,13 @@ namespace SkyVault.WebApi.Workloads
 
             return Results.Ok(result.SucceededWithValue(profdef));
 
-        }   
+        }
+        private static SkyvaultContext CreateDbContext()
+        {
+            var builder = new DbContextOptionsBuilder<SkyvaultContext>();
+            builder.UseMySql("Server=ayubdevmysql.southeastasia.cloudapp.azure.com;Database=skyvault;Uid=skyapp;Pwd=2NMc5*3Ee%Kxa^K3;", 
+                new MySqlServerVersion(new Version(8, 0))); // Or your preferred database provider
+            return new SkyvaultContext(builder.Options);
+        }
     }
 }

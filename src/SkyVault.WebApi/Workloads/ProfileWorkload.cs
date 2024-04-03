@@ -19,6 +19,7 @@ namespace SkyVault.WebApi.Workloads
             var result = new SkyResult<ProfilePayload>();
 
             var systemUserData = new SystemUserData(dbContext);
+
             var systemUser = systemUserData.GetUserByProfileId(Convert.ToInt32(profile.SystemUserId));
 
             if (systemUser == null)
@@ -128,15 +129,26 @@ namespace SkyVault.WebApi.Workloads
                        SkyvaultContext dbContext
                    )
         {
+
+            ;
             var customerProfileData = new CustomerProfileData(dbContext);
             
-            var customerProfile = customerProfileData.Get(id, sysUserId);
+            if (!int.TryParse(id, out int profileId))
+                return Results.BadRequest(new SkyResult<ProfilePayload>()
+                    .Fail("Invalid profile id found", "400", "0"));
 
-            var result = new SkyResult<ProfilePayload>();
+            if (!int.TryParse(sysUserId, out int systemUserId))
+                return Results.BadRequest(new SkyResult<ProfilePayload>()
+                    .Fail("Invalid system user id found", "400", "0"));
 
-            return customerProfile == null ? 
-                Results.NotFound(result.Fail("No profile found","404","0")) : 
-                Results.Ok(result.SucceededWithValue(ToProfilePayload(customerProfile)));
+            var customerProfile = customerProfileData.Get(profileId, systemUserId);
+
+            if (customerProfile == null)
+                return Results.NotFound(new SkyResult<ProfilePayload>()
+                                       .Fail("No profile found", "404", "0"));
+
+            return Results.Ok(new SkyResult<ProfilePayload>()
+                .SucceededWithValue(ToProfilePayload(customerProfile)));
         }
 
         //public static SkyResult<List<ProfileSearchResponse>> GetAllProfiles(
