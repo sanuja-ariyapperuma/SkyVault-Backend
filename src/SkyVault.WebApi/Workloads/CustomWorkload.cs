@@ -23,15 +23,18 @@ namespace SkyVault.WebApi.Workloads
             var tasks = new Task[] 
             {
                 Task.Run(() => {
-                    var commonData = new CommonData(CreateDbContext());
-                    salutations = commonData.Salutations();
+                        using var dbctx = CreateDbContext();
+                        var commonData = new CommonData(dbctx);
+                        salutations = commonData.Salutations();
                 }),
                 Task.Run(() => {
-                    var commonData = new CommonData(CreateDbContext());
+                    using var dbctx = CreateDbContext();
+                    var commonData = new CommonData(dbctx);
                     nationalities = commonData.GetNationalities();
                 }),
                 Task.Run(() => {
-                    var commonData = new CommonData(CreateDbContext());
+                    using var dbctx = CreateDbContext();
+                    var commonData = new CommonData(dbctx);
                     countries = commonData.GetCountries();
                 })
             };
