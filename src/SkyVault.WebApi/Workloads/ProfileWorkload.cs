@@ -11,45 +11,199 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class ProfileWorkload
     {
-        public static async Task<SkyResult<ProfilePayload>> SaveProfile(
+        public static IResult SaveProfile(
             [FromBody] ProfilePayload profile,
             SkyvaultContext dbContext
         )
         {
- 
-            var newprofile = await dbContext.CustomerProfiles.CreateProfile(profile, dbContext);
-
             var result = new SkyResult<ProfilePayload>();
-            return newprofile == null ? result.Fail("Invalid Information Found", "400", "0") : result.SucceededWithValue(newprofile);
+
+            var systemUserData = new SystemUserData(dbContext);
+            var systemUser = systemUserData.GetUserByProfileId(Convert.ToInt32(profile.SystemUserId));
+
+            if (systemUser == null)
+            {
+                return Results.BadRequest(result.Fail("No Matching System User Found", "400", "0"));
+            }
+
+            var commonData = new CommonData(dbContext);
+            
+            var salutation = commonData.Salutation(Convert.ToInt32(profile.SalutationId));
+
+            if (salutation == null)
+            {
+                return Results.BadRequest(result.Fail("No Matching Salutation Found", "400", "0"));
+            }
+
+            var comMethod = commonData.GetCommunicationMethod(Convert.ToInt32(profile.PreffdComMth));
+
+            if (comMethod == null)
+            {
+                return Results.BadRequest(result.Fail("No Matching Communication Method Found", "400", "0"));
+            }
+
+            var passports = new List<Backend.Models.Passport>();
+            var frequentFlyerNumbers = profile.FrequentFlyerNumbers.Select(item => new FrequentFlyerNumber() { FlyerNumber = item }).ToList();
+
+            foreach (var passport in profile.Passports) 
+            {
+                var country = commonData.GetCountry(Convert.ToInt32(passport.CountryId));
+                if (country == null)
+                {
+                    return Results.BadRequest(result.Fail("No Matching Country Found", "400", "0"));
+                }
+
+                var nationality = commonData.GetNationality(Convert.ToInt32(passport.NationalityId));
+
+                var newpassport = new Backend.Models.Passport()
+                {
+                    LastName = passport.LastName,
+                    OtherNames = passport.OtherNames,
+                    PassportNumber = passport.PassportNumber,
+                    Country = country,
+                    Nationality = nationality,
+                    Gender = passport.Gender,
+                    DateOfBirth = DateOnly.FromDateTime(Convert.ToDateTime(passport.DateOfBirth)),
+                    PlaceOfBirth = passport.PlaceOfBirth,
+                    IsPrimary = passport.IsPrimary,
+                    ExpiryDate = DateOnly.FromDateTime(Convert.ToDateTime(passport.ExpiryDate)),
+                };
+
+                var visas = new List<Backend.Models.Visa>();
+
+                foreach (var visa in passport.Visa)
+                {
+                    var visaCountry = commonData.GetCountry(Convert.ToInt32(visa.CountryId));
+
+                    if (visaCountry == null)
+                    {
+                        return Results.BadRequest(result.Fail("No Matching Visa Country Found", "400", "0"));
+                    }
+
+                    var newVisa = new Backend.Models.Visa()
+                    {
+                        VisaNumber = visa.VisaNumber,
+                        Country = visaCountry,
+                        IssuedPlace = visa.IssuedPlace,
+                        IssuedDate = DateOnly.FromDateTime(Convert.ToDateTime(visa.IssuedDate)),
+                        ExpireDate = DateOnly.FromDateTime(Convert.ToDateTime(visa.ExpireDate))
+                    };
+
+                    visas.Add(newVisa);
+                }
+                newpassport.Visas = visas;
+                passports.Add(newpassport);
+            }
+
+            Backend.Models.CustomerProfile parent = null;
+
+            if (int.TryParse(profile.ParentId, out int parentId))
+            {
+                parent = dbContext.CustomerProfiles.Find(parentId);
+                if (parent == null)
+                {
+                    return Results.BadRequest(result.Fail("No Matching Parent Profile Found", "400", "0"));
+                }
+            }
+
+            var newProfile = new CustomerProfile()
+            {
+                Salutation = salutation,
+                Passports = passports,
+                FrequentFlyerNumbers = frequentFlyerNumbers,
+                SystemUser = systemUser,
+                Parent = parent,
+                PreferredComm = comMethod
+            };
+
+            var customerProfileData = new CustomerProfileData(dbContext);
+            customerProfileData.Create(newProfile);
+
+            return Results.Ok(result.SucceededWithValue(ToProfilePayload(newProfile)));
         }
 
-        public static async Task<SkyResult<ProfilePayload>> GetProfile(
+        public static IResult GetProfile(
                        [FromRoute] string id, 
                        [FromRoute] string sysUserId,
                        SkyvaultContext dbContext
                    )
         {
-            var customerProfile = await dbContext.CustomerProfiles.GetProfile(id, sysUserId, dbContext);
+            var customerProfileData = new CustomerProfileData(dbContext);
+            
+            var customerProfile = customerProfileData.Get(id, sysUserId);
 
             var result = new SkyResult<ProfilePayload>();
 
             return customerProfile == null ? 
-                result.Fail("Profile not found", "404", "0") : 
-                result.SucceededWithValue(customerProfile);
+                Results.NotFound(result.Fail("No profile found","404","0")) : 
+                Results.Ok(result.SucceededWithValue(ToProfilePayload(customerProfile)));
         }
 
-        public static async Task<SkyResult<List<ProfileSearchResponse>>> GetAllProfiles(
-                [FromRoute] string SysUserId,
-                [FromRoute] string RoleId,
-                [FromRoute] string SearchQuery,
-                SkyvaultContext dbContext
-            ) 
-        {
-            var searchResult = await dbContext.CustomerProfiles.GetAllProfiles(SysUserId, RoleId, SearchQuery, dbContext);
+        //public static SkyResult<List<ProfileSearchResponse>> GetAllProfiles(
+        //        [FromRoute] string SysUserId,
+        //        [FromRoute] string RoleId,
+        //        [FromRoute] string SearchQuery,
+        //        SkyvaultContext dbContext
+        //    ) 
+        //{
+        //    var searchResult = dbContext.CustomerProfiles.GetAllProfiles(SysUserId, RoleId, SearchQuery, dbContext);
             
-            var result = new SkyResult<List<ProfileSearchResponse>>();
+        //    var result = new SkyResult<List<ProfileSearchResponse>>();
 
-            return result.SucceededWithValue(searchResult);
+        //    return result.SucceededWithValue(searchResult);
+        //}
+
+        private static ProfilePayload ToProfilePayload(CustomerProfile customerProfile)
+        {
+            var passports = new List<Payloads.Passport>();
+
+            foreach (var passport in customerProfile.Passports)
+            {
+                var visas = new List<Payloads.Visa>();
+
+                foreach (var visa in passport.Visas)
+                {
+                    var v = new Payloads.Visa(
+                        visa.Id.ToString(),
+                        visa.VisaNumber,
+                        visa.CountryId.ToString(),
+                        visa.IssuedPlace,
+                        visa.IssuedDate.ToShortDateString(),
+                        visa.ExpireDate.ToShortDateString(),
+                        ""
+                        );
+                    visas.Add(v);
+                }
+
+                var psp = new Payloads.Passport(
+                    passport.Id.ToString(),
+                    passport.LastName,
+                    passport.OtherNames,
+                    passport.PassportNumber,
+                    passport.Gender,
+                    passport.DateOfBirth.ToShortDateString(),
+                    passport.PlaceOfBirth,
+                    passport.ExpiryDate?.ToShortDateString(),
+                    passport.NationalityId.ToString(),
+                    passport.CountryId.ToString(),
+                    passport.IsPrimary,
+                    visas.ToArray()
+                    );
+                passports.Add(psp);
+
+            }
+
+            var profilePayload = new ProfilePayload(
+                customerProfile.Id.ToString(),
+                customerProfile.SalutationId.ToString(),
+                passports.ToArray(),
+                customerProfile.FrequentFlyerNumbers.Select(item => item.FlyerNumber).ToArray(),
+                customerProfile.Id.ToString(),
+                customerProfile.ParentId.ToString(),
+                customerProfile.SystemUserId.ToString()
+                );
+
+            return profilePayload;
         }
 
     }

@@ -19,7 +19,8 @@ internal static class AuthenticationWorkload
             return Results.BadRequest(request);
         }
         
-        var sysUser =  dbContext.SystemUsers.CreateOrGetUser(request, dbContext);
+        var SystemUserData = new SystemUserData(dbContext);
+        var sysUser = SystemUserData.CreateOrGetUser(request);
         
         return Results.Ok(new WelcomeUserResponse(sysUser.SamProfileId, 
             $"{sysUser.FirstName} {sysUser.LastName}", 
