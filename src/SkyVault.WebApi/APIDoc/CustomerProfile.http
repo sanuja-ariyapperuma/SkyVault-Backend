@@ -12,7 +12,7 @@ Content-Type: application/json
         "passports": [
             {
                 "lastName": "Ranaweera",
-                "otherNames": "Amali Lanz",
+                "otherNames": "Amal Lanz",
                 "passportNumber": "84478546",
                 "gender": "F",
                 "dateOfBirth": "01/01/1995",
@@ -41,4 +41,4 @@ Content-Type: application/json
 
 ###
 //Search by any name or passport number
-GET {{rootURL}}/profile/Amali/1/1
+GET {{rootURL}}/searchprofile/else/1/1
