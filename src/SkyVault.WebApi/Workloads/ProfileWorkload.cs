@@ -151,19 +151,31 @@ namespace SkyVault.WebApi.Workloads
                 .SucceededWithValue(ToProfilePayload(customerProfile)));
         }
 
-        //public static SkyResult<List<ProfileSearchResponse>> GetAllProfiles(
-        //        [FromRoute] string SysUserId,
-        //        [FromRoute] string RoleId,
-        //        [FromRoute] string SearchQuery,
-        //        SkyvaultContext dbContext
-        //    ) 
-        //{
-        //    var searchResult = dbContext.CustomerProfiles.GetAllProfiles(SysUserId, RoleId, SearchQuery, dbContext);
-            
-        //    var result = new SkyResult<List<ProfileSearchResponse>>();
+        public static IResult SearchProfiles(
+                [FromRoute] string SysUserId,
+                [FromRoute] string RoleId,
+                [FromRoute] string SearchQuery,
+                SkyvaultContext dbContext
+            )
+        {
+            var customerProfileData = new CustomerProfileData(dbContext);
 
-        //    return result.SucceededWithValue(searchResult);
-        //}
+            if(!int.TryParse(SysUserId,out int systemUserId)) 
+                return Results.BadRequest(new SkyResult<ProfilePayload>()
+                    .Fail("Invalid profile id found", "400", "0"));
+
+            var searchResult = customerProfileData.Search(SearchQuery, systemUserId, Convert.ToInt32(RoleId));
+
+            if (searchResult.Count == 0)
+                return Results.NotFound(new SkyResult<ProfilePayload>()
+                .Fail("No profiles found", "404", "0"));
+
+            var response = ToSearchProfileResponse(searchResult);
+
+            var result = new SkyResult<List<SearchProfileResponse>>();
+
+            return Results.Ok(result.SucceededWithValue(response));
+        }
 
         private static ProfilePayload ToProfilePayload(CustomerProfile customerProfile)
         {
@@ -216,6 +228,21 @@ namespace SkyVault.WebApi.Workloads
                 );
 
             return profilePayload;
+        }
+
+        private static List<SearchProfileResponse> ToSearchProfileResponse(List<CustomerProfile> customerProfile)
+        {
+            return customerProfile.SelectMany(cp => cp.Passports
+            .Select(
+                p => new SearchProfileResponse(
+                    cp.Id,
+                    p.LastName,
+                    p.OtherNames,
+                    p.PassportNumber,
+                    cp.Salutation.SalutationName
+                    )
+                )
+            ).ToList();
         }
 
     }
