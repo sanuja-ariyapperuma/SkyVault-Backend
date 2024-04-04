@@ -8,7 +8,7 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class CustomWorkload
     {
-        public static async Task<IResult> GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper,
+        public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper,
                        IConfiguration configuration)
         {
             //var commonData = new CommonData(CreateDbContext());
@@ -20,7 +20,7 @@ namespace SkyVault.WebApi.Workloads
             List<Backend.Models.Nationality> nationalities = new();
             List<Backend.Models.Country> countries = new();
 
-            var tasks = new Task[] 
+            var tasks = new Task[]
             {
                 Task.Run(() => {
                         using var dbctx = CreateDbContext();
@@ -45,10 +45,10 @@ namespace SkyVault.WebApi.Workloads
             var genders = commonData.GetGender();
 
             var profdef = new ProfileDefinitionResponse(
-                mapper.Map<List<Payloads.ResponsePayloads.Salutation>>(salutations),
-                mapper.Map<List<Payloads.ResponsePayloads.Nationality>>(nationalities),
-                mapper.Map<List<Payloads.ResponsePayloads.Gender>>(genders),
-                mapper.Map<List<Payloads.ResponsePayloads.Country>>(countries));
+                mapper.Map<List<Payloads.CommonPayloads.Salutation>>(salutations),
+                mapper.Map<List<Payloads.CommonPayloads.Nationality>>(nationalities),
+                mapper.Map<List<Payloads.CommonPayloads.Gender>>(genders),
+                mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
 
             var result = new SkyResult<ProfileDefinitionResponse>();
 

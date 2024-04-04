@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SkyVault.Payloads.CommonPayloads;
 
-namespace SkyVault.Payloads.ResponsePayloads
-{
+namespace SkyVault.Payloads.ResponsePayloads;
+
     public record ProfileDefinitionResponse(
     List<Salutation>? Salutations,
     List<Nationality>? Nationalities,
@@ -13,24 +9,3 @@ namespace SkyVault.Payloads.ResponsePayloads
     List<Country>? Countries
     );
 
-    public class Salutation 
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-    }
-    public class Nationality
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-    }
-    public class Country
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-    }
-    public class Gender
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-    }
-}
