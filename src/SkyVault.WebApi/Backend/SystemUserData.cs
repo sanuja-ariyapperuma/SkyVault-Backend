@@ -3,15 +3,8 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
 {
-    public sealed class SystemUserData
+    public sealed class SystemUserData(SkyvaultContext _db)
     {
-        private readonly SkyvaultContext _db;
-
-        public SystemUserData(SkyvaultContext db)
-        {
-            _db = db;
-        }
-
         public SystemUser CreateOrGetUser(ValidateUserRequest requestUser)
         {
             var sysUser = _db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
