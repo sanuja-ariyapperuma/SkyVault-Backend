@@ -8,19 +8,19 @@ namespace SkyVault.WebApi.MappingProfiles
     {
         public MappingProfile()
         {
-            CreateMap<Backend.Models.Salutation, Payloads.ResponsePayloads.Salutation>()
+            CreateMap<Salutation, Payloads.CommonPayloads.Salutation>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.SalutationName));
 
-            CreateMap<Backend.Models.Nationality,  Payloads.ResponsePayloads.Nationality>()
+            CreateMap<Nationality,  Payloads.CommonPayloads.Nationality>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.NationalityName));
 
-            CreateMap<Backend.Models.Country, Payloads.ResponsePayloads.Country>()
+            CreateMap<Country, Payloads.CommonPayloads.Country>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CountryName));
 
-            CreateMap<Backend.Gender, Payloads.ResponsePayloads.Gender>();
+            CreateMap<Backend.Gender, Payloads.CommonPayloads.Gender>();
         }
     }
 }
