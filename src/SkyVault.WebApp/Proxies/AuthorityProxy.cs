@@ -22,25 +22,25 @@ public sealed class AuthorityProxy(HttpClient httpClient)
     {
         var menus = new[]
         {
-            new SkyVaultMenuItem(MenuName: "Profile Management", MenuUri: "#", MenuIconUri: "~/img/icons/pf_icon.png",
+            new SkyVaultMenuItem(MenuName: "Profile Management", MenuUri: "#", MenuIconUri: "/img/icons/pf_icon.png",
                 Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName),
-            new SkyVaultMenuItem(MenuName: "Notifications", MenuUri: "#", MenuIconUri: "~/img/icons/noti_icon.png",
+            new SkyVaultMenuItem(MenuName: "Notifications", MenuUri: "#", MenuIconUri: "/img/icons/noti_icon.png",
                 Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName,
                 Children: new[]
                 {
                     new SkyVaultMenuItem(MenuName: "Birthday Greetings", MenuUri: "#",
-                        MenuIconUri: "~/img/icons/bd_icon.png", Role: string.Empty),
+                        MenuIconUri: "/img/icons/bd_icon.png", Role: string.Empty),
                     new SkyVaultMenuItem(MenuName: "Passport Expiration", MenuUri: "#",
-                        MenuIconUri: "~/img/icons/psprt_icon.png", Role: string.Empty),
+                        MenuIconUri: "/img/icons/psprt_icon.png", Role: string.Empty),
                     new SkyVaultMenuItem(MenuName: "VISA Expiration", MenuUri: "#",
-                        MenuIconUri: "~/img/icons/visa_icon.png", Role: string.Empty),
+                        MenuIconUri: "/img/icons/visa_icon.png", Role: string.Empty),
                     new SkyVaultMenuItem(MenuName: "Send Notification", MenuUri: "#",
-                        MenuIconUri: "~/img/icons/sendnoti_icon.png", Role: string.Empty),
-                    new SkyVaultMenuItem(MenuName: "History", MenuUri: "#", MenuIconUri: "~/img/icons/hstry_icon.png",
+                        MenuIconUri: "/img/icons/sendnoti_icon.png", Role: string.Empty),
+                    new SkyVaultMenuItem(MenuName: "History", MenuUri: "#", MenuIconUri: "/img/icons/hstry_icon.png",
                         Role: string.Empty)
                 }),
             new SkyVaultMenuItem(MenuName: "Transfer Profiles", MenuUri: "#",
-                MenuIconUri: "~/img/icons/trnprof_icon.png", Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName)
+                MenuIconUri: "/img/icons/trnprof_icon.png", Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName)
         };
 
         /*var filteredMenus = menus.Where(menu => menu.Role == role || role == "admin");

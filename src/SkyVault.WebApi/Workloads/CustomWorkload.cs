@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
+using SkyVault.WebApi.Helper;
 
 namespace SkyVault.WebApi.Workloads
 {
@@ -23,18 +24,15 @@ namespace SkyVault.WebApi.Workloads
             var tasks = new Task[]
             {
                 Task.Run(() => {
-                        using var dbctx = CreateDbContext();
-                        var commonData = new CommonData(dbctx);
+                        var commonData = new CommonData(dbContext.CreateDbContext());
                         salutations = commonData.Salutations();
                 }),
                 Task.Run(() => {
-                    using var dbctx = CreateDbContext();
-                    var commonData = new CommonData(dbctx);
+                    var commonData = new CommonData(dbContext.CreateDbContext());
                     nationalities = commonData.GetNationalities();
                 }),
                 Task.Run(() => {
-                    using var dbctx = CreateDbContext();
-                    var commonData = new CommonData(dbctx);
+                    var commonData = new CommonData(dbContext.CreateDbContext());
                     countries = commonData.GetCountries();
                 })
             };
@@ -54,13 +52,6 @@ namespace SkyVault.WebApi.Workloads
 
             return Results.Ok(result.SucceededWithValue(profdef));
 
-        }
-        private static SkyvaultContext CreateDbContext()
-        {
-            var builder = new DbContextOptionsBuilder<SkyvaultContext>();
-            builder.UseMySql("Server=ayubdevmysql.southeastasia.cloudapp.azure.com;Database=skyvault;Uid=skyapp;Pwd=2NMc5*3Ee%Kxa^K3;", 
-                new MySqlServerVersion(new Version(8, 0))); // Or your preferred database provider
-            return new SkyvaultContext(builder.Options);
         }
     }
 }
