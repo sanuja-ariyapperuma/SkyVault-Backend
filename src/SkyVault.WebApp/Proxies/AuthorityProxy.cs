@@ -43,8 +43,10 @@ public sealed class AuthorityProxy(HttpClient httpClient)
                 MenuIconUri: "~/img/icons/trnprof_icon.png", Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName)
         };
 
-        var filteredMenus = menus.Where(menu => menu.Role == role || role == "All");
+        /*var filteredMenus = menus.Where(menu => menu.Role == role || role == "admin");
 
-        return filteredMenus;
+        return filteredMenus*/;
+
+        return menus;
     }
 }

@@ -8,13 +8,13 @@ using SkyVault.WebApp.Proxies;
 
 namespace SkyVault.WebApp.Pages
 {
-    [Authorize]
+    //[Authorize]
     public class IndexModel(
         IConfiguration configuration,
         IAntiforgery antiForgery,
         AuthorityProxy authorityProxy) : Models.SkyVaultPageModel(antiForgery)
     {
-        public override void OnGet()
+        /*public override void OnGet()
         {
             base.OnGet();
 
@@ -55,6 +55,41 @@ namespace SkyVault.WebApp.Pages
             
             //Get menus as per the assigned role.
             ViewData["UserMenus"] = authorityProxy.GetMenus(Role);
+        }*/
+        
+        public override IActionResult OnGet()
+        {
+            base.OnGet();
+            
+            var skyUser = new SkyVaultUser(
+                "test@gmail.com",
+                "Test", 
+                "User", 
+                "test@gmail.com", 
+                "Admin");
+           
+            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
+                skyUser.LastName, skyUser.Email, skyUser.Role);
+
+            var skyResult = authorityProxy.GetUserInfo(userRequest);
+
+            if (skyResult!.Succeeded == false)
+            {
+                return RedirectToPage("/unauthorized");
+            }
+            
+            //Bind only what was processed by the API and not what was received by the claims.
+            var welcomeUser = skyResult.Value;
+            
+            base.Upn = welcomeUser.Upn;
+            base.FullName = welcomeUser.FullName;
+            base.Email = welcomeUser.Email;
+            base.Role = welcomeUser.Role;
+            
+            //Get menus as per the assigned role.
+            ViewData["UserMenus"] = authorityProxy.GetMenus(Role!);
+            
+            return Page();
         }
 
         public RedirectResult OnGetSignOut()

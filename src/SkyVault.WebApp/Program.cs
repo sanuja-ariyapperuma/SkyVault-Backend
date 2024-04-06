@@ -5,6 +5,9 @@ using Microsoft.IdentityModel.Logging;
 using SkyVault.WebApp.Middlewares;
 using SkyVault.WebApp.Pages;
 using SkyVault.WebApp.Proxies;
+using HttpClientHandler = System.Net.Http.HttpClientHandler;
+using Uri = System.Uri;
+using WebApplicationBuilder = Microsoft.AspNetCore.Builder.WebApplicationBuilder;
 
 const string fallbackBaseUri = "https://localhost/api";
 
@@ -18,7 +21,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
-builder.Services.AddAuthentication(azureOptions =>
+/*builder.Services.AddAuthentication(azureOptions =>
     {
         azureOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         azureOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -34,14 +37,14 @@ builder.Services.AddAuthentication(azureOptions =>
                     return Task.CompletedTask;
 
                 if (LoginModel.RedirectToSso == true) return Task.CompletedTask;
-                
+
                 context.Response.Redirect("/login");
                 context.HandleResponse();
 
                 return Task.CompletedTask;
             }
         };
-    });
+    });*/
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20);
@@ -50,16 +53,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddHttpClient("BaseClient", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
-});
-builder.Services.AddHttpClient<AuthorityProxy>();
-builder.Services.AddHttpClient<CustomerProxy>();
+ConfigureHttpClient<AuthorityProxy>(builder);
+ConfigureHttpClient<CustomerProxy>(builder);
 
 var app = builder.Build();
 
-IdentityModelEventSource.ShowPII = true;
+//IdentityModelEventSource.ShowPII = true;
 
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
@@ -67,8 +66,21 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 app.MapRazorPages();
-app.UseMiddleware<ExceptionMiddleware>();
+//app.UseMiddleware<ExceptionMiddleware>();
 app.Run();
+return;
+
+void ConfigureHttpClient<T>(WebApplicationBuilder wab) where T : class
+{
+    wab.Services.AddHttpClient<T>(client =>
+    {
+        client.BaseAddress = new Uri(wab.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
+        client.DefaultRequestHeaders.Add("X-API-KEY", wab.Configuration["BaseApiKey"]);
+    }).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler()
+    {
+        ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+    });
+}

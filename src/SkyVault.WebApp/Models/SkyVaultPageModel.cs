@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SkyVault.WebApp.Models;
@@ -11,10 +12,12 @@ public class SkyVaultPageModel(IAntiforgery antiForgery) : PageModel
     public string? Email { get; private protected set; }
     public string? Role { get; private protected set; }
     
-    public virtual void OnGet()
+    public virtual IActionResult OnGet()
     {
         ArgumentNullException.ThrowIfNull(antiForgery);
             
         AntiForgeryToken = antiForgery.GetAndStoreTokens(HttpContext).RequestToken;
+        
+        return Page();
     }
 }
