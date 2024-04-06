@@ -3,11 +3,11 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
 {
-    public sealed class SystemUserData(SkyvaultContext _db)
+    public sealed class SystemUserData(SkyvaultContext db)
     {
         public SystemUser CreateOrGetUser(ValidateUserRequest requestUser)
         {
-            var sysUser = _db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
+            var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
 
             if (sysUser != null)
                 return sysUser;
@@ -20,15 +20,15 @@ namespace SkyVault.WebApi.Backend
                 UserRole = requestUser.Role
             };
 
-            _db.SystemUsers.Add(sysUser);
-            _db.SaveChanges();
+            db.SystemUsers.Add(sysUser);
+            db.SaveChanges();
 
             return sysUser;
         }
 
         public SystemUser? GetUserByProfileId(int sysUserId)
         {
-            return _db.SystemUsers.Find(sysUserId);
+            return db.SystemUsers.Find(sysUserId);
         }
     }
 }
