@@ -1,7 +1,7 @@
 ﻿@rootURL=https://localhost:7199
 
 POST {{rootURL}}/auth/user
-Authorization: abc123@@@
+X-API-KEY: 7heBJBIPU25duYMFKrCf
 Content-Type: application/json
 
 {

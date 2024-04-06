@@ -1,3 +1,5 @@
 @rootURL=https://localhost:7199
 
 GET {{rootURL}}/profilepage-commondata
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json

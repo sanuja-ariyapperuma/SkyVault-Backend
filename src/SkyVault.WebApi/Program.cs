@@ -25,7 +25,7 @@ public class Program
         app.MapCustomerEndpoints();
         app.MapProfileEndpoints();
         app.MapHealthChecks("health");
-        app.UseMiddleware<ExceptionMiddleware>();
+        //app.UseMiddleware<ExceptionMiddleware>();
         app.Run();
     }
 }
