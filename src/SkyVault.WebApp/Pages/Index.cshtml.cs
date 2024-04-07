@@ -67,7 +67,7 @@ namespace SkyVault.WebApp.Pages
                 "User", 
                 "test@gmail.com", 
                 "Admin");
-           
+            
             var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
                 skyUser.LastName, skyUser.Email, skyUser.Role);
 
@@ -75,6 +75,10 @@ namespace SkyVault.WebApp.Pages
 
             if (skyResult!.Succeeded == false)
             {
+                TempData["Message"] = skyResult.Message;
+                TempData["ErrorCode"] = skyResult.ErrorCode;
+                TempData["CorrelationId"] = skyResult.CorrelationId;
+                
                 return RedirectToPage("/unauthorized");
             }
             
