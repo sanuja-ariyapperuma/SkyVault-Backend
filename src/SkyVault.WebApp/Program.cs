@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Logging;
+using SkyVault.WebApp;
 using SkyVault.WebApp.Middlewares;
 using SkyVault.WebApp.Pages;
 using SkyVault.WebApp.Proxies;
@@ -57,6 +58,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddTransient<CorrelationIdDelegatingHandler>();
 
 ConfigureHttpClient<AuthorityProxy>(builder);
 ConfigureHttpClient<CustomerProxy>(builder);
@@ -87,6 +89,7 @@ void ConfigureHttpClient<T>(WebApplicationBuilder wab) where T : class
         client.DefaultRequestHeaders.Add("X-Api-Key", wab.Configuration["BaseApiKey"]);
     }).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler()
     {
+        //To be removed when we deploy to production. The is a breaker for developer certificate validation.
         ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-    });
+    }).AddHttpMessageHandler<CorrelationIdDelegatingHandler>();
 }

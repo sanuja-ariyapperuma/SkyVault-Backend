@@ -12,22 +12,26 @@ public sealed class AuthorityProxy(HttpClient httpClient)
     {
         var response = httpClient.PostAsJsonAsync("/auth/user", validateUserRequest).Result;
         
-        if (response.StatusCode == HttpStatusCode.BadRequest)
+        switch (response.StatusCode)
         {
-            var failedPayload = response.Content.ReadFromJsonAsync<ValidationProblemDetails>().Result;
+            case HttpStatusCode.BadRequest:
+            {
+                var failedPayload = response.Content.ReadFromJsonAsync<ValidationProblemDetails>().Result;
             
-            return new SkyResult<WelcomeUserResponse>()
-                .Fail(message: failedPayload?.Detail,
-                    errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
-                    correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
-        } else if (response.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var failedPayload = response.Content.ReadFromJsonAsync<ProblemDetails>().Result;
+                return new SkyResult<WelcomeUserResponse>()
+                    .Fail(message: failedPayload?.Detail,
+                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+            }
+            case HttpStatusCode.InternalServerError:
+            {
+                var failedPayload = response.Content.ReadFromJsonAsync<ProblemDetails>().Result;
             
-            return new SkyResult<WelcomeUserResponse>()
-                .Fail(message: failedPayload?.Detail,
-                    errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
-                    correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+                return new SkyResult<WelcomeUserResponse>()
+                    .Fail(message: failedPayload?.Detail,
+                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+            }
         }
 
         response.EnsureSuccessStatusCode();

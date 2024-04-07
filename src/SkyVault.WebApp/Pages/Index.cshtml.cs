@@ -12,7 +12,8 @@ namespace SkyVault.WebApp.Pages
     public class IndexModel(
         IConfiguration configuration,
         IAntiforgery antiForgery,
-        AuthorityProxy authorityProxy) : Models.SkyVaultPageModel(antiForgery)
+        AuthorityProxy authorityProxy,
+        IHttpContextAccessor httpContextAccessor) : Models.SkyVaultPageModel(antiForgery)
     {
         /*public override void OnGet()
         {
@@ -24,17 +25,17 @@ namespace SkyVault.WebApp.Pages
             //Making sure that all values required by the claims are present before proceeding.
             if (HttpContext.Session.GetString(StateKeys.ClaimsCheckSessionKey) is null)
                 HttpContext.Response.Redirect("/claimspage", true);
-            
+
             var claimDictionary = User.Claims.ToDictionary(c => c.Type, c => c.Value);
-            
+
             var skyUser = new SkyVaultUser(
                 claimDictionary.GetValueOrDefault(ClaimTypes.Email),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Name),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Surname),
                 claimDictionary.GetValueOrDefault(ClaimTypes.Email),
                 claimDictionary.GetValueOrDefault(SkyVaultConfigurationKeys.SkyVaultUserRoleClaimKey));
-           
-            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
+
+            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName,
                 skyUser.LastName, skyUser.Email, skyUser.Role);
 
             var skyResult = authorityProxy.GetUserInfo(userRequest);
@@ -44,31 +45,35 @@ namespace SkyVault.WebApp.Pages
                 HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return;
             }
-            
+
             //Bind only what was processed by the API and not what was received by the claims.
             var welcomeUser = skyResult.Value;
-            
+
             base.Upn = welcomeUser.Upn;
             base.FullName = welcomeUser.FullName;
             base.Email = welcomeUser.Email;
             base.Role = welcomeUser.Role;
-            
+
             //Get menus as per the assigned role.
             ViewData["UserMenus"] = authorityProxy.GetMenus(Role);
         }*/
-        
+
         public override IActionResult OnGet()
         {
             base.OnGet();
-            
+
+            var correlationId =
+                (httpContextAccessor.HttpContext!
+                    .Items["X-Correlation-ID"] ??= "Not Available") as string;
+
             var skyUser = new SkyVaultUser(
                 "test@gmail.com",
                 "Test", 
                 "User", 
                 "test@gmail.com", 
                 "Admin");
-            
-            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName, 
+
+            var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName,
                 skyUser.LastName, skyUser.Email, skyUser.Role);
 
             var skyResult = authorityProxy.GetUserInfo(userRequest);
@@ -77,22 +82,23 @@ namespace SkyVault.WebApp.Pages
             {
                 TempData["Message"] = skyResult.Message;
                 TempData["ErrorCode"] = skyResult.ErrorCode;
-                TempData["CorrelationId"] = skyResult.CorrelationId;
-                
+                TempData["CorrelationId1"] = correlationId;
+                TempData["CorrelationId2"] = skyResult.CorrelationId;
+
                 return RedirectToPage("/unauthorized");
             }
-            
+
             //Bind only what was processed by the API and not what was received by the claims.
             var welcomeUser = skyResult.Value;
-            
+
             base.Upn = welcomeUser?.Upn;
             base.FullName = welcomeUser?.FullName;
             base.Email = welcomeUser?.Email;
             base.Role = welcomeUser?.Role;
-            
+
             //Get menus as per the assigned role.
             ViewData["UserMenus"] = authorityProxy.GetMenus(Role!);
-            
+
             return Page();
         }
 
