@@ -79,7 +79,7 @@ void ConfigureHttpClient<T>(WebApplicationBuilder wab) where T : class
     wab.Services.AddHttpClient<T>(client =>
     {
         client.BaseAddress = new Uri(wab.Configuration["BaseApiUrl"] ?? fallbackBaseUri);
-        client.DefaultRequestHeaders.Add("X-API-KEY", wab.Configuration["BaseApiKey"]);
+        client.DefaultRequestHeaders.Add("X-Api-Key", wab.Configuration["BaseApiKey"]);
     }).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler()
     {
         ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
