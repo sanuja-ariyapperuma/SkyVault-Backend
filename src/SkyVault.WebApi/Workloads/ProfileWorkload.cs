@@ -10,123 +10,60 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class ProfileWorkload
     {
+        private static string correlationId = string.Empty;
+
         public static IResult SaveProfile(
             [FromBody] ProfilePayload profile, SkyvaultContext dbContext, HttpContext context)
         {
-            var correlationId = context.Items["X-Correlation-ID"]?.ToString();
+            correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
             var commonData = new CommonData(dbContext);
             var systemUserData = new SystemUserData(dbContext);
 
-            ValidationProblemDetails BuildValidationProblemDetails(string detail, string errorCode) =>
-                new ValidationProblemDetails().ToValidationProblemDetails(detail, errorCode, correlationId);
-
             try
             {
-                if (!int.TryParse(profile.SystemUserId, out int systemUserId))
-                    return Results.Problem(BuildValidationProblemDetails("Invalid System User Id", "30550615-0000"));
 
-                var systemUser = systemUserData.GetUserByProfileId(systemUserId, correlationId);
+                var systemUser = systemUserData.GetUserByProfileId(Convert.ToInt32(profile.SystemUserId), correlationId);
+                var salutation = commonData.Salutation(Convert.ToInt32(profile.SalutationId));
+                var comMethod = commonData.GetCommunicationMethod(Convert.ToInt32(profile.PreffdComMth));
 
                 if (!systemUser.Succeeded)
-                    return Results.Problem(BuildValidationProblemDetails("No Matching System User Found",
-                        "30550615-0001"));
-
-                if (!int.TryParse(profile.SalutationId, out int salutationId))
-                    return Results.Problem(BuildValidationProblemDetails("Invalid Salutation Id", "30550615-0002"));
-
-                var salutation = commonData.Salutation(salutationId);
+                    return Results.Problem(
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                            "No Matching System User Found","30550615-0000", correlationId)
+                        );
 
                 if (salutation == null)
-                    return Results.Problem(BuildValidationProblemDetails("No Matching Salutation Found",
-                        "30550615-0003"));
 
-                if (!int.TryParse(profile.PreffdComMth, out int preffComMthId))
-                    return Results.Problem(BuildValidationProblemDetails("Invalid Communication Method Id",
-                        "30550615-0004"));
-
-                var comMethod = commonData.GetCommunicationMethod(preffComMthId);
+                    return Results.Problem(
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                            "No Matching Salutation Found", "30550615-0001", correlationId));
 
                 if (comMethod == null)
-                    return Results.Problem(BuildValidationProblemDetails("No Matching Communication Method Found",
-                        "30550615-0005"));
+                    return Results.Problem(
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                            "No Matching Communication Method Found", "30550615-0002", correlationId));
 
-                var passports = new List<Backend.Models.Passport>();
+                var passports = CreateNewPassport(profile, commonData);
+
+                if (passports == null)
+                    return Results.Problem(
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                            "Invalid Passport Or Visa Data Found", "30550615-0003", correlationId));
 
                 var frequentFlyerNumbers = profile.FrequentFlyerNumbers
                     .Select(item => new FrequentFlyerNumber() { FlyerNumber = item }).ToList();
 
-                foreach (var passport in profile.Passports)
-                {
-                    if (!int.TryParse(passport.CountryId, out int countryId))
-                        return Results.Problem(BuildValidationProblemDetails("Invalid Country Id", "30550615-0006"));
-
-                    var country = commonData.GetCountry(countryId);
-                    if (country == null)
-                        return Results.Problem(BuildValidationProblemDetails("No Matching Country Found",
-                            "30550615-0007"));
-
-                    if (!int.TryParse(passport.NationalityId, out int nationalityId))
-                        return Results.Problem(BuildValidationProblemDetails("Invalid Nationality Id",
-                            "30550615-0008"));
-
-                    var nationality = commonData.GetNationality(nationalityId);
-                    if (nationality == null)
-                        return Results.Problem(BuildValidationProblemDetails("No Matching Nationality Found",
-                            "30550615-0009"));
-
-                    var newpassport = new Backend.Models.Passport()
-                    {
-                        LastName = passport.LastName,
-                        OtherNames = passport.OtherNames,
-                        PassportNumber = passport.PassportNumber,
-                        Country = country,
-                        Nationality = nationality,
-                        Gender = passport.Gender,
-                        DateOfBirth = DateOnly.FromDateTime(DateTime.Parse(passport.DateOfBirth)),
-                        PlaceOfBirth = passport.PlaceOfBirth,
-                        IsPrimary = passport.IsPrimary,
-                        ExpiryDate = DateOnly.FromDateTime(DateTime.Parse(passport.ExpiryDate)),
-                    };
-
-                    var visas = new List<Backend.Models.Visa>();
-
-                    foreach (var visa in passport.Visa)
-                    {
-                        if (!int.TryParse(visa.CountryId, out int visaCountryId))
-                            return Results.Problem(BuildValidationProblemDetails("Invalid Visa Country Id",
-                                "30550615-0010"));
-
-                        var visaCountry = commonData.GetCountry(visaCountryId);
-
-                        if (visaCountry == null)
-                            return Results.Problem(BuildValidationProblemDetails("No Matching Visa Country Found",
-                                "30550615-0011"));
-
-                        var newVisa = new Backend.Models.Visa()
-                        {
-                            VisaNumber = visa.VisaNumber,
-                            Country = visaCountry,
-                            IssuedPlace = visa.IssuedPlace,
-                            IssuedDate = DateOnly.FromDateTime(DateTime.Parse(visa.IssuedDate)),
-                            ExpireDate = DateOnly.FromDateTime(DateTime.Parse(visa.ExpireDate))
-                        };
-
-                        visas.Add(newVisa);
-                    }
-
-                    newpassport.Visas = visas;
-                    passports.Add(newpassport);
-                }
-
+                
                 CustomerProfile? parent = null;
 
                 if (int.TryParse(profile.ParentId, out int parentId))
                 {
                     parent = dbContext.CustomerProfiles.Find(parentId);
                     if (parent == null)
-                        return Results.Problem(BuildValidationProblemDetails("No Matching Parent Profile Found",
-                            "30550615-0012"));
+                        return Results.Problem(
+                            new ValidationProblemDetails().ToValidationProblemDetails(
+                            "No Matching Parent Profile Found", "30550615-0004", correlationId));
                 }
 
                 var newProfile = new CustomerProfile()
@@ -140,69 +77,89 @@ namespace SkyVault.WebApi.Workloads
                 };
 
                 var customerProfileData = new CustomerProfileData(dbContext);
+
                 customerProfileData.Create(newProfile);
 
                 return Results.Ok(ToProfilePayload(newProfile));
+            }
+            catch(FormatException e) 
+            {
+                e.LogException(correlationId);
+
+                return Results.Problem(new ProblemDetails().ToProblemDetails(
+                    "Invalid type of data found in the profile", "30550615-0005", correlationId));
             }
             catch (Exception e)
             {
                 e.LogException(correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "An unexpected error occurred. Please try again later.", "30550615-0001", correlationId));
+                    "An unexpected error occurred. Please try again later.", "30550615-0006", correlationId));
             }
         }
 
         public static IResult GetProfile(
             [FromRoute] string id,
             [FromRoute] string sysUserId,
-            SkyvaultContext dbContext
+            SkyvaultContext dbContext,
+            HttpContext context
         )
         {
-            var customerProfileData = new CustomerProfileData(dbContext);
+            try
+            {
+                correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
-            if (!int.TryParse(id, out int profileId))
-                return Results.BadRequest(new SkyResult<ProfilePayload>()
-                    .Fail("Invalid profile id found", "400", "0"));
+                var customerProfileData = new CustomerProfileData(dbContext);
 
-            if (!int.TryParse(sysUserId, out int systemUserId))
-                return Results.BadRequest(new SkyResult<ProfilePayload>()
-                    .Fail("Invalid system user id found", "400", "0"));
+                var customerProfile = customerProfileData.Get(
+                    Convert.ToInt32(id), Convert.ToInt32(sysUserId));
 
-            var customerProfile = customerProfileData.Get(profileId, systemUserId);
+                if (customerProfile == null)
+                    return Results.Problem(
+                        new ProblemDetails().ToProblemDetails(
+                    "No profile found", "30550615-0007", correlationId));
 
-            if (customerProfile == null)
-                return Results.NotFound(new SkyResult<ProfilePayload>()
-                    .Fail("No profile found", "404", "0"));
+                return Results.Ok(ToProfilePayload(customerProfile));
+            }
+            catch (FormatException e)
+            {
+                e.LogException(correlationId);
 
-            return Results.Ok(new SkyResult<ProfilePayload>()
-                .SucceededWithValue(ToProfilePayload(customerProfile)));
+                return Results.Problem(new ProblemDetails().ToProblemDetails(
+                    "Invalid type of data in request", "30550615-0008", correlationId));
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
+
+                return Results.Problem(new ProblemDetails().ToProblemDetails(
+                    "An unexpected error occurred. Please try again later.", "30550615-0009", correlationId));
+            }
         }
 
         public static IResult SearchProfiles(
             [FromRoute] string SysUserId,
             [FromRoute] string RoleId,
             [FromRoute] string SearchQuery,
-            SkyvaultContext dbContext
+            SkyvaultContext dbContext,
+            HttpContext context
         )
         {
+            correlationId = context.Items["X-Correlation-ID"]?.ToString();
+
             var customerProfileData = new CustomerProfileData(dbContext);
 
-            if (!int.TryParse(SysUserId, out int systemUserId))
-                return Results.BadRequest(new SkyResult<ProfilePayload>()
-                    .Fail("Invalid profile id found", "400", "0"));
-
-            var searchResult = customerProfileData.Search(SearchQuery, systemUserId, Convert.ToInt32(RoleId));
+            var searchResult = customerProfileData.Search(SearchQuery, Convert.ToInt32(SysUserId), Convert.ToInt32(RoleId));
 
             if (searchResult.Count == 0)
-                return Results.NotFound(new SkyResult<ProfilePayload>()
-                    .Fail("No profiles found", "404", "0"));
+                return Results.Problem(new ProblemDetails().ToProblemDetails(
+                    "No profile found", "30550615-0010", correlationId));
 
             var response = ToSearchProfileResponse(searchResult);
 
             var result = new SkyResult<List<SearchProfileResponse>>();
 
-            return Results.Ok(result.SucceededWithValue(response));
+            return Results.Ok(response);
         }
 
         private static ProfilePayload ToProfilePayload(CustomerProfile customerProfile)
@@ -248,7 +205,8 @@ namespace SkyVault.WebApi.Workloads
             return profilePayload;
         }
 
-        private static List<SearchProfileResponse> ToSearchProfileResponse(List<CustomerProfile> customerProfile)
+        private static List<SearchProfileResponse> ToSearchProfileResponse(
+            List<CustomerProfile> customerProfile)
         {
             return customerProfile.SelectMany(cp => cp.Passports
                 .Select(
@@ -261,6 +219,80 @@ namespace SkyVault.WebApi.Workloads
                     )
                 )
             ).ToList();
+        }
+
+        private static List<Backend.Models.Passport> CreateNewPassport(ProfilePayload profile, 
+            CommonData commonData) 
+        {
+            var passports = new List<Backend.Models.Passport>();
+
+            foreach (var passport in profile.Passports)
+            {
+                var country = commonData.GetCountry(Convert.ToInt32(passport.CountryId));
+                var nationality = commonData.GetNationality(Convert.ToInt32(passport.CountryId));
+
+                if (country == null || nationality == null)
+                    return null;
+
+                List<Backend.Models.Visa> visas = [];
+
+                if (passport.Visa.Length > 0) 
+                {
+                    visas = CreateVisa(passport.Visa.ToList(), commonData);
+                    if (visas == null)
+                        return null;
+                }
+                    
+
+                var newpassport = new Backend.Models.Passport()
+                {
+                    LastName = passport.LastName,
+                    OtherNames = passport.OtherNames,
+                    PassportNumber = passport.PassportNumber,
+                    Country = country,
+                    Nationality = nationality,
+                    Gender = passport.Gender,
+                    DateOfBirth = DateOnly.FromDateTime(DateTime.Parse(passport.DateOfBirth)),
+                    PlaceOfBirth = passport.PlaceOfBirth,
+                    IsPrimary = passport.IsPrimary,
+                    ExpiryDate = DateOnly.FromDateTime(DateTime.Parse(passport.ExpiryDate)),
+                    Visas = visas
+                };
+
+                passports.Add(newpassport);
+            }
+            
+            return passports;
+
+        }
+        private static List<Backend.Models.Visa> CreateVisa(
+            List<Payloads.CommonPayloads.Visa> visas, CommonData commonData) {
+
+            var visasEntity = new List<Backend.Models.Visa>();
+
+            foreach (var visa in visas)
+            {
+
+                var visaCountry = commonData.GetCountry(Convert.ToInt32(visa.CountryId));
+
+                if (visaCountry == null)
+                    return null;
+
+                var newVisa = new Backend.Models.Visa()
+                {
+                    VisaNumber = visa.VisaNumber,
+                    Country = visaCountry,
+                    IssuedPlace = visa.IssuedPlace,
+                    IssuedDate = DateOnly.FromDateTime(DateTime.Parse(visa.IssuedDate)),
+                    ExpireDate = DateOnly.FromDateTime(DateTime.Parse(visa.ExpireDate))
+                };
+
+                visasEntity.Add(newVisa);
+                
+            }
+
+            return visasEntity;
+
         }
     }
 }
