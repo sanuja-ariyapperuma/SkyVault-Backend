@@ -13,8 +13,10 @@ public class ExceptionMiddleware(RequestDelegate next)
         }
         catch (Exception ex)
         {
+            var correlationId = httpContext.Items["X-Correlation-ID"]?.ToString();
+            
             //Send to central exception handler
-            ex.LogException();
+            ex.LogException(correlationId);
             
             await HandleException(httpContext, ex);
         }

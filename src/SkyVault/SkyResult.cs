@@ -5,16 +5,16 @@ public sealed class SkyResult<T>
 {
     public string? Message { get; private set; }
     public string? ErrorCode { get; private set; }
-    public string? TraceId { get; private set; }
+    public string? CorrelationId { get; private set; }
     
-    public T Value { get; private set; } = default!;
+    public T? Value { get; private set; }
     public bool Succeeded { get; private set; } = false;
 
-    public SkyResult<T> Fail(string message, string errorCode, string traceId)
+    public SkyResult<T> Fail(string? message, string? errorCode, string? correlationId)
     {
         Message = message;
         ErrorCode = errorCode;
-        TraceId = traceId;
+        CorrelationId = correlationId;
 
         return this;
     }
@@ -25,7 +25,7 @@ public sealed class SkyResult<T>
 
         Message = string.Empty;
         ErrorCode = string.Empty;
-        TraceId = string.Empty;
+        CorrelationId = string.Empty;
         
         Value = value;
         Succeeded = true;

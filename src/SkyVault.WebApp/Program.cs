@@ -69,6 +69,7 @@ app.UseSession();
 //app.UseAuthentication();
 //app.UseAuthorization();
 app.MapRazorPages();
+app.UseMiddleware<CorrelationIdMiddleware>();
 //app.UseMiddleware<ExceptionMiddleware>();
 app.Run();
 return;

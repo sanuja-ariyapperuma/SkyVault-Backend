@@ -81,10 +81,10 @@ namespace SkyVault.WebApp.Pages
             //Bind only what was processed by the API and not what was received by the claims.
             var welcomeUser = skyResult.Value;
             
-            base.Upn = welcomeUser.Upn;
-            base.FullName = welcomeUser.FullName;
-            base.Email = welcomeUser.Email;
-            base.Role = welcomeUser.Role;
+            base.Upn = welcomeUser?.Upn;
+            base.FullName = welcomeUser?.FullName;
+            base.Email = welcomeUser?.Email;
+            base.Role = welcomeUser?.Role;
             
             //Get menus as per the assigned role.
             ViewData["UserMenus"] = authorityProxy.GetMenus(Role!);

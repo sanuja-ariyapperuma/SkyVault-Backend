@@ -12,6 +12,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddHealthChecks();
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
@@ -20,6 +21,7 @@ public class Program
         builder.Services.AddAutoMapper(typeof(Program).Assembly,typeof(MappingProfile).Assembly);
 
         var app = builder.Build();
+        app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseMiddleware<BasicAuthMiddleware>();
         app.MapLoginEndpoints();
         app.MapCustomerEndpoints();
