@@ -1,5 +1,6 @@
-﻿namespace SkyVault.WebApi.Backend
+﻿namespace SkyVault.WebApi.Backend.Models
 {
+    //Do not add this class to the DbContext
     public class Gender
     {
         public string Id { get; set; } = string.Empty;

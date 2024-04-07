@@ -15,9 +15,9 @@ namespace SkyVault.WebApi.Workloads
         {
             var correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
-            List<Backend.Models.Salutation> salutations = [];
-            List<Backend.Models.Nationality> nationalities = [];
-            List<Backend.Models.Country> countries = [];
+            List<Salutation> salutations = [];
+            List<Nationality> nationalities = [];
+            List<Country> countries = [];
 
             try
             {
@@ -59,7 +59,7 @@ namespace SkyVault.WebApi.Workloads
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
                     "An unexpected error occurred. Please try again later.",
-                    "2adb05bf-0001", correlationId));
+                    "2adb05bf-0000", correlationId));
             }
         }
     }
