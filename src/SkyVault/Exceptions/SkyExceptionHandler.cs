@@ -12,6 +12,6 @@ public static class SkyExceptionHandler
     {
         if (e.ExceptionObject is not Exception exception) return;
         
-        exception.LogException();
+        exception.LogException(Guid.NewGuid().ToString());
     }
 }

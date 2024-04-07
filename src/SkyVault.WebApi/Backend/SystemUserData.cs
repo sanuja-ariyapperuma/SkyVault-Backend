@@ -1,34 +1,69 @@
-﻿using SkyVault.Payloads.RequestPayloads;
+﻿//https://www.fileformat.info/tool/hash.htm
+
+using SkyVault.Exceptions;
+using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
 {
     public sealed class SystemUserData(SkyvaultContext db)
     {
-        public SystemUser CreateOrGetUser(ValidateUserRequest requestUser)
+        public SkyResult<SystemUser> CreateOrGetUser(ValidateUserRequest requestUser, string? correlationId)
         {
-            var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
-
-            if (sysUser != null)
-                return sysUser;
-
-            sysUser = new SystemUser
+            try
             {
-                FirstName = requestUser.FirstName,
-                LastName = requestUser.LastName,
-                SamProfileId = requestUser.Upn,
-                UserRole = requestUser.Role
-            };
+                var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
 
-            db.SystemUsers.Add(sysUser);
-            db.SaveChanges();
+                if (sysUser != null)
+                    return new SkyResult<SystemUser>().SucceededWithValue(sysUser);
 
-            return sysUser;
+                sysUser = new SystemUser
+                {
+                    FirstName = requestUser.FirstName,
+                    LastName = requestUser.LastName,
+                    SamProfileId = requestUser.Upn,
+                    UserRole = requestUser.Role
+                };
+                
+                db.SystemUsers.Add(sysUser);
+                db.SaveChanges();
+                
+                return new SkyResult<SystemUser>().SucceededWithValue(sysUser);
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
+
+                return new SkyResult<SystemUser>().Fail(
+                    message: "An unexpected error occurred while creating user. Please try again.",
+                    errorCode: "2ac5059f-0001",
+                    correlationId: correlationId);
+            }
         }
 
-        public SystemUser? GetUserByProfileId(int sysUserId)
+        public SkyResult<SystemUser> GetUserByProfileId(int sysUserId, string? correlationId)
         {
-            return db.SystemUsers.Find(sysUserId);
+            try
+            {
+                var user = db.SystemUsers.Find(sysUserId);
+
+                if (user == null)
+                    return new SkyResult<SystemUser>().Fail(
+                        message: "User not found.",
+                        errorCode: "2ac5059f-0002",
+                        correlationId: correlationId);
+
+                return new SkyResult<SystemUser>().SucceededWithValue(user);
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
+                
+                return new SkyResult<SystemUser>().Fail(
+                    message: "An unexpected error occurred while fetching user. Please try again.",
+                    errorCode: "2ac5059f-0003",
+                    correlationId: correlationId);
+            }
         }
     }
 }

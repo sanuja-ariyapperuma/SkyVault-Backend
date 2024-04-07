@@ -1,3 +1,5 @@
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApp.Models;
@@ -9,12 +11,29 @@ public sealed class AuthorityProxy(HttpClient httpClient)
     public SkyResult<WelcomeUserResponse>? GetUserInfo(ValidateUserRequest validateUserRequest)
     {
         var response = httpClient.PostAsJsonAsync("/auth/user", validateUserRequest).Result;
-
-        if (!response.IsSuccessStatusCode)
-            return new SkyResult<WelcomeUserResponse>().Fail("Failed to get user info",
-                "AUTH-0001", "000-000");
         
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var failedPayload = response.Content.ReadFromJsonAsync<ValidationProblemDetails>().Result;
+            
+            return new SkyResult<WelcomeUserResponse>()
+                .Fail(message: failedPayload?.Detail,
+                    errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                    correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+        } else if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var failedPayload = response.Content.ReadFromJsonAsync<ProblemDetails>().Result;
+            
+            return new SkyResult<WelcomeUserResponse>()
+                .Fail(message: failedPayload?.Detail,
+                    errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                    correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+        }
+
+        response.EnsureSuccessStatusCode();
+
         var payload = response.Content.ReadFromJsonAsync<WelcomeUserResponse>().Result;
+        
         return new SkyResult<WelcomeUserResponse>().SucceededWithValue(payload!);
     }
 
@@ -45,7 +64,8 @@ public sealed class AuthorityProxy(HttpClient httpClient)
 
         /*var filteredMenus = menus.Where(menu => menu.Role == role || role == "admin");
 
-        return filteredMenus*/;
+        return filteredMenus*/
+        ;
 
         return menus;
     }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using SkyVault.Exceptions;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
@@ -9,49 +10,57 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class CustomWorkload
     {
-        public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext, IMapper mapper,
-                       IConfiguration configuration)
+        public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
+            IMapper mapper, IConfiguration configuration, HttpContext context)
         {
-            //var commonData = new CommonData(CreateDbContext());
+            var correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
-            //var salutations = commonData.Salutations();
-            //var nationalities = commonData.GetNationalities();
-            //var countries = commonData.GetCountries();
-            List<Backend.Models.Salutation> salutations = new();
-            List<Backend.Models.Nationality> nationalities = new();
-            List<Backend.Models.Country> countries = new();
+            List<Backend.Models.Salutation> salutations = [];
+            List<Backend.Models.Nationality> nationalities = [];
+            List<Backend.Models.Country> countries = [];
 
-            var tasks = new Task[]
+            try
             {
-                Task.Run(() => {
+                var tasks = new Task[]
+                {
+                    Task.Run(() =>
+                    {
                         var commonData = new CommonData(dbContext.CreateDbContext());
                         salutations = commonData.Salutations();
-                }),
-                Task.Run(() => {
-                    var commonData = new CommonData(dbContext.CreateDbContext());
-                    nationalities = commonData.GetNationalities();
-                }),
-                Task.Run(() => {
-                    var commonData = new CommonData(dbContext.CreateDbContext());
-                    countries = commonData.GetCountries();
-                })
-            };
+                    }),
+                    Task.Run(() =>
+                    {
+                        var commonData = new CommonData(dbContext.CreateDbContext());
+                        nationalities = commonData.GetNationalities();
+                    }),
+                    Task.Run(() =>
+                    {
+                        var commonData = new CommonData(dbContext.CreateDbContext());
+                        countries = commonData.GetCountries();
+                    })
+                };
 
-            Task.WaitAll(tasks);
+                Task.WaitAll(tasks);
 
-            var commonData = new CommonData(dbContext);
-            var genders = commonData.GetGender();
+                var commonData = new CommonData(dbContext);
+                var genders = commonData.GetGender();
 
-            var profdef = new ProfileDefinitionResponse(
-                mapper.Map<List<Payloads.CommonPayloads.Salutation>>(salutations),
-                mapper.Map<List<Payloads.CommonPayloads.Nationality>>(nationalities),
-                mapper.Map<List<Payloads.CommonPayloads.Gender>>(genders),
-                mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
+                var profileDefinition = new ProfileDefinitionResponse(
+                    mapper.Map<List<Payloads.CommonPayloads.Salutation>>(salutations),
+                    mapper.Map<List<Payloads.CommonPayloads.Nationality>>(nationalities),
+                    mapper.Map<List<Payloads.CommonPayloads.Gender>>(genders),
+                    mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
 
-            var result = new SkyResult<ProfileDefinitionResponse>();
+                return Results.Ok(profileDefinition);
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
 
-            return Results.Ok(result.SucceededWithValue(profdef));
-
+                return Results.Problem(new ProblemDetails().ToProblemDetails(
+                    "An unexpected error occurred. Please try again later.",
+                    "2adb05bf-0001", correlationId));
+            }
         }
     }
 }
