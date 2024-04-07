@@ -15,6 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAntiforgery(options => options.HeaderName = "XSRF-TOKEN");
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
 builder.Services.AddRazorPages();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
