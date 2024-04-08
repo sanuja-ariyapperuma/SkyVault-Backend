@@ -25,7 +25,7 @@ internal static class AuthenticationWorkload
         {
             return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
                 "One or more required fields are missing. Please provide all required fields.",
-                "67010904-0001", correlationId));
+                "67010904-0000", correlationId));
         }
 
         var systemUserData = new SystemUserData(dbContext);

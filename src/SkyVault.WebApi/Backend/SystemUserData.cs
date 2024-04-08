@@ -36,7 +36,7 @@ namespace SkyVault.WebApi.Backend
 
                 return new SkyResult<SystemUser>().Fail(
                     message: "An unexpected error occurred while creating user. Please try again.",
-                    errorCode: "2ac5059f-0001",
+                    errorCode: "2ac5059f-0000",
                     correlationId: correlationId);
             }
         }
@@ -50,7 +50,7 @@ namespace SkyVault.WebApi.Backend
                 if (user == null)
                     return new SkyResult<SystemUser>().Fail(
                         message: "User not found.",
-                        errorCode: "2ac5059f-0002",
+                        errorCode: "2ac5059f-0001",
                         correlationId: correlationId);
 
                 return new SkyResult<SystemUser>().SucceededWithValue(user);
@@ -61,7 +61,7 @@ namespace SkyVault.WebApi.Backend
                 
                 return new SkyResult<SystemUser>().Fail(
                     message: "An unexpected error occurred while fetching user. Please try again.",
-                    errorCode: "2ac5059f-0003",
+                    errorCode: "2ac5059f-0002",
                     correlationId: correlationId);
             }
         }

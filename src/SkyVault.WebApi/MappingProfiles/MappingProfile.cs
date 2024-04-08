@@ -20,7 +20,7 @@ namespace SkyVault.WebApi.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CountryName));
 
-            CreateMap<Backend.Gender, Payloads.CommonPayloads.Gender>();
+            CreateMap<Gender, Payloads.CommonPayloads.Gender>();
         }
     }
 }
