@@ -10,7 +10,7 @@
                 if (parent.Children == null)
                 {
                     <li>
-                        <a href="@parent.MenuUri" class="active">
+                        <a href="@parent.MenuUri" class="">
                             <img class="navitemicon" src="@parent.MenuIconUri" alt="@parent.MenuName"/>
                             @parent.MenuName
                         </a>
@@ -19,7 +19,7 @@
                 else
                 {
                     <li>
-                        <a href="@parent.MenuUri" class="active">
+                        <a href="@parent.MenuUri" class="">
                             <img class="navitemicon" src="@parent.MenuIconUri" alt="@parent.MenuName"/>
                             @parent.MenuName
                         </a>
@@ -29,7 +29,7 @@
                             @foreach (var child in parent.Children)
                             {
                                 <li>
-                                    <a href="@child.MenuUri" class="active">
+                                    <a href="@child.MenuUri" class="">
                                         <img class="navitemicon" src="@child.MenuIconUri" alt="@child.MenuName"/>
                                         @child.MenuName
                                     </a>
