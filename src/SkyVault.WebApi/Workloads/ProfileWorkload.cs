@@ -15,13 +15,14 @@ namespace SkyVault.WebApi.Workloads
         public static IResult SaveProfile(
             [FromBody] ProfilePayload profile, SkyvaultContext dbContext, HttpContext context)
         {
-            correlationId = context.Items["X-Correlation-ID"]?.ToString();
-
-            var commonData = new CommonData(dbContext);
-            var systemUserData = new SystemUserData(dbContext);
+            
 
             try
             {
+                correlationId = context.Items["X-Correlation-ID"]?.ToString();
+
+                var commonData = new CommonData(dbContext);
+                var systemUserData = new SystemUserData(dbContext);
 
                 var systemUser = systemUserData.GetUserByProfileId(Convert.ToInt32(profile.SystemUserId), correlationId);
                 var salutation = commonData.Salutation(Convert.ToInt32(profile.SalutationId));
@@ -145,21 +146,31 @@ namespace SkyVault.WebApi.Workloads
             HttpContext context
         )
         {
-            correlationId = context.Items["X-Correlation-ID"]?.ToString();
+            try
+            {
+                correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
-            var customerProfileData = new CustomerProfileData(dbContext);
+                var customerProfileData = new CustomerProfileData(dbContext);
 
-            var searchResult = customerProfileData.Search(SearchQuery, Convert.ToInt32(SysUserId), Convert.ToInt32(RoleId));
+                var searchResult = customerProfileData.Search(
+                    SearchQuery, Convert.ToInt32(SysUserId), Convert.ToInt32(RoleId));
 
-            if (searchResult.Count == 0)
+                if (searchResult.Count == 0)
+                    return Results.Problem(new ProblemDetails().ToProblemDetails(
+                        "No profile found", "30550615-0010", correlationId));
+
+                var response = ToSearchProfileResponse(searchResult);
+
+                return Results.Ok(response);
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
+
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "No profile found", "30550615-0010", correlationId));
-
-            var response = ToSearchProfileResponse(searchResult);
-
-            var result = new SkyResult<List<SearchProfileResponse>>();
-
-            return Results.Ok(response);
+                    "An unexpected error occurred. Please try again later.", 
+                    "30550615-0011", correlationId));
+            }
         }
 
         private static ProfilePayload ToProfilePayload(CustomerProfile customerProfile)

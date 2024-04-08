@@ -1,21 +1,22 @@
 ﻿@{
 }
-<div class="auto-group-nmbu-Brn">
-    <div class="auto-group-mvga-v3g">
-        <p class="dashboard-Fbk">Dashboard</p>
-        <div class="primary-button-nbg">
-            <div class="group-13-tuc">
-                <div class="rectangle-9-cKp">
-                </div>
-                <div class="rectangle-10-8JA">
-                </div>
-            </div>
-            <p class="create-profile-f3C">Create Profile</p>
-        </div>
-    </div>
-    <div class="frame-17-ZPU">
-        <p class="search-GYn">Search</p>
-        <img class="search-zDt" src="./assets/search.png"/>
-    </div>
-    <img class="traveling-rafiki-7JW" src="./assets/traveling-rafiki.png"/>
+<link href="/css/dashboard.css" rel="stylesheet" />
+<div class="pagetopcontainer">
+    <h2>
+        Dashboard
+    </h2>
+     <button class="commonbtn">
+         <img class="plusicon" src="~/img/icons/plus_icon.png" /> Create Profile
+     </button>
+</div>
+<div class="searcharea">
+    <input class="form-control searchbox" list="datalistOptions" id="exampleDataList" placeholder="Search">
+    <datalist id="datalistOptions">
+      <option value="San Francisco" />
+      <option value="New York" />
+      <option value="Seattle" />
+      <option value="Los Angeles" />
+      <option value="Chicago" />
+    </datalist>
+    <img class="searchicon" src="~/img/icons/search_icon.png" />
 </div>
