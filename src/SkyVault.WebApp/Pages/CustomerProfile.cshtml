@@ -1,0 +1,208 @@
+﻿@page
+@model SkyVault.WebApp.Pages.CustomerProfileModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewBag.Title = "Customer Profile - SkyVault(24.04)/DEV";
+}
+
+<div class="pagetopcontainer">
+    <h2>
+        Customer Profile
+    </h2>
+    <div class="maincontent">
+        <div class="accordion accordion-flush customaccordion customItemBtnBottom" id="accordionFlushExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header topaccordionitemcustom customItem" id="flush-headingOne">
+                    <button class="accordion-button collapsed accordion-title customItemBtnTop" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        Passport Information (Primary)
+                    </button>
+                </h2>
+                <div id="flush-collapseOne" class="accordion-collapse collapse accordionitemcustom" aria-labelledby="flush-headingOne">
+                    <div class="accordion-body">
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <select class="form-select customselect" aria-label="Salutation select">
+                                    <option selected>Select Salutation</option>
+                                    <option value="1">Mr.</option>
+                                    <option value="2">Mrs.</option>
+                                    <option value="3">Ms.</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext" placeholder="Last Name" />
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext" placeholder="Other Names" />
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select customselect" aria-label="Nationality select">
+                                    <option selected>Select Nationality</option>
+                                    <option value="1">Sri Lankan</option>
+                                    <option value="2">Finnish</option>
+                                    <option value="3">Polish</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <select class="form-select customselect" aria-label="Gender select">
+                                    <option selected>Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext" placeholder="Place of Birth" />
+                            </div>
+                           
+                        </div>
+                        <div class="row my-4">
+                            
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext " placeholder="Passport Number" />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="date" class="form-control customdate" value="Date of Birthday" />
+                            </div>
+
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <input type="date" class="form-control customdate" value="Passport Expiry Date" />
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select customselect" aria-label="Gender select">
+                                    <option selected>Select Country</option>
+                                    <option value="1">Sri Lanka</option>
+                                    <option value="2">Finland</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row moveelementstoright my-0">
+                            <button class="col-md-3 commonbtn">
+                                <img class="plusicon" src="~/img/icons/plus_icon.png" /> Add Secondary Passport
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header accordionitemcustom accordion-title" id="flush-headingTwo">
+                    <button class="accordion-button collapsed accordion-title" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                        VISA Information
+                    </button>
+                </h2>
+                <div id="flush-collapseTwo" class="accordion-collapse collapse accordionitemcustom" aria-labelledby="flush-headingTwo">
+                    <div class="accordion-body">
+
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext" placeholder="VISA Number" />
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select customselect" aria-label="Country">
+                                    <option selected>Country Salutation</option>
+                                    <option value="1">Sri Lanka</option>
+                                    <option value="2">Finnish</option>
+                                    <option value="3">Netherlands</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext" placeholder="VISA Issues Place" />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="date" class="form-control customdate" value="VISA Issued Date" />
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <input type="date" class="form-control customdate" value="VISA Expiry Date" />
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input my-2" type="checkbox" value="" id="flexCheckDefault">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Assign to primary passport <br/>(<span class="smalltext">Uncheck to assign with secondary passport</span>)
+                                    </label>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header accordionitemcustom" id="flush-headingThree">
+                    <button class="accordion-button collapsed accordion-title" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                        Frequent Flyer Number
+                    </button>
+                </h2>
+                <div id="flush-collapseThree" class="accordion-collapse collapse accordionitemcustom" aria-labelledby="flush-headingThree">
+                    <div class="accordion-body">
+
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control customtext" placeholder="Flyer Number" />
+                            </div>
+                            <div class="col-md-6 moveelementstoright">
+                                <button class="commonbtn">
+                                    <img class="plusicon" src="~/img/icons/plus_icon.png" />
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item customItemBtnBottom">
+                <h2 class="accordion-header accordionitemcustom customItemBtnBottom" id="flush-headingFour">
+                    <button class="accordion-button collapsed accordion-title customItemBtnBottom" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false" aria-controls="flush-collapseFour">
+                        Preferred Communication Method
+                    </button>
+                </h2>
+                <div id="flush-collapseFour" class="accordion-collapse collapse customItemBtnBottom accordionitemcustom" aria-labelledby="flush-headingFour">
+                    <div class="accordion-body">
+                        <div class="row prefferedComMethArea">
+                            <div class="form-check col-md-4">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    WhatsApp
+                                </label>
+                            </div>
+                            <div class="form-check col-md-4">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Email
+                                </label>
+                            </div>
+                            <div class="form-check col-md-4">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    None
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row bottomSaveButton my-3">
+            <div class="moveright">
+                <button class="commonbtn">
+                    <img class="saveicon" src="~/img/icons/save_icon.png" /> Save &nbsp;
+                </button>
+            </div>
+            
+        </div>
+    </div>
+</div>
