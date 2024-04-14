@@ -11,9 +11,10 @@ namespace SkyVault.WebApp.Pages
         AuthorityProxy authorityProxy,
         IHttpContextAccessor httpContextAccessor) : Models.SkyVaultPageModel(antiForgery)
     {
-        public override IActionResult OnGet()
+        public IActionResult OnGet()
         {
-            base.OnGet();
+            base.Init();
+            
             return Page();
         }
     }

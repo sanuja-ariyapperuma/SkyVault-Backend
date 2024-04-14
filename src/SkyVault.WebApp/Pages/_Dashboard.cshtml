@@ -1,22 +1,32 @@
-﻿@{
+﻿@model SkyVault.WebApp.Pages.IndexModel
+@{
 }
-<link href="/css/dashboard.css" rel="stylesheet" />
+<link href="/css/dashboard.css" rel="stylesheet"/>
 <div class="pagetopcontainer">
     <h2>
         Dashboard
     </h2>
-     <button class="commonbtn">
-         <img class="plusicon" src="~/img/icons/plus_icon.png" /> Create Profile
-     </button>
+    <button class="commonbtn">
+        <img class="plusicon" src="~/img/icons/plus_icon.png"/> Create Profile
+    </button>
 </div>
-<div class="searcharea">
-    <input class="form-control searchbox" list="datalistOptions" id="exampleDataList" placeholder="Search">
-    <datalist id="datalistOptions">
-      <option value="San Francisco" />
-      <option value="New York" />
-      <option value="Seattle" />
-      <option value="Los Angeles" />
-      <option value="Chicago" />
-    </datalist>
-    <img class="searchicon" src="~/img/icons/search_icon.png" />
-</div>
+<form>
+    <div class="searcharea">
+        <input class="form-control searchbox" id="searcher" name="searcher"
+               hx-post="@Url.Page("Index", "Search")" hx-target="#search-results"
+               hx-trigger="input changed delay:500ms, search"
+               hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken"}'
+               placeholder="Begin Typing To Search Profiles...">
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody id="search-results">
+        </tbody>
+    </table>
+</form>

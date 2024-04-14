@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApp.Models;
 using SkyVault.WebApp.Proxies;
@@ -12,8 +13,7 @@ namespace SkyVault.WebApp.Pages
     public class IndexModel(
         IConfiguration configuration,
         IAntiforgery antiForgery,
-        AuthorityProxy authorityProxy,
-        IHttpContextAccessor httpContextAccessor) : Models.SkyVaultPageModel(antiForgery)
+        AuthorityProxy authorityProxy) : Models.SkyVaultPageModel(antiForgery)
     {
         /*public override void OnGet()
         {
@@ -58,12 +58,12 @@ namespace SkyVault.WebApp.Pages
             ViewData["UserMenus"] = authorityProxy.GetMenus(Role);
         }*/
 
-        public override IActionResult OnGet()
+        public IActionResult OnGet()
         {
-            base.OnGet();
+            base.Init();
 
             var correlationId =
-                (httpContextAccessor.HttpContext!
+                (PageContext.HttpContext!
                     .Items["X-Correlation-ID"] ??= "Not Available") as string;
 
             var skyUser = new SkyVaultUser(
@@ -107,6 +107,11 @@ namespace SkyVault.WebApp.Pages
             var signOutUrl = $"https://login.microsoftonline.com/{configuration["AzureAD:TenantId"]}/oauth2/logout";
 
             return RedirectPermanent(signOutUrl);
+        }
+
+        public IActionResult OnPostSearch([FromForm] string searcher)
+        {
+            return Content($"You searched for {searcher}", "text/html");
         }
     }
 }
