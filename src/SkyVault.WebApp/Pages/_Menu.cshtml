@@ -3,9 +3,9 @@
 }
 <nav>
     <ul>
-        @if (ViewData["UserMenus"] != null)
+        @if (Model.Menus != null)
         {
-            @foreach (var parent in (ViewData["UserMenus"] as IEnumerable<SkyVaultMenuItem>)!)
+            @foreach (var parent in (Model.Menus as IEnumerable<SkyVaultMenuItem>)!)
             {
                 if (parent.Children == null)
                 {

@@ -95,9 +95,8 @@ namespace SkyVault.WebApp.Pages
             base.FullName = welcomeUser?.FullName;
             base.Email = welcomeUser?.Email;
             base.Role = welcomeUser?.Role;
-
-            //Get menus as per the assigned role.
-            ViewData["UserMenus"] = authorityProxy.GetMenus(Role!);
+            base.Menus = authorityProxy.GetMenus(Role!);
+            base.SetSession();
 
             return Page();
         }
