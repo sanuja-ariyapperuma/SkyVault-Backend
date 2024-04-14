@@ -8,13 +8,12 @@ namespace SkyVault.WebApp.Pages
     public class CustomerProfileModel(
         IConfiguration configuration,
         IAntiforgery antiForgery,
-        AuthorityProxy authorityProxy,
-        IHttpContextAccessor httpContextAccessor) : Models.SkyVaultPageModel(antiForgery)
+        AuthorityProxy authorityProxy) : Models.SkyVaultPageModel(antiForgery)
     {
         public IActionResult OnGet()
         {
             base.Init();
-            
+
             return Page();
         }
     }
