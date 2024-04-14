@@ -10,52 +10,51 @@ namespace SkyVault.WebApi.Workloads
 {
     internal static class ProfileWorkload
     {
-        private static string correlationId = string.Empty;
+        private static string _correlationId = string.Empty;
 
         public static IResult SaveProfile(
             [FromBody] ProfilePayload profile, SkyvaultContext dbContext, HttpContext context)
         {
-            
-
             try
             {
-                correlationId = context.Items["X-Correlation-ID"]?.ToString();
+                _correlationId = CorrelationHandler.Get(context);
 
                 var commonData = new CommonData(dbContext);
                 var systemUserData = new SystemUserData(dbContext);
 
-                var systemUser = systemUserData.GetUserByProfileId(Convert.ToInt32(profile.SystemUserId), correlationId);
+                var systemUser =
+                    systemUserData.GetUserByProfileId(Convert.ToInt32(profile.SystemUserId), _correlationId);
                 var salutation = commonData.Salutation(Convert.ToInt32(profile.SalutationId));
                 var comMethod = commonData.GetCommunicationMethod(Convert.ToInt32(profile.PreffdComMth));
 
                 if (!systemUser.Succeeded)
                     return Results.Problem(
                         new ValidationProblemDetails().ToValidationProblemDetails(
-                            "No Matching System User Found","30550615-0000", correlationId)
-                        );
+                            "No Matching System User Found", "30550615-0000", _correlationId)
+                    );
 
                 if (salutation == null)
 
                     return Results.Problem(
                         new ValidationProblemDetails().ToValidationProblemDetails(
-                            "No Matching Salutation Found", "30550615-0001", correlationId));
+                            "No Matching Salutation Found", "30550615-0001", _correlationId));
 
                 if (comMethod == null)
                     return Results.Problem(
                         new ValidationProblemDetails().ToValidationProblemDetails(
-                            "No Matching Communication Method Found", "30550615-0002", correlationId));
+                            "No Matching Communication Method Found", "30550615-0002", _correlationId));
 
                 var passports = CreateNewPassport(profile, commonData);
 
                 if (passports == null)
                     return Results.Problem(
                         new ValidationProblemDetails().ToValidationProblemDetails(
-                            "Invalid Passport Or Visa Data Found", "30550615-0003", correlationId));
+                            "Invalid Passport Or Visa Data Found", "30550615-0003", _correlationId));
 
                 var frequentFlyerNumbers = profile.FrequentFlyerNumbers
                     .Select(item => new FrequentFlyerNumber() { FlyerNumber = item }).ToList();
 
-                
+
                 CustomerProfile? parent = null;
 
                 if (int.TryParse(profile.ParentId, out int parentId))
@@ -64,7 +63,7 @@ namespace SkyVault.WebApi.Workloads
                     if (parent == null)
                         return Results.Problem(
                             new ValidationProblemDetails().ToValidationProblemDetails(
-                            "No Matching Parent Profile Found", "30550615-0004", correlationId));
+                                "No Matching Parent Profile Found", "30550615-0004", _correlationId));
                 }
 
                 var newProfile = new CustomerProfile()
@@ -83,19 +82,19 @@ namespace SkyVault.WebApi.Workloads
 
                 return Results.Ok(ToProfilePayload(newProfile));
             }
-            catch(FormatException e) 
+            catch (FormatException e)
             {
-                e.LogException(correlationId);
+                e.LogException(_correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "Invalid type of data found in the profile", "30550615-0005", correlationId));
+                    "Invalid type of data found in the profile", "30550615-0005", _correlationId));
             }
             catch (Exception e)
             {
-                e.LogException(correlationId);
+                e.LogException(_correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "An unexpected error occurred. Please try again later.", "30550615-0006", correlationId));
+                    "An unexpected error occurred. Please try again later.", "30550615-0006", _correlationId));
             }
         }
 
@@ -108,7 +107,7 @@ namespace SkyVault.WebApi.Workloads
         {
             try
             {
-                correlationId = context.Items["X-Correlation-ID"]?.ToString();
+                _correlationId = CorrelationHandler.Get(context);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
 
@@ -118,23 +117,23 @@ namespace SkyVault.WebApi.Workloads
                 if (customerProfile == null)
                     return Results.Problem(
                         new ProblemDetails().ToProblemDetails(
-                    "No profile found", "30550615-0007", correlationId));
+                            "No profile found", "30550615-0007", _correlationId));
 
                 return Results.Ok(ToProfilePayload(customerProfile));
             }
             catch (FormatException e)
             {
-                e.LogException(correlationId);
+                e.LogException(_correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "Invalid type of data in request", "30550615-0008", correlationId));
+                    "Invalid type of data in request", "30550615-0008", _correlationId));
             }
             catch (Exception e)
             {
-                e.LogException(correlationId);
+                e.LogException(_correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "An unexpected error occurred. Please try again later.", "30550615-0009", correlationId));
+                    "An unexpected error occurred. Please try again later.", "30550615-0009", _correlationId));
             }
         }
 
@@ -148,7 +147,7 @@ namespace SkyVault.WebApi.Workloads
         {
             try
             {
-                correlationId = context.Items["X-Correlation-ID"]?.ToString();
+                _correlationId = CorrelationHandler.Get(context);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
 
@@ -157,7 +156,7 @@ namespace SkyVault.WebApi.Workloads
 
                 if (searchResult.Count == 0)
                     return Results.Problem(new ProblemDetails().ToProblemDetails(
-                        "No profile found", "30550615-0010", correlationId));
+                        "No profile found", "30550615-0010", _correlationId));
 
                 var response = ToSearchProfileResponse(searchResult);
 
@@ -165,11 +164,11 @@ namespace SkyVault.WebApi.Workloads
             }
             catch (Exception e)
             {
-                e.LogException(correlationId);
+                e.LogException(_correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "An unexpected error occurred. Please try again later.", 
-                    "30550615-0011", correlationId));
+                    "An unexpected error occurred. Please try again later.",
+                    "30550615-0011", _correlationId));
             }
         }
 
@@ -232,8 +231,8 @@ namespace SkyVault.WebApi.Workloads
             ).ToList();
         }
 
-        private static List<Backend.Models.Passport> CreateNewPassport(ProfilePayload profile, 
-            CommonData commonData) 
+        private static List<Backend.Models.Passport> CreateNewPassport(ProfilePayload profile,
+            CommonData commonData)
         {
             var passports = new List<Backend.Models.Passport>();
 
@@ -247,13 +246,13 @@ namespace SkyVault.WebApi.Workloads
 
                 List<Backend.Models.Visa> visas = [];
 
-                if (passport.Visa.Length > 0) 
+                if (passport.Visa.Length > 0)
                 {
                     visas = CreateVisa(passport.Visa.ToList(), commonData);
                     if (visas == null)
                         return null;
                 }
-                    
+
 
                 var newpassport = new Backend.Models.Passport()
                 {
@@ -272,18 +271,17 @@ namespace SkyVault.WebApi.Workloads
 
                 passports.Add(newpassport);
             }
-            
+
             return passports;
-
         }
-        private static List<Backend.Models.Visa> CreateVisa(
-            List<Payloads.CommonPayloads.Visa> visas, CommonData commonData) {
 
+        private static List<Backend.Models.Visa> CreateVisa(
+            List<Payloads.CommonPayloads.Visa> visas, CommonData commonData)
+        {
             var visasEntity = new List<Backend.Models.Visa>();
 
             foreach (var visa in visas)
             {
-
                 var visaCountry = commonData.GetCountry(Convert.ToInt32(visa.CountryId));
 
                 if (visaCountry == null)
@@ -299,11 +297,9 @@ namespace SkyVault.WebApi.Workloads
                 };
 
                 visasEntity.Add(newVisa);
-                
             }
 
             return visasEntity;
-
         }
     }
 }

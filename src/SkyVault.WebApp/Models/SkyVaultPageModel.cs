@@ -12,12 +12,10 @@ public class SkyVaultPageModel(IAntiforgery antiForgery) : PageModel
     public string? Email { get; private protected set; }
     public string? Role { get; private protected set; }
     
-    public virtual IActionResult OnGet()
+    protected void Init()
     {
         ArgumentNullException.ThrowIfNull(antiForgery);
             
         AntiForgeryToken = antiForgery.GetAndStoreTokens(HttpContext).RequestToken;
-        
-        return Page();
     }
 }
