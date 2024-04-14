@@ -20,11 +20,6 @@ body::after {
     -webkit-justify-content:  space-between;
     justify-content:  space-between;
 }
-.plusicon {
-    width: 30px;
-    margin-right: 10px;
-    position: relative;
-}
 .searcharea{
     display: flex;
     margin-top: 25px;
