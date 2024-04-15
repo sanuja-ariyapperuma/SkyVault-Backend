@@ -1,7 +1,13 @@
 @rootURL=https://localhost:7199
 
-GET {{rootURL}}/profile/20/1
+POST {{rootURL}}/getprofile
 X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "20",
+  "sysUserId": "1"
+}
 
 ###
 
@@ -43,5 +49,12 @@ Content-Type: application/json
 
 ###
 //Search by any name or passport number
-GET {{rootURL}}/searchprofile/844/5/1
+POST {{rootURL}}/searchprofile
 X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "SearchQuery": "Ranaw",
+  "SysUserId": "1",
+  "RoleId": "1"
+}

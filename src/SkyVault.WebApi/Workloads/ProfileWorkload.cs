@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
+using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
@@ -99,8 +100,7 @@ namespace SkyVault.WebApi.Workloads
         }
 
         public static IResult GetProfile(
-            [FromRoute] string id,
-            [FromRoute] string sysUserId,
+            [FromBody] GetProfileRequest getProfile,
             SkyvaultContext dbContext,
             HttpContext context
         )
@@ -112,7 +112,7 @@ namespace SkyVault.WebApi.Workloads
                 var customerProfileData = new CustomerProfileData(dbContext);
 
                 var customerProfile = customerProfileData.Get(
-                    Convert.ToInt32(id), Convert.ToInt32(sysUserId));
+                    Convert.ToInt32(getProfile?.id), Convert.ToInt32(getProfile?.sysUserId));
 
                 if (customerProfile == null)
                     return Results.Problem(
@@ -138,25 +138,29 @@ namespace SkyVault.WebApi.Workloads
         }
 
         public static IResult SearchProfiles(
-            [FromRoute] string SysUserId,
-            [FromRoute] string RoleId,
-            [FromRoute] string SearchQuery,
+            [FromBody] SearchProfileRequest searchProfileRequest,
             SkyvaultContext dbContext,
             HttpContext context
         )
         {
             try
             {
+                if (String.IsNullOrWhiteSpace(searchProfileRequest.SearchQuery))
+                    return Results.Problem(new ProblemDetails().ToProblemDetails(
+                                               "Empty search query found", "30550615-0011", _correlationId));
+
                 _correlationId = CorrelationHandler.Get(context);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
 
                 var searchResult = customerProfileData.Search(
-                    SearchQuery, Convert.ToInt32(SysUserId), Convert.ToInt32(RoleId));
+                    searchProfileRequest.SearchQuery, 
+                    Convert.ToInt32(searchProfileRequest.SysUserId), 
+                    Convert.ToInt32(searchProfileRequest.RoleId));
 
                 if (searchResult.Count == 0)
                     return Results.Problem(new ProblemDetails().ToProblemDetails(
-                        "No profile found", "30550615-0010", _correlationId));
+                        "No profile found", "30550615-0012", _correlationId));
 
                 var response = ToSearchProfileResponse(searchResult);
 
