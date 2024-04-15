@@ -8,12 +8,11 @@
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
-            app.MapGet("/profile/{Id}/{sysUserId}", Workloads.ProfileWorkload.GetProfile)
+            app.MapPost("/getprofile", Workloads.ProfileWorkload.GetProfile)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
-            app.MapGet("/searchprofile/{SearchQuery}/{SysUserId}/{RoleId}", 
-                Workloads.ProfileWorkload.SearchProfiles)
+            app.MapPost("/searchprofile", Workloads.ProfileWorkload.SearchProfiles)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
         }
