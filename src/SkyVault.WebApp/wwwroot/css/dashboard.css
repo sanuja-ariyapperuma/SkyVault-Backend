@@ -13,14 +13,16 @@ body::after {
     opacity: 0.3; /* Adjust the opacity as needed */
     z-index: -1; /* Ensure the overlay is behind other content */
 }
+
 .pagetopcontainer {
     display: flex;
     flex-direction: row;
     width: 90%;
-    -webkit-justify-content:  space-between;
-    justify-content:  space-between;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
 }
-.searcharea{
+
+.searcharea {
     display: flex;
     margin-top: 25px;
     width: 90%;
@@ -44,9 +46,10 @@ body::after {
     margin-left: calc(100% - 530px);
     margin-top: 10px;
 }
-.searchicon:hover {
-    cursor: pointer;
-}
+
+    .searchicon:hover {
+        cursor: pointer;
+    }
 
 ::-webkit-input-placeholder {
     font-family: 'Source Sans Pro', sans-serif; /* Use the custom font */
@@ -64,4 +67,13 @@ body::after {
     font-family: 'Source Sans Pro', sans-serif; /* Use the custom font */
 }
 
+#createProfileBtn {
+    margin-top: 25px;
+    padding-right: 20px;
+}
 
+#createProfileBtn {
+        text-decoration: none;
+        color: white;
+        outline: none !important;
+}
