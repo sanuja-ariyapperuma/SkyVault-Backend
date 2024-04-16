@@ -140,29 +140,27 @@ namespace SkyVault.WebApi.Workloads
         public static IResult SearchProfiles(
             [FromBody] SearchProfileRequest searchProfileRequest,
             SkyvaultContext dbContext,
-            HttpContext context
-        )
+            HttpContext context)
         {
             try
             {
-                if (String.IsNullOrWhiteSpace(searchProfileRequest.SearchQuery))
-                    return Results.Problem(new ProblemDetails().ToProblemDetails(
+                if (string.IsNullOrWhiteSpace(searchProfileRequest.SearchQuery))
+                    return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
                                                "Empty search query found", "30550615-0011", _correlationId));
 
                 _correlationId = CorrelationHandler.Get(context);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
 
-                var searchResult = customerProfileData.Search(
+                var customerProfiles = customerProfileData.Search(
                     searchProfileRequest.SearchQuery, 
                     Convert.ToInt32(searchProfileRequest.SysUserId), 
                     Convert.ToInt32(searchProfileRequest.RoleId));
-
-                if (searchResult.Count == 0)
-                    return Results.Problem(new ProblemDetails().ToProblemDetails(
-                        "No profile found", "30550615-0012", _correlationId));
-
-                var response = ToSearchProfileResponse(searchResult);
+                
+                var searchedProfiles = ToSearchProfileResponse(customerProfiles!);
+                var response = new SearchProfileResponse(
+                    searchProfileRequest.SearchQuery,
+                    searchedProfiles);
 
                 return Results.Ok(response);
             }
@@ -219,12 +217,12 @@ namespace SkyVault.WebApi.Workloads
             return profilePayload;
         }
 
-        private static List<SearchProfileResponse> ToSearchProfileResponse(
-            List<CustomerProfile> customerProfile)
+        private static IEnumerable<SearchProfileItem> ToSearchProfileResponse(
+            IEnumerable<CustomerProfile> customerProfile)
         {
             return customerProfile.SelectMany(cp => cp.Passports
                 .Select(
-                    p => new SearchProfileResponse(
+                    p => new SearchProfileItem(
                         cp.Id,
                         p.LastName,
                         p.OtherNames,
