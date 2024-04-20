@@ -54,7 +54,6 @@ X-API-KEY: 7heBJBIPU25duYMFKrCf
 Content-Type: application/json
 
 {
-  "SearchQuery": "Ranaw",
-  "SysUserId": "1",
-  "RoleId": "1"
+  "SearchQuery": "Ran",
+  "SysUserId": "1"
 }

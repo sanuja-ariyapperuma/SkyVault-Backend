@@ -72,7 +72,7 @@ body::after {
     padding-right: 20px;
 }
 
-#createProfileBtn {
+#createProfileBtn{
         text-decoration: none;
         color: white;
         outline: none !important;
