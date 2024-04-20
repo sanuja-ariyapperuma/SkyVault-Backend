@@ -154,8 +154,7 @@ namespace SkyVault.WebApi.Workloads
 
                 var customerProfiles = customerProfileData.Search(
                     searchProfileRequest.SearchQuery, 
-                    Convert.ToInt32(searchProfileRequest.SysUserId), 
-                    Convert.ToInt32(searchProfileRequest.RoleId));
+                    Convert.ToInt32(searchProfileRequest.SysUserId));
                 
                 var searchedProfiles = ToSearchProfileResponse(customerProfiles!);
                 var response = new SearchProfileResponse(

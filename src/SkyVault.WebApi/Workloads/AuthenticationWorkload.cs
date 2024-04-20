@@ -37,7 +37,9 @@ internal static class AuthenticationWorkload
 
         var sysUser = result.Value;
 
-        return Results.Ok(new WelcomeUserResponse(sysUser!.SamProfileId,
+        return Results.Ok(new WelcomeUserResponse(
+            sysUser!.Id.ToString(),
+            sysUser!.SamProfileId,
             $"{sysUser.FirstName} {sysUser.LastName}",
             DateTime.Today.ToLongDateString(),
             sysUser.UserRole,
