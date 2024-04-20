@@ -1,0 +1,12 @@
+﻿@page
+@model SkyVault.WebApp.Pages.InnerErrorModel
+@{
+    Layout = null;
+}
+<h1 style="text-align: center;">System Message</h1>
+<div style="text-align: center;">
+    <p>Message: @TempData["Message"]</p>
+    <p>Error Code: @TempData["ErrorCode"]</p>
+    <p>Correlation ID (Web): @TempData["CorrelationId1"]</p>
+    <p>Correlation ID (Api): @TempData["CorrelationId2"]</p>
+</div>
