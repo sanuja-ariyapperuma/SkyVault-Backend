@@ -52,4 +52,9 @@ public class SkyVaultPageModel(IAntiforgery antiForgery) : PageModel
         var menusJson = System.Text.Json.JsonSerializer.Serialize(Menus);
         HttpContext.Session.SetString("Session.Menus", menusJson);
     }
+
+    protected bool HasSessionExpired()
+    {
+        return Upn is null || FullName is null || Email is null || Role is null;
+    }
 }

@@ -109,6 +109,9 @@ namespace SkyVault.WebApp.Pages
         public IActionResult OnPostSearch([FromForm] string searcher)
         {
             base.Init();
+            
+            if (string.IsNullOrWhiteSpace(searcher))
+                return Content("Please enter a search term", "text/html");
 
             var searchProfileRequest = new SearchProfileRequest(this.Upn, this.Role, searcher);
             var skyResult = customerProxy.SearchProfile(searchProfileRequest);
