@@ -45,7 +45,7 @@ public sealed class AuthorityProxy(HttpClient httpClient)
     {
         var menus = new[]
         {
-            new SkyVaultMenuItem(MenuName: "Profile Management", MenuUri: "#", MenuIconUri: "/img/icons/pf_icon.png",
+            new SkyVaultMenuItem(MenuName: "Profile Management", MenuUri: "/createprofile", MenuIconUri: "/img/icons/pf_icon.png",
                 Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName),
             new SkyVaultMenuItem(MenuName: "Notifications", MenuUri: "#", MenuIconUri: "/img/icons/noti_icon.png",
                 Role: SkyVaultConfigurationKeys.SkyVaultSuperAdminRoleName,
