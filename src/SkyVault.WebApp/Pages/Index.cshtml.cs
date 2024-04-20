@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,8 @@ namespace SkyVault.WebApp.Pages
     public class IndexModel(
         IConfiguration configuration,
         IAntiforgery antiForgery,
-        AuthorityProxy authorityProxy) : Models.SkyVaultPageModel(antiForgery)
+        AuthorityProxy authorityProxy,
+        CustomerProxy customerProxy) : Models.SkyVaultPageModel(antiForgery)
     {
         /*public override void OnGet()
         {
@@ -62,10 +64,6 @@ namespace SkyVault.WebApp.Pages
         {
             base.Init();
 
-            var correlationId =
-                (PageContext.HttpContext!
-                    .Items["X-Correlation-ID"] ??= "Not Available") as string;
-
             var skyUser = new SkyVaultUser(
                 "test@gmail.com",
                 "Test", 
@@ -82,7 +80,7 @@ namespace SkyVault.WebApp.Pages
             {
                 TempData["Message"] = skyResult.Message;
                 TempData["ErrorCode"] = skyResult.ErrorCode;
-                TempData["CorrelationId1"] = correlationId;
+                TempData["CorrelationId1"] = WebCorrelationId;
                 TempData["CorrelationId2"] = skyResult.CorrelationId;
 
                 return RedirectToPage("/unauthorized");
@@ -110,7 +108,46 @@ namespace SkyVault.WebApp.Pages
 
         public IActionResult OnPostSearch([FromForm] string searcher)
         {
-            return Content($"You searched for {searcher}", "text/html");
+            base.Init();
+
+            var searchProfileRequest = new SearchProfileRequest(this.Upn, this.Role, searcher);
+            var skyResult = customerProxy.SearchProfile(searchProfileRequest);
+
+            if (skyResult!.Succeeded == false)
+            {
+                TempData["Message"] = skyResult.Message;
+                TempData["ErrorCode"] = skyResult.ErrorCode;
+                TempData["CorrelationId1"] = WebCorrelationId;
+                TempData["CorrelationId2"] = skyResult.CorrelationId;
+
+                return RedirectToPage("/innererror");
+            }
+
+            var searchProfileResponse = skyResult.Value;
+
+            if (searchProfileResponse?.Profiles != null && searchProfileResponse.Profiles.Any())
+            {
+                var sb = new StringBuilder();
+
+                foreach (var profile in searchProfileResponse.Profiles)
+                {
+                    var profileData = new List<string?>
+                    {
+                        profile.LastName,
+                        profile.OtherNames,
+                        profile.Salutation,
+                        profile.PassportNumber
+                    };
+
+                    sb.Append($"<tr><td>{string.Join("</td><td>", profileData)}</td></tr>");
+                }
+
+                return Content(sb.ToString(), "text/html");
+            }
+            else
+            {
+                return Content("No results found", "text/html");
+            }
         }
     }
 }

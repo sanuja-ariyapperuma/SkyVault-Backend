@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SkyVault.WebApp.Models;
@@ -12,6 +11,7 @@ public class SkyVaultPageModel(IAntiforgery antiForgery) : PageModel
     public string? Email { get; private protected set; }
     public string? Role { get; private protected set; }
     public IEnumerable<SkyVaultMenuItem>? Menus { get; private protected set; }
+    public string? WebCorrelationId { get; private protected set; }
     
     protected void Init()
     {
@@ -20,6 +20,10 @@ public class SkyVaultPageModel(IAntiforgery antiForgery) : PageModel
         AntiForgeryToken = antiForgery.GetAndStoreTokens(HttpContext).RequestToken;
         
         GetSession();
+        
+        WebCorrelationId =
+            (PageContext.HttpContext!
+                .Items["X-Correlation-ID"] ??= "Not Available") as string;
     }
 
     private void GetSession()
