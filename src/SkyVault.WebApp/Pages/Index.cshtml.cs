@@ -69,7 +69,7 @@ namespace SkyVault.WebApp.Pages
                 "Test", 
                 "User", 
                 "test@gmail.com", 
-                "Admin");
+                "admin");
 
             var userRequest = new ValidateUserRequest(skyUser.Upn, skyUser.FirstName,
                 skyUser.LastName, skyUser.Email, skyUser.Role);
@@ -113,7 +113,7 @@ namespace SkyVault.WebApp.Pages
             if (string.IsNullOrWhiteSpace(searcher))
                 return Content("Please enter a search term", "text/html");
 
-            var searchProfileRequest = new SearchProfileRequest(this.Upn, this.Role, searcher);
+            var searchProfileRequest = new SearchProfileRequest(this.Upn, searcher);
             var skyResult = customerProxy.SearchProfile(searchProfileRequest);
 
             if (skyResult!.Succeeded == false)
