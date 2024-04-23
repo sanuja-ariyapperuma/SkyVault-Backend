@@ -1,5 +1,6 @@
 @rootURL=https://localhost:7199
 
+//Create or get system user profile
 POST {{rootURL}}/getprofile
 X-API-KEY: 7heBJBIPU25duYMFKrCf
 Content-Type: application/json
@@ -11,6 +12,7 @@ Content-Type: application/json
 
 ###
 
+// Do not use this endpoint
 POST {{rootURL}}/profile
 X-API-KEY: 7heBJBIPU25duYMFKrCf
 Content-Type: application/json
@@ -56,4 +58,111 @@ Content-Type: application/json
 {
   "SearchQuery": "Ran",
   "SysUserId": "1"
+}
+
+###
+
+//Create new customer profile with passport 
+POST {{rootURL}}/addPassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "customerProfileId": "",
+  "systemUserId": "1",
+  "parentId": "",
+  "lastName": "Weerarathna",
+  "otherNames": "Iraj",
+  "passportNumber": "33345678",
+  "gender": "F",
+  "dateOfBirth": "01/01/1994",
+  "placeOfBirth": "Gampaha",
+  "expiryDate": "01/01/2027",
+  "nationalityId": "1",
+  "countryId": "1",
+  "isPrimary": "1", 
+  "salutationId": "2"
+}
+
+###
+
+//Add new passport to existing Customer Profile 
+POST {{rootURL}}/addPassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "lastName": "Ranaweera",
+  "otherNames": "Sunil Lanz",
+  "passportNumber": "21212121",
+  "gender": "F",
+  "dateOfBirth": "01/01/1995",
+  "placeOfBirth": "Colombo",
+  "expiryDate": "01/01/2024",
+  "nationalityId": "1",
+  "countryId": "1",
+  "isPrimary": "0", 
+  "salutationId": "2"
+}
+
+###
+
+//Update Passport Details
+PUT {{rootURL}}/updatePassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "2",
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "lastName": "Paker",
+  "otherNames": "Shawn",
+  "passportNumber": "74478546",
+  "gender": "M",
+  "dateOfBirth": "01/01/1996",
+  "placeOfBirth": "Gampaha",
+  "expiryDate": "01/01/2023",
+  "nationalityId": "2",
+  "countryId": "2",
+  "isPrimary": "1", 
+  "salutationId": "1"
+}
+
+###
+// Add new visa to existing passport
+POST {{rootURL}}/addVisa
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "",
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "passportId": "1",
+  "visanumber": "98sd7fs98df7s9dg",
+  "visaissuedplace": "Colombo",
+  "visaissueddate": "01/01/1996",
+  "visaexpirydate": "01/01/2023",
+  "countryId": "2"
+}
+
+###
+//Update Visa Details
+PUT {{rootURL}}/updateVisa
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "1",
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "passportId": "1",
+  "visanumber": "1111111112222222",
+  "visaissuedplace": "Colombo",
+  "visaissueddate": "01/01/1996",
+  "visaexpirydate": "01/01/2023",
+  "countryId": "2"
 }

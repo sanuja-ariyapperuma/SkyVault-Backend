@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
@@ -41,6 +42,86 @@ namespace SkyVault.WebApi.Backend
             db.SaveChanges();
 
             return savedprofile.Entity;
+        }
+
+        public SkyResult<String> ValidateProfile(PassportRequest passportRequest, string correlationId) 
+        {
+            var isSystemUserExists = db.SystemUsers.Any(s => s.Id == Convert.ToInt32(passportRequest.SystemUserId));
+            var isSalutationExists = db.Salutations.Any(s => s.Id == Convert.ToInt32(passportRequest.SalutationId));
+            var isNationalityExists = db.Nationalities.Any(s => s.Id == Convert.ToInt32(passportRequest.NationalityId));
+            var isCountryExists = db.Countries.Any(s => s.Id == Convert.ToInt32(passportRequest.CountryId));
+            var isPassportNumberExists = db.Passports.Any(s => s.PassportNumber == passportRequest.PassportNumber);
+
+            if (!String.IsNullOrWhiteSpace(passportRequest.ParentId)) 
+            {
+                var isParentExists = db.CustomerProfiles.Any(s => s.Id == Convert.ToInt32(passportRequest.ParentId));
+                if (!isParentExists)
+                    return new SkyResult<String>().Fail("Parent does not exist", "4cf0079e-0004", correlationId);
+            }
+
+            if (!String.IsNullOrWhiteSpace(passportRequest.CustomerProfileId)) 
+            {
+                var isCustomerProfileExists = db.CustomerProfiles.Any(s => s.Id == Convert.ToInt32(passportRequest.CustomerProfileId));
+                if (!isCustomerProfileExists)
+                    return new SkyResult<String>().Fail("Customer Profile does not exist", "4cf0079e-0004", correlationId);
+            }
+
+            if (!isSystemUserExists)
+                return new SkyResult<String>().Fail("System User does not exist", "4cf0079e-0000", correlationId);
+
+            if(!isSalutationExists)
+                return new SkyResult<String>().Fail("Salutation does not exist", "4cf0079e-0001", correlationId);
+
+            if (!isNationalityExists)
+                return new SkyResult<String>().Fail("National does not exist", "4cf0079e-0002", correlationId);
+
+            if (!isCountryExists)
+                return new SkyResult<String>().Fail("Country does not exist", "4cf0079e-0003", correlationId);
+
+            if (isPassportNumberExists)
+                return new SkyResult<String>().Fail("Passport Number already exists", "4cf0079e-0006", correlationId);
+
+
+            return new SkyResult<String>().SucceededWithValue("Validated");
+        }
+
+        public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, string correlationId)
+        {
+            try
+            {
+                var passport = new Passport
+                {
+                    PassportNumber = passportRequest.PassportNumber!,
+                    LastName = passportRequest.LastName!,
+                    OtherNames = passportRequest.OtherNames,
+                    CountryId = Convert.ToInt32(passportRequest.CountryId),
+                    DateOfBirth = DateOnly.FromDateTime(DateTime.Parse(passportRequest.DateOfBirth)),
+                    ExpiryDate = DateOnly.FromDateTime(DateTime.Parse(passportRequest.ExpiryDate)),
+                    Gender = passportRequest.Gender!,
+                    IsPrimary = passportRequest.IsPrimary!,
+                    NationalityId = Convert.ToInt32(passportRequest.NationalityId),
+                    PlaceOfBirth = passportRequest.PlaceOfBirth
+                };
+
+                var newProfile = new CustomerProfile
+                {
+                    SystemUserId = Convert.ToInt32(passportRequest.SystemUserId),
+                    SalutationId = Convert.ToInt32(passportRequest.SalutationId),
+                    PreferredCommId = 1,
+                    ParentId = String.IsNullOrWhiteSpace(passportRequest.ParentId) ? null : Convert.ToInt32(passportRequest.ParentId),
+                    Passports = new List<Passport> { passport } 
+                };
+
+                var savedprofile = db.CustomerProfiles.Add(newProfile);
+                db.SaveChanges();
+
+                return new SkyResult<CustomerProfile>().SucceededWithValue(savedprofile.Entity);
+
+            }
+            catch(Exception ex)
+            {
+                return new SkyResult<CustomerProfile>().Fail(ex.Message, "4cf0079e-0005", correlationId);
+            }
         }
     }
 }
