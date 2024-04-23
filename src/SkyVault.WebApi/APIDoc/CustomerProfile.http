@@ -150,6 +150,7 @@ Content-Type: application/json
 }
 
 ###
+
 //Update Visa Details
 PUT {{rootURL}}/updateVisa
 X-API-KEY: 7heBJBIPU25duYMFKrCf
@@ -165,4 +166,17 @@ Content-Type: application/json
   "visaissueddate": "01/01/1996",
   "visaexpirydate": "01/01/2023",
   "countryId": "2"
+}
+
+###
+
+//Update Commiunication Method
+PUT {{rootURL}}/updateCommMethod
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "prefCommId": "2"
 }

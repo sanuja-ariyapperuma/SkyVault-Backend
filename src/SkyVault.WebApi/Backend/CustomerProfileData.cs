@@ -123,5 +123,25 @@ namespace SkyVault.WebApi.Backend
                 return new SkyResult<CustomerProfile>().Fail(ex.Message, "4cf0079e-0005", correlationId);
             }
         }
+
+        public SkyResult<String> UpdateComMethod(ComMethodRequest comMethodRequest, string correlationId) 
+        {
+            var isCommMethodExists = db.CommunicationMethods.Any(s => s.Id == Convert.ToInt32(comMethodRequest.PrefCommId));
+
+            if (!isCommMethodExists)
+                return new SkyResult<String>().Fail("Communication Method does not exist", "4cf0079e-0007", correlationId);
+
+            var result = db.CustomerProfiles.Where(c => 
+                c.Id == Convert.ToInt32(comMethodRequest.CustomerProfileId) &&
+                c.SystemUserId == Convert.ToInt32(comMethodRequest.SystemUserId)
+                ).ExecuteUpdate(update => 
+                    update.SetProperty(cp => cp.PreferredCommId , Convert.ToInt32(comMethodRequest.PrefCommId))
+            );
+
+            if (result == 0)
+                return new SkyResult<String>().Fail("No Profile Found or Unauthorize Update", "4cf0079e-0008", correlationId);
+
+            return new SkyResult<String>().SucceededWithValue("Preffered Commiunication Method Updated");
+        }
     }
 }

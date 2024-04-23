@@ -4,9 +4,6 @@
     {
         public static void MapProfileEndpoints(this WebApplication app)
         {
-            //app.MapPost("/profile", Workloads.ProfileWorkload.SaveProfile)
-            //    .Produces(StatusCodes.Status200OK)
-            //    .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPost("/getprofile", Workloads.ProfileWorkload.GetProfile)
                 .Produces(StatusCodes.Status200OK)
@@ -29,6 +26,10 @@
                 .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPut("/updatevisa", Workloads.ProfileWorkload.UpdateVisa)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPut("/updateCommMethod", Workloads.ProfileWorkload.UpdateComMethod)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
         }

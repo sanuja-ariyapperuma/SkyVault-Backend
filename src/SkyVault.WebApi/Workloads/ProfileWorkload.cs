@@ -207,6 +207,24 @@ namespace SkyVault.WebApi.Workloads
             return Results.Ok(result.Value);
         }
 
+        public static IResult UpdateComMethod([FromBody] ComMethodRequest comMethodRequest,
+                       SkyvaultContext dbContext,
+                                  HttpContext context)
+        {
+            _correlationId = CorrelationHandler.Get(context);
+
+            var customerProfileData = new CustomerProfileData(dbContext);
+
+            var result = customerProfileData.UpdateComMethod(comMethodRequest, _correlationId);
+
+            if (!result.Succeeded)
+                return Results.Problem(
+                                       new ValidationProblemDetails().ToValidationProblemDetails(
+                                                              result.Message, result.ErrorCode, _correlationId));
+
+            return Results.Ok(result.Value);
+        }
+
         #endregion
 
         #region Private Methods
