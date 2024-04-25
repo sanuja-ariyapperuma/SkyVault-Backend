@@ -6,7 +6,7 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
 {
-    public class CustomerProfileData(SkyvaultContext db)
+    public sealed class CustomerProfileData(SkyvaultContext db)
     {
         public CustomerProfile? Get(int profileId, int systemUserId) =>
             db.CustomerProfiles.Include(p => p.Passports)

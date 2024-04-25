@@ -4,7 +4,7 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
 {
-    public class PassportData(SkyvaultContext db)
+    public sealed class PassportData(SkyvaultContext db)
     {
         public SkyResult<Passport> AddNewPassport(PassportRequest newPassport, string correlationId)
         {

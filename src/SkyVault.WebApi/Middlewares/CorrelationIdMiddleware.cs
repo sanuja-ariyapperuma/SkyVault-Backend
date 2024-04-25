@@ -1,6 +1,6 @@
 namespace SkyVault.WebApi.Middlewares;
 
-public class CorrelationIdMiddleware(RequestDelegate next)
+public sealed class CorrelationIdMiddleware(RequestDelegate next)
 {
     private const string CorrelationIdHeaderKey = "X-Correlation-ID";
 
