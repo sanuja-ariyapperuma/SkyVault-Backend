@@ -4,7 +4,7 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
 {
-    public class VisaData(SkyvaultContext db)
+    public sealed class VisaData(SkyvaultContext db)
     {
 
         public SkyResult<String> ValidateVisaDetails(VisaReqeust visaRequest, string correlationId)
