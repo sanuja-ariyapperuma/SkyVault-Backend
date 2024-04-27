@@ -89,6 +89,7 @@ namespace SkyVault.WebApp.Pages
             //Bind only what was processed by the API and not what was received by the claims.
             var welcomeUser = skyResult.Value;
 
+            base.SystemUserId = welcomeUser?.Id;
             base.Upn = welcomeUser?.Upn;
             base.FullName = welcomeUser?.FullName;
             base.Email = welcomeUser?.Email;
@@ -109,8 +110,11 @@ namespace SkyVault.WebApp.Pages
         public IActionResult OnPostSearch([FromForm] string searcher)
         {
             base.Init();
+            
+            if (string.IsNullOrWhiteSpace(searcher))
+                return Content("Please enter a search term", "text/html");
 
-            var searchProfileRequest = new SearchProfileRequest(this.Upn, searcher);
+            var searchProfileRequest = new SearchProfileRequest(this.SystemUserId, searcher);
             var skyResult = customerProxy.SearchProfile(searchProfileRequest);
 
             if (skyResult!.Succeeded == false)

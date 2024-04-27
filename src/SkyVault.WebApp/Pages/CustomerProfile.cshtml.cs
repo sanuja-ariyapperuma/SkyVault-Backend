@@ -16,5 +16,15 @@ namespace SkyVault.WebApp.Pages
 
             return Page();
         }
+
+        public IActionResult OnGetPassport(string passportNo)
+        {
+            return Partial("_Passport");
+        }
+
+        public IActionResult OnGetVisa(string visaNo)
+        {
+            return Partial("_Vista");
+        }
     }
 }

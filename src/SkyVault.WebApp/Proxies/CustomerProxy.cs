@@ -38,5 +38,5 @@ public sealed class CustomerProxy(HttpClient httpClient)
         var payload = postResponse.Content.ReadFromJsonAsync<SearchProfileResponse>().Result;
         
         return new SkyResult<SearchProfileResponse>().SucceededWithValue(payload!);
-    } 
+    }
 }
