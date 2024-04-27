@@ -1,0 +1,60 @@
+@model SkyVault.WebApp.Models.PassportModel
+
+<div class="row my-3">
+    <div class="col-md-6">
+        <select id="editPassportSalutation" class="form-select customselect" aria-label="Salutation select">
+            <option selected>Select Salutation</option>
+            <option value="1">Mr.</option>
+            <option value="2">Mrs.</option>
+            <option value="3">Ms.</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <input type="text" class="form-control customtext" placeholder="Last Name"/>
+    </div>
+</div>
+<div class="row my-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control customtext" placeholder="Other Names"/>
+    </div>
+    <div class="col-md-6">
+        <select class="form-select customselect" aria-label="Nationality select">
+            <option selected>Select Nationality</option>
+            <option value="1">Sri Lankan</option>
+            <option value="2">Finnish</option>
+            <option value="3">Polish</option>
+        </select>
+    </div>
+</div>
+<div class="row my-3">
+    <div class="col-md-6">
+        <select class="form-select customselect" aria-label="Gender select">
+            <option selected>Select Gender</option>
+            <option value="1">Male</option>
+            <option value="2">Female</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <input type="text" class="form-control customtext" placeholder="Place of Birth"/>
+    </div>
+</div>
+<div class="row my-4">
+    <div class="col-md-6">
+        <input type="text" class="form-control customtext " placeholder="Passport Number"/>
+    </div>
+    <div class="col-md-6">
+        <input type="date" class="form-control customdate" value="Date of Birthday"/>
+    </div>
+</div>
+<div class="row my-3">
+    <div class="col-md-6">
+        <input type="date" class="form-control customdate" value="Passport Expiry Date"/>
+    </div>
+    <div class="col-md-6">
+        <select class="form-select customselect" aria-label="Gender select">
+            <option selected>Select Country</option>
+            <option value="1">Sri Lanka</option>
+            <option value="2">Finland</option>
+        </select>
+    </div>
+</div>
