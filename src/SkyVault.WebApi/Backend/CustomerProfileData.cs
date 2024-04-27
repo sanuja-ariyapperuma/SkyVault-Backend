@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
+using SkyVault.Payloads.ResponsePayloads;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -13,26 +14,31 @@ namespace SkyVault.WebApi.Backend
                 .ThenInclude(o => o.Visas)
                 .FirstOrDefault(p => p.Id == profileId && p.SystemUserId == systemUserId);
 
-        public List<CustomerProfile>? Search(string searchQuery, int systemUserId)
+        public List<SearchProfileItem>? Search(string searchQuery, int systemUserId)
         {
             string systemUserRoles = db.SystemUsers.Find(systemUserId)!.UserRole!;
 
-            var query = db.CustomerProfiles
-                .Include(p => p.Passports)
-                .Include(p => p.Salutation)
-                .Where(c => (systemUserRoles == "admin" ||
-                             systemUserRoles == "su.admin" ||
-                             c.SystemUserId == systemUserId) &&
-                            (c.Passports.Any(p => p.PassportNumber.Contains(searchQuery)) ||
-                             c.Passports.Any(p => p.LastName.Contains(searchQuery)) ||
-                             c.Passports.Any(p => p.OtherNames!.Contains(searchQuery))));
+            var query = db.Passports.Where(p => 
+                (systemUserRoles == "admin" ||
+                systemUserRoles == "su.admin" ||
+                p.CustomerProfile.SystemUserId == systemUserId) &&
+                (
+                    p.PassportNumber.Contains(searchQuery) ||
+                    p.LastName.Contains(searchQuery) ||
+                    (
+                        p.OtherNames != null && 
+                        p.OtherNames.Contains(searchQuery)
+                    )
+                ));
 
-            return query.Select(p => new CustomerProfile
-            {
-                Id = p.Id,
-                Salutation = p.Salutation,
-                Passports = p.Passports
-            }).ToList();
+            return query.Select(p => new SearchProfileItem
+            (
+                p.CustomerProfileId.ToString(),
+                p.LastName,
+                p.OtherNames,
+                p.PassportNumber,
+                p.CustomerProfile.Salutation.SalutationName
+            )).ToList();
         }
 
 
