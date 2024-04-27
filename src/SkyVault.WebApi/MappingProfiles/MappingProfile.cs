@@ -4,7 +4,7 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.MappingProfiles
 {
-    public class MappingProfile: Profile
+    public sealed class MappingProfile: Profile
     {
         public MappingProfile()
         {
