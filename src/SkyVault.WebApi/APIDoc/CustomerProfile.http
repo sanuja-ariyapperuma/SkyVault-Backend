@@ -6,8 +6,8 @@ X-API-KEY: 7heBJBIPU25duYMFKrCf
 Content-Type: application/json
 
 {
-  "id": "20",
-  "sysUserId": "1"
+  "id": "2",
+  "sysUserId": "9"
 }
 
 ###
@@ -56,7 +56,7 @@ X-API-KEY: 7heBJBIPU25duYMFKrCf
 Content-Type: application/json
 
 {
-  "SearchQuery": "Sha",
+  "SearchQuery": "Ran",
   "SysUserId": "9"
 }
 
@@ -71,12 +71,12 @@ Content-Type: application/json
   "customerProfileId": "",
   "systemUserId": "1",
   "parentId": "",
-  "lastName": "Weerarathna",
+  "lastName": "Perera",
   "otherNames": "Iraj",
-  "passportNumber": "33345678",
+  "passportNumber": "43214321",
   "gender": "F",
   "dateOfBirth": "01/01/1994",
-  "placeOfBirth": "Gampaha",
+  "placeOfBirth": "Nuwara Eliya",
   "expiryDate": "01/01/2027",
   "nationalityId": "1",
   "countryId": "1",
@@ -179,4 +179,29 @@ Content-Type: application/json
   "customerProfileId": "2",
   "systemUserId": "1",
   "prefCommId": "2"
+}
+
+###
+
+//Get Passport by Id
+POST {{rootURL}}/getpassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "1",
+  "sysUserId": "1"
+}
+
+### 
+
+//Get Visa by ID
+
+POST {{rootURL}}/getvisa
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "1",
+  "sysUserId": "1"
 }
