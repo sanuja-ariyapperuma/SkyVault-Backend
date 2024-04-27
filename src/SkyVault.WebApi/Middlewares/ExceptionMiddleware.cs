@@ -3,7 +3,7 @@ using SkyVault.Exceptions;
 
 namespace SkyVault.WebApi.Middlewares
 {
-    public class ExceptionMiddleware(RequestDelegate next)
+    public sealed class ExceptionMiddleware(RequestDelegate next)
     {
         public async Task InvokeAsync(HttpContext httpContext)
         {
