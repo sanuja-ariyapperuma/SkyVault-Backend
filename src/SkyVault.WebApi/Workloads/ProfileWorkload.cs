@@ -140,6 +140,70 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
+        public static IResult GetPassport(
+            [FromBody] GetPassportRequest passportRequest, 
+            SkyvaultContext dbContext, 
+            HttpContext context
+            )
+        {
+            _correlationId = CorrelationHandler.Get(context);
+
+            var passportData = new PassportData(dbContext);
+
+            var passport = passportData.GetPassportById(passportRequest.id!,passportRequest.sysUserId!,_correlationId);
+
+            if(passport == null)
+                return Results.Problem(
+                                       new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "No passport found", "30550615-0007", _correlationId));
+
+
+
+            return Results.Ok(new SkyVault.Payloads.CommonPayloads.Passport(
+                passport.Value!.Id.ToString(),
+                passport.Value.LastName,
+                passport.Value.OtherNames,
+                passport.Value.PassportNumber,
+                passport.Value.Gender,
+                passport.Value.DateOfBirth.ToString(),
+                passport.Value.PlaceOfBirth,
+                passport.Value.ExpiryDate.ToString(),
+                passport.Value.NationalityId.ToString(),
+                passport.Value.CountryId.ToString(),
+                passport.Value.IsPrimary,
+                null
+            ));
+
+        }
+
+        public static IResult GetVisa(
+            [FromBody] GetVisaRequest visaReqeust,
+            SkyvaultContext dbContext,
+            HttpContext context){
+            
+            _correlationId = CorrelationHandler.Get(context);
+
+            var visaData = new VisaData(dbContext);
+
+            var result = visaData.GetVisaById(visaReqeust,_correlationId);
+
+            if(result == null)
+                return Results.Problem(
+                                       new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "No Visa found", "30550615-0008", _correlationId));
+
+            return Results.Ok(new SkyVault.Payloads.CommonPayloads.Visa(
+                result.Value!.Id.ToString(),
+                result.Value.VisaNumber,
+                result.Value.CountryId.ToString(),
+                result.Value.IssuedPlace,
+                result.Value.IssuedDate.ToString(),
+                result.Value.ExpireDate.ToString(),
+                null
+            ));
+
+        }
+
         public static IResult UpdatePassport(
                 [FromBody] PassportRequest passportRequest,
                 SkyvaultContext dbContext,

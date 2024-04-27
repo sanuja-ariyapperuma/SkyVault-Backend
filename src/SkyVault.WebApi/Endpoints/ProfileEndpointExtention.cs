@@ -17,11 +17,19 @@
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
+            app.MapPost("/getpassport", Workloads.ProfileWorkload.GetPassport)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
             app.MapPut("/updatepassport", Workloads.ProfileWorkload.UpdatePassport)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPost("/addvisa", Workloads.ProfileWorkload.AddVisa)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/getvisa", Workloads.ProfileWorkload.GetVisa)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 

@@ -93,5 +93,24 @@ namespace SkyVault.WebApi.Backend
             return new SkyResult<String>().SucceededWithValue("Validated");
                 
         }
+
+        public SkyResult<Passport> GetPassportById(string passportId, string systemUserId, string correlationId){
+
+            var systemUserRole = db.SystemUsers.Find(Convert.ToInt32(systemUserId))?.UserRole;
+
+            var result = db.Passports.Where(p => 
+                p.Id == Convert.ToInt32(passportId) && 
+                (
+                    systemUserRole == null ||
+                    systemUserRole == "admin" ||
+                    systemUserRole == "su.admin" ||
+                    p.CustomerProfile.SystemUserId == Convert.ToInt32(systemUserId)
+                )).FirstOrDefault();
+
+            if(result == null)
+                return new SkyResult<Passport>().Fail("No passport found", "1f7504d7-0005", correlationId);
+
+            return new SkyResult<Passport>().SucceededWithValue(result);
+        }
     }
 }
