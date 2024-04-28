@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SkyVault.Payloads.RequestPayloads;
@@ -83,7 +84,7 @@ namespace SkyVault.WebApp.Pages
                 TempData["CorrelationId1"] = WebCorrelationId;
                 TempData["CorrelationId2"] = skyResult.CorrelationId;
 
-                return RedirectToPage("/unauthorized");
+                return RedirectPermanent("/error");
             }
 
             //Bind only what was processed by the API and not what was received by the claims.
@@ -104,6 +105,8 @@ namespace SkyVault.WebApp.Pages
         {
             var signOutUrl = $"https://login.microsoftonline.com/{configuration["AzureAD:TenantId"]}/oauth2/logout";
 
+            Response.Headers["HX-Redirect"] = signOutUrl;
+            
             return RedirectPermanent(signOutUrl);
         }
 
@@ -124,29 +127,18 @@ namespace SkyVault.WebApp.Pages
                 TempData["CorrelationId1"] = WebCorrelationId;
                 TempData["CorrelationId2"] = skyResult.CorrelationId;
 
-                return RedirectToPage("/innererror");
+                Response.Headers["HX-Redirect"] = "/error";
+                
+                return RedirectPermanent("/error");
             }
 
             var searchProfileResponse = skyResult.Value;
 
             if (searchProfileResponse?.Profiles != null && searchProfileResponse.Profiles.Any())
             {
-                var sb = new StringBuilder();
+                TempData["Dashboard.Results"] = searchProfileResponse.Profiles;
 
-                foreach (var profile in searchProfileResponse.Profiles)
-                {
-                    var profileData = new List<string?>
-                    {
-                        profile.LastName,
-                        profile.OtherNames,
-                        profile.Salutation,
-                        profile.PassportNumber
-                    };
-
-                    sb.Append($"<tr><td>{string.Join("</td><td>", profileData)}</td></tr>");
-                }
-
-                return Content(sb.ToString(), "text/html");
+                return Partial("_DashboardResults", this);
             }
             else
             {
