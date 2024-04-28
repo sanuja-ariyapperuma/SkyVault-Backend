@@ -34,8 +34,8 @@ namespace SkyVault.WebApi.Workloads
 
                 if (customerProfile == null)
                     return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "No profile found", "30550615-0007", _correlationId));
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                            "No profile found", "30550615-0001", _correlationId));
 
                 return Results.Ok(ToProfilePayload(customerProfile));
             }
@@ -43,15 +43,16 @@ namespace SkyVault.WebApi.Workloads
             {
                 e.LogException(_correlationId);
 
-                return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "Invalid type of data in request", "30550615-0008", _correlationId));
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Incorrect format of data found", "30550615-0002", _correlationId
+                ));
             }
             catch (Exception e)
             {
                 e.LogException(_correlationId);
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "An unexpected error occurred. Please try again later.", "30550615-0009", _correlationId));
+                    "An unexpected error occurred. Please try again later.", "30550615-0003", _correlationId));
             }
         }
 
@@ -64,7 +65,7 @@ namespace SkyVault.WebApi.Workloads
             {
                 if (string.IsNullOrWhiteSpace(searchProfileRequest.SearchQuery))
                     return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-                                               "Empty search query found", "30550615-0011", _correlationId));
+                                               "Empty search query found", "30550615-0004", _correlationId));
 
                 _correlationId = CorrelationHandler.Get(context);
 
@@ -73,13 +74,15 @@ namespace SkyVault.WebApi.Workloads
                 var customerProfiles = customerProfileData.Search(
                     searchProfileRequest.SearchQuery, 
                     Convert.ToInt32(searchProfileRequest.SysUserId));
-                
-                var searchedProfiles = ToSearchProfileResponse(customerProfiles!);
-                var response = new SearchProfileResponse(
-                    searchProfileRequest.SearchQuery,
-                    searchedProfiles);
 
-                return Results.Ok(response);
+                return Results.Ok(customerProfiles);
+            }
+            catch(FormatException e){
+                e.LogException(_correlationId);
+
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Incorrect format of data found", "30550615-0005", _correlationId
+                ));
             }
             catch (Exception e)
             {
@@ -87,7 +90,7 @@ namespace SkyVault.WebApi.Workloads
 
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
                     "An unexpected error occurred. Please try again later.",
-                    "30550615-0012", _correlationId));
+                    "30550615-0006", _correlationId));
             }
         }
 
@@ -107,6 +110,8 @@ namespace SkyVault.WebApi.Workloads
                                         validateProfileData.Message, validateProfileData.ErrorCode, 
                                         _correlationId));
 
+            SaveUpdateCustomerProfileResponse savedCustomerProfile;
+
             if (String.IsNullOrWhiteSpace(passportRequest.CustomerProfileId)) 
             {
                 var savedprofile = customerProfileData.SaveProfile(passportRequest, _correlationId);
@@ -115,17 +120,87 @@ namespace SkyVault.WebApi.Workloads
                     return Results.Problem(
                                            new ValidationProblemDetails().ToValidationProblemDetails(
                                                 savedprofile.Message, savedprofile.ErrorCode, _correlationId));
+                
+                savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savedprofile.Value!.Id.ToString());
             }
             else 
             {
                 var passportData = new PassportData(dbContext);
                 var savepassport = passportData.AddNewPassport(passportRequest, _correlationId);
+
+                if (!savepassport.Succeeded)
+                    return Results.Problem(
+                                           new ValidationProblemDetails().ToValidationProblemDetails(
+                                                savepassport.Message, "500", _correlationId));
+
+                savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savepassport.Value!.Id.ToString());
             }
 
+            return Results.Ok(savedCustomerProfile);
 
+        }
+
+        public static IResult GetPassport(
+            [FromBody] GetPassportRequest passportRequest, 
+            SkyvaultContext dbContext, 
+            HttpContext context
+            )
+        {
+            _correlationId = CorrelationHandler.Get(context);
+
+            var passportData = new PassportData(dbContext);
+
+            var passport = passportData.GetPassportById(passportRequest.id!,passportRequest.sysUserId!,_correlationId);
+
+            if(passport == null)
+                return Results.Problem(
+                                       new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "No passport found", "30550615-0007", _correlationId));
+
+
+
+            return Results.Ok(new SkyVault.Payloads.CommonPayloads.Passport(
+                passport.Value!.Id.ToString(),
+                passport.Value.LastName,
+                passport.Value.OtherNames,
+                passport.Value.PassportNumber,
+                passport.Value.Gender,
+                passport.Value.DateOfBirth.ToString(),
+                passport.Value.PlaceOfBirth,
+                passport.Value.ExpiryDate.ToString(),
+                passport.Value.NationalityId.ToString(),
+                passport.Value.CountryId.ToString(),
+                passport.Value.IsPrimary,
+                null
+            ));
+
+        }
+
+        public static IResult GetVisa(
+            [FromBody] GetVisaRequest visaReqeust,
+            SkyvaultContext dbContext,
+            HttpContext context){
             
+            _correlationId = CorrelationHandler.Get(context);
 
-            return Results.Ok("Passport Added Successfully");
+            var visaData = new VisaData(dbContext);
+
+            var result = visaData.GetVisaById(visaReqeust,_correlationId);
+
+            if(result == null)
+                return Results.Problem(
+                                       new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "No Visa found", "30550615-0008", _correlationId));
+
+            return Results.Ok(new SkyVault.Payloads.CommonPayloads.Visa(
+                result.Value!.Id.ToString(),
+                result.Value.VisaNumber,
+                result.Value.CountryId.ToString(),
+                result.Value.IssuedPlace,
+                result.Value.IssuedDate.ToString(),
+                result.Value.ExpireDate.ToString(),
+                null
+            ));
 
         }
 
@@ -153,7 +228,7 @@ namespace SkyVault.WebApi.Workloads
                     new ValidationProblemDetails().ToValidationProblemDetails(
                     result.Message, result.ErrorCode, _correlationId));
 
-            return Results.Ok(result.Value);
+            return Results.Ok(new SaveUpdateCustomerProfileResponse(passportRequest.CustomerProfileId));
  
         }
 
@@ -179,7 +254,7 @@ namespace SkyVault.WebApi.Workloads
                                        new ValidationProblemDetails().ToValidationProblemDetails(
                                         result.Message, result.ErrorCode, _correlationId));
 
-            return Results.Ok(result.Value);
+            return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));
         }
 
         public static IResult UpdateVisa([FromBody] VisaReqeust visaReqeust,
@@ -204,7 +279,7 @@ namespace SkyVault.WebApi.Workloads
                     new ValidationProblemDetails().ToValidationProblemDetails(
                     result.Message, result.ErrorCode, _correlationId));
 
-            return Results.Ok(result.Value);
+            return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));
         }
 
         public static IResult UpdateComMethod([FromBody] ComMethodRequest comMethodRequest,
@@ -222,7 +297,7 @@ namespace SkyVault.WebApi.Workloads
                                        new ValidationProblemDetails().ToValidationProblemDetails(
                                                               result.Message, result.ErrorCode, _correlationId));
 
-            return Results.Ok(result.Value);
+            return Results.Ok(new SaveUpdateCustomerProfileResponse(comMethodRequest.CustomerProfileId));
         }
 
         #endregion
@@ -270,22 +345,6 @@ namespace SkyVault.WebApi.Workloads
             );
 
             return profilePayload;
-        }
-
-        private static IEnumerable<SearchProfileItem> ToSearchProfileResponse(
-            IEnumerable<CustomerProfile> customerProfile)
-        {
-            return customerProfile.SelectMany(cp => cp.Passports
-                .Select(
-                    p => new SearchProfileItem(
-                        cp.Id,
-                        p.LastName,
-                        p.OtherNames,
-                        p.PassportNumber,
-                        cp.Salutation.SalutationName
-                    )
-                )
-            ).ToList();
         }
 
         #endregion

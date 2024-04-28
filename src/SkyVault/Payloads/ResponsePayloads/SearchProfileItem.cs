@@ -1,7 +1,7 @@
 namespace SkyVault.Payloads.ResponsePayloads;
 
 public record SearchProfileItem(
-    int? ProfileId,
+    string? ProfileId,
     string? LastName,
     string? OtherNames,
     string? PassportNumber,
