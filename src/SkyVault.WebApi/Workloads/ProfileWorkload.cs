@@ -180,27 +180,49 @@ namespace SkyVault.WebApi.Workloads
             [FromBody] GetVisaRequest visaReqeust,
             SkyvaultContext dbContext,
             HttpContext context){
-            
-            _correlationId = CorrelationHandler.Get(context);
 
-            var visaData = new VisaData(dbContext);
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
 
-            var result = visaData.GetVisaById(visaReqeust,_correlationId);
+                var visaData = new VisaData(dbContext);
+                
+                var result = visaData.GetVisaById(
+                    Convert.ToInt32(visaReqeust.Id),
+                    Convert.ToInt32(visaReqeust.systemUserId),
+                    _correlationId);
 
-            if(result == null)
+                if(!result.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                            "No Visa found", "30550615-0008", _correlationId));
+
+                return Results.Ok(new SkyVault.Payloads.CommonPayloads.Visa(
+                    result.Value!.Id.ToString(),
+                    result.Value.VisaNumber,
+                    result.Value.CountryId.ToString(),
+                    result.Value.IssuedPlace,
+                    result.Value.IssuedDate.ToString(),
+                    result.Value.ExpireDate.ToString(),
+                    null
+                ));
+            }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
                 return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                        "No Visa found", "30550615-0008", _correlationId));
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Invalid type of data found", "30550615-0009", _correlationId));
+            }
+            catch (System.Exception e)
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                        new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0010", _correlationId));
+            }
 
-            return Results.Ok(new SkyVault.Payloads.CommonPayloads.Visa(
-                result.Value!.Id.ToString(),
-                result.Value.VisaNumber,
-                result.Value.CountryId.ToString(),
-                result.Value.IssuedPlace,
-                result.Value.IssuedDate.ToString(),
-                result.Value.ExpireDate.ToString(),
-                null
-            ));
+
 
         }
 
@@ -236,50 +258,85 @@ namespace SkyVault.WebApi.Workloads
             SkyvaultContext dbContext,
             HttpContext context)
         {
-            _correlationId = CorrelationHandler.Get(context);
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
 
-            var visaData = new VisaData(dbContext);
+                var visaData = new VisaData(dbContext);
+                var customerProfileData = new CustomerProfileData(dbContext);
 
-            var validateVisa = visaData.ValidateVisaDetails(visaReqeust, _correlationId);
+                var authorized = customerProfileData.CheckAccessToTheProfile(
+                    Convert.ToInt32(visaReqeust.CustomerProfileId),
+                    Convert.ToInt32(visaReqeust.SystemUserId),
+                    _correlationId
+                );
 
-            if (!validateVisa.Succeeded)
+                if(!authorized.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                            authorized.Message, authorized.ErrorCode, _correlationId));
+
+
+                var result = visaData.AddVisa(visaReqeust, _correlationId);
+
+                if (!result.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                            result.Message, result.ErrorCode, _correlationId));
+
+                return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));    
+            }
+            catch (System.Exception e)
+            {
+                e.LogException(_correlationId);
+
                 return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                        validateVisa.Message, validateVisa.ErrorCode, _correlationId));
-
-            var result = visaData.AddVisa(visaReqeust, _correlationId);
-
-            if (!result.Succeeded)
-                return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                        result.Message, result.ErrorCode, _correlationId));
-
-            return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));
+                                        new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0012", _correlationId));
+            }
+            
         }
 
         public static IResult UpdateVisa([FromBody] VisaReqeust visaReqeust,
             SkyvaultContext dbContext,
             HttpContext context)
         {
-            _correlationId = CorrelationHandler.Get(context);
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
 
-            var visaData = new VisaData(dbContext);
+                var visaData = new VisaData(dbContext);
 
-            var validateVisa = visaData.ValidateVisaDetails(visaReqeust, _correlationId);
+                var customerProfileData = new CustomerProfileData(dbContext);
 
-            if (!validateVisa.Succeeded)
+                var authorized = customerProfileData.CheckAccessToTheProfile(
+                    Convert.ToInt32(visaReqeust.CustomerProfileId),
+                    Convert.ToInt32(visaReqeust.SystemUserId),
+                    _correlationId
+                );
+
+                if(!authorized.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                            authorized.Message, authorized.ErrorCode, _correlationId));
+                    
+                var result = visaData.UpdateVisa(visaReqeust, _correlationId);
+
+                if (!result.Succeeded)
+                    return Results.Problem(
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                        result.Message, result.ErrorCode, _correlationId));
+
+                return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));
+            }
+            catch (System.Exception e)
+            {
+                e.LogException(_correlationId);
                 return Results.Problem(
-                                    new ValidationProblemDetails().ToValidationProblemDetails(
-                                    validateVisa.Message, validateVisa.ErrorCode, _correlationId));
-
-            var result = visaData.UpdateVisa(visaReqeust, _correlationId);
-
-            if (!result.Succeeded)
-                return Results.Problem(
-                    new ValidationProblemDetails().ToValidationProblemDetails(
-                    result.Message, result.ErrorCode, _correlationId));
-
-            return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));
+                                            new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0011", _correlationId));
+            }
+            
         }
 
         public static IResult UpdateComMethod([FromBody] ComMethodRequest comMethodRequest,
