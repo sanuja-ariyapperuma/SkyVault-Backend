@@ -1,0 +1,50 @@
+@rootURL=https://localhost:7199
+
+//Get Visa by ID
+
+POST {{rootURL}}/getvisa
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "1",
+  "sysUserId": "1"
+}
+
+###
+
+// Add new visa to existing passport
+POST {{rootURL}}/addVisa
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "",
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "passportId": "1",
+  "visanumber": "222fs98df7s9dg",
+  "visaissuedplace": "Colombo",
+  "visaissueddate": "01/01/1996",
+  "visaexpirydate": "01/01/2023",
+  "countryId": "2"
+}
+
+###
+
+//Update Visa Details
+PUT {{rootURL}}/updateVisa
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "1",
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "passportId": "1",
+  "visanumber": "444112222222",
+  "visaissuedplace": "Colombo",
+  "visaissueddate": "01/01/1996",
+  "visaexpirydate": "01/01/2023",
+  "countryId": "2"
+}
