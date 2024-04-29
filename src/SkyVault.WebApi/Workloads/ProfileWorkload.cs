@@ -490,6 +490,32 @@ namespace SkyVault.WebApi.Workloads
             
         }
 
+        public static IResult CheckPassportExist(
+            [FromBody] GetPassportRequest passportRequest,
+            SkyvaultContext dbContext,
+            HttpContext context)
+        {
+            
+            _correlationId = CorrelationHandler.Get(context);
+
+            if(passportRequest.passportNumber == null || String.IsNullOrWhiteSpace(passportRequest.passportNumber))
+                return Results.Problem(
+                                            new ValidationProblemDetails().ToValidationProblemDetails(
+                                                "Passport Number cannot be empty", "30550615-0026", _correlationId));
+
+            var passportData = new PassportData(dbContext);
+
+            var isPassportExists = passportData.CheckPassportExists(passportRequest.passportNumber,_correlationId);
+
+            if(!isPassportExists.Succeeded)
+                return Results.Problem(
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Passport Number already exists", "30550615-0027", _correlationId));
+
+            return Results.Ok("Passport Number available");
+
+        }
+
         #endregion
 
         #region Private Methods
