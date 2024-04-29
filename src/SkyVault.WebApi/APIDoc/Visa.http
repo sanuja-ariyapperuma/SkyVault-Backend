@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
   "id": "1",
-  "sysUserId": "1"
+  "systemUserId": "1"
 }
 
 ###
