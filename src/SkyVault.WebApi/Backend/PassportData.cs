@@ -73,7 +73,6 @@ namespace SkyVault.WebApi.Backend
                 return new SkyResult<String>().Fail(ex.Message, "1f7504d7-0001", correlationId);
             }
         }
-
         public SkyResult<Passport> GetPassportById(int passportId, string correlationId){
 
             var result = db.Passports.Where(p => 
@@ -83,6 +82,16 @@ namespace SkyVault.WebApi.Backend
                 return new SkyResult<Passport>().Fail("No passport found", "1f7504d7-0005", correlationId);
 
             return new SkyResult<Passport>().SucceededWithValue(result);
+        }
+    
+        public SkyResult<String> CheckPassportExists(string passportNumber, string correlationId)
+        {
+            var isPassportExists = db.Passports.Any(p => p.PassportNumber == passportNumber);
+
+            if(isPassportExists)
+                return new SkyResult<String>().Fail("Passport Number Already Exists", "1f7504d7-0006", correlationId);
+
+            return new SkyResult<String>().SucceededWithValue("Passport Number can be use");
         }
     }
 }

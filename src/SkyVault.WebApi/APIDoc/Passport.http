@@ -12,6 +12,17 @@ Content-Type: application/json
 
 ###
 
+//Check passport exists by passport number
+POST {{rootURL}}/checkpPassportNumber
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "passportnumber": "1"
+}
+
+###
+
 //Update Passport Details
 PUT {{rootURL}}/updatePassport
 X-API-KEY: 7heBJBIPU25duYMFKrCf
