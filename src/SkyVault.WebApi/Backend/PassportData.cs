@@ -45,8 +45,7 @@ namespace SkyVault.WebApi.Backend
                 var rowsAffected = db.Passports
                     .Include(p => p.CustomerProfile)
                     .Where(p =>
-                        p.Id == Convert.ToInt32(passportRequest.Id) &&
-                        p.CustomerProfile.SystemUserId == Convert.ToInt32(passportRequest.SystemUserId)
+                        p.Id == Convert.ToInt32(passportRequest.Id)
                     ).ExecuteUpdate(updates =>
                         updates.SetProperty(passport => passport.PassportNumber, passportRequest.PassportNumber)
                         .SetProperty(passport => passport.LastName, passportRequest.LastName)
@@ -75,37 +74,10 @@ namespace SkyVault.WebApi.Backend
             }
         }
 
-        public SkyResult<String> ValidatePassportDetails(PassportRequest passportRequest, string correlationId) 
-        {
-            var isNationality = db.Nationalities.Any(n => n.Id == Convert.ToInt32(passportRequest.NationalityId));
-            var isCountry = db.Countries.Any(c => c.Id == Convert.ToInt32(passportRequest.CountryId));
-            var isSalutaion = db.Salutations.Any(s => s.Id == Convert.ToInt32(passportRequest.SalutationId));
-
-            if (!isNationality)
-                return new SkyResult<String>().Fail("Invalid Nationality Found", "1f7504d7-0001", correlationId);
-
-            if(!isCountry)
-                return new SkyResult<String>().Fail("Invalid Country Found", "1f7504d7-0002", correlationId);
-
-            if(!isSalutaion)
-                return new SkyResult<String>().Fail("Invalid Salutation Found", "1f7504d7-0003", correlationId);
-
-            return new SkyResult<String>().SucceededWithValue("Validated");
-                
-        }
-
-        public SkyResult<Passport> GetPassportById(string passportId, string systemUserId, string correlationId){
-
-            var systemUserRole = db.SystemUsers.Find(Convert.ToInt32(systemUserId))?.UserRole;
+        public SkyResult<Passport> GetPassportById(int passportId, string correlationId){
 
             var result = db.Passports.Where(p => 
-                p.Id == Convert.ToInt32(passportId) && 
-                (
-                    systemUserRole == null ||
-                    systemUserRole == "admin" ||
-                    systemUserRole == "su.admin" ||
-                    p.CustomerProfile.SystemUserId == Convert.ToInt32(systemUserId)
-                )).FirstOrDefault();
+                p.Id == passportId).FirstOrDefault();
 
             if(result == null)
                 return new SkyResult<Passport>().Fail("No passport found", "1f7504d7-0005", correlationId);

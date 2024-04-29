@@ -98,64 +98,103 @@ namespace SkyVault.WebApi.Workloads
             SkyvaultContext dbContext,
             HttpContext context) 
         {
-            _correlationId = CorrelationHandler.Get(context);
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
 
-            var customerProfileData = new CustomerProfileData(dbContext);
+                var customerProfileData = new CustomerProfileData(dbContext);
 
-            var validateProfileData = customerProfileData.ValidateProfile(passportRequest, _correlationId);
+                SaveUpdateCustomerProfileResponse savedCustomerProfile;
 
-            if (!validateProfileData.Succeeded)
+                if (String.IsNullOrWhiteSpace(passportRequest.CustomerProfileId)) 
+                {
+                    var savedprofile = customerProfileData.SaveProfile(passportRequest, _correlationId);
+
+                    if (!savedprofile.Succeeded)
+                        return Results.Problem(
+                                            new ValidationProblemDetails().ToValidationProblemDetails(
+                                                    savedprofile.Message, savedprofile.ErrorCode, _correlationId));
+                    
+                    savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savedprofile.Value!.Id.ToString());
+                }
+                else 
+                {
+
+                    var authorized = customerProfileData.CheckAccessToTheProfile(
+                        Convert.ToInt32(passportRequest.CustomerProfileId),
+                        Convert.ToInt32(passportRequest.SystemUserId),
+                        _correlationId
+                    );
+
+                    if (!authorized.Succeeded)
+                        return Results.Problem(
+                                            new ValidationProblemDetails().ToValidationProblemDetails(
+                                                authorized.Message, authorized.ErrorCode, _correlationId));
+
+                    var passportData = new PassportData(dbContext);
+                    var savepassport = passportData.AddNewPassport(passportRequest, _correlationId);
+
+                    if (!savepassport.Succeeded)
+                        return Results.Problem(
+                                            new ValidationProblemDetails().ToValidationProblemDetails(
+                                                    savepassport.Message, "30550615-0007", _correlationId));
+
+                    savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savepassport.Value!.Id.ToString());
+                }
+
+                return Results.Ok(savedCustomerProfile);
+            }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
+
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Incorrect format of data found", "30550615-0008", _correlationId
+                ));
+            }
+            catch (System.Exception e)
+            {
+                e.LogException(_correlationId);
+
                 return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                        validateProfileData.Message, validateProfileData.ErrorCode, 
-                                        _correlationId));
-
-            SaveUpdateCustomerProfileResponse savedCustomerProfile;
-
-            if (String.IsNullOrWhiteSpace(passportRequest.CustomerProfileId)) 
-            {
-                var savedprofile = customerProfileData.SaveProfile(passportRequest, _correlationId);
-
-                if (!savedprofile.Succeeded)
-                    return Results.Problem(
-                                           new ValidationProblemDetails().ToValidationProblemDetails(
-                                                savedprofile.Message, savedprofile.ErrorCode, _correlationId));
-                
-                savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savedprofile.Value!.Id.ToString());
-            }
-            else 
-            {
-                var passportData = new PassportData(dbContext);
-                var savepassport = passportData.AddNewPassport(passportRequest, _correlationId);
-
-                if (!savepassport.Succeeded)
-                    return Results.Problem(
-                                           new ValidationProblemDetails().ToValidationProblemDetails(
-                                                savepassport.Message, "500", _correlationId));
-
-                savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savepassport.Value!.Id.ToString());
+                                    new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0009", _correlationId));
             }
 
-            return Results.Ok(savedCustomerProfile);
 
         }
 
         public static IResult GetPassport(
-            [FromBody] GetPassportRequest passportRequest, 
-            SkyvaultContext dbContext, 
+            [FromBody] GetPassportRequest passportRequest,
+            SkyvaultContext dbContext,
             HttpContext context
             )
         {
+            try
+            {
             _correlationId = CorrelationHandler.Get(context);
 
             var passportData = new PassportData(dbContext);
 
-            var passport = passportData.GetPassportById(passportRequest.id!,passportRequest.sysUserId!,_correlationId);
+            var customer_profile_data = new CustomerProfileData(dbContext);
 
-            if(passport == null)
+            var authorization = customer_profile_data.CheckAccessToTheProfileWithPassportId(
+                Convert.ToInt32(passportRequest.id),
+                Convert.ToInt32(passportRequest.sysUserId),
+                _correlationId
+                );
+
+            if (!authorization.Succeeded)
+                return Results.Problem(
+                                   new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Unauthorized", "30550615-0010", _correlationId));
+
+            var passport = passportData.GetPassportById(Convert.ToInt32(passportRequest.id), _correlationId);
+
+            if (passport == null)
                 return Results.Problem(
                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                        "No passport found", "30550615-0007", _correlationId));
+                                        "No passport found", "30550615-0011", _correlationId));
 
 
 
@@ -173,6 +212,23 @@ namespace SkyVault.WebApi.Workloads
                 passport.Value.IsPrimary,
                 null
             ));
+            }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Invalid type of data found", "30550615-0012", _correlationId));
+            }
+            catch (System.Exception e)
+            {
+                
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                        new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0013", _correlationId));
+            }
+            
 
         }
 
@@ -186,16 +242,27 @@ namespace SkyVault.WebApi.Workloads
                 _correlationId = CorrelationHandler.Get(context);
 
                 var visaData = new VisaData(dbContext);
+                var customer_profile_data = new CustomerProfileData(dbContext);
+
+                var authorization = customer_profile_data.CheckAccessToTheProfileWithVisaId(
+                    Convert.ToInt32(visaReqeust.Id),
+                    Convert.ToInt32(visaReqeust.systemUserId),
+                    _correlationId
+                    );
+
+                if(!authorization.Succeeded)
+                    return Results.Problem(
+                                       new ValidationProblemDetails().ToValidationProblemDetails(
+                                            "Unauthorized", "30550615-0014", _correlationId));
                 
                 var result = visaData.GetVisaById(
                     Convert.ToInt32(visaReqeust.Id),
-                    Convert.ToInt32(visaReqeust.systemUserId),
                     _correlationId);
 
                 if(!result.Succeeded)
                     return Results.Problem(
                                         new ValidationProblemDetails().ToValidationProblemDetails(
-                                            "No Visa found", "30550615-0008", _correlationId));
+                                            "No Visa found", "30550615-0015", _correlationId));
 
                 return Results.Ok(new SkyVault.Payloads.CommonPayloads.Visa(
                     result.Value!.Id.ToString(),
@@ -212,14 +279,14 @@ namespace SkyVault.WebApi.Workloads
                 e.LogException(_correlationId);
                 return Results.Problem(
                                     new ValidationProblemDetails().ToValidationProblemDetails(
-                                        "Invalid type of data found", "30550615-0009", _correlationId));
+                                        "Invalid type of data found", "30550615-0016", _correlationId));
             }
             catch (System.Exception e)
             {
                 e.LogException(_correlationId);
                 return Results.Problem(
                                         new ProblemDetails().ToProblemDetails(
-                                            "Something went wrong", "30550615-0010", _correlationId));
+                                            "Something went wrong", "30550615-0017", _correlationId));
             }
 
 
@@ -229,19 +296,26 @@ namespace SkyVault.WebApi.Workloads
         public static IResult UpdatePassport(
                 [FromBody] PassportRequest passportRequest,
                 SkyvaultContext dbContext,
-                HttpContext context) 
+                HttpContext context)
         {
-            _correlationId = CorrelationHandler.Get(context);
-            
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
+
             var passportData = new PassportData(dbContext);
 
-            var validatePassport = passportData.ValidatePassportDetails(passportRequest, _correlationId);
+            var customerProfileData = new CustomerProfileData(dbContext);
 
-            if (!validatePassport.Succeeded)
+            var authorized = customerProfileData.CheckAccessToTheProfile(
+                Convert.ToInt32(passportRequest.CustomerProfileId),
+                Convert.ToInt32(passportRequest.SystemUserId),
+                _correlationId
+            );
+
+            if (!authorized.Succeeded)
                 return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                            validatePassport.Message, validatePassport.ErrorCode, _correlationId));
-
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        authorized.Message, authorized.ErrorCode, _correlationId));
 
             var result = passportData.UpdatePassport(passportRequest, _correlationId);
 
@@ -251,7 +325,23 @@ namespace SkyVault.WebApi.Workloads
                     result.Message, result.ErrorCode, _correlationId));
 
             return Results.Ok(new SaveUpdateCustomerProfileResponse(passportRequest.CustomerProfileId));
- 
+
+            }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Invalid type of data found", "30550615-0018", _correlationId));
+            }
+            catch (System.Exception e)
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                        new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0019", _correlationId));
+            }
+            
         }
 
         public static IResult AddVisa([FromBody] VisaReqeust visaReqeust,
@@ -286,13 +376,19 @@ namespace SkyVault.WebApi.Workloads
 
                 return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));    
             }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Invalid type of data found", "30550615-0022", _correlationId));
+            }
             catch (System.Exception e)
             {
                 e.LogException(_correlationId);
-
                 return Results.Problem(
                                         new ProblemDetails().ToProblemDetails(
-                                            "Something went wrong", "30550615-0012", _correlationId));
+                                            "Something went wrong", "30550615-0020", _correlationId));
             }
             
         }
@@ -329,12 +425,19 @@ namespace SkyVault.WebApi.Workloads
 
                 return Results.Ok(new SaveUpdateCustomerProfileResponse(visaReqeust.CustomerProfileId));
             }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Invalid type of data found", "30550615-0023", _correlationId));
+            }
             catch (System.Exception e)
             {
                 e.LogException(_correlationId);
                 return Results.Problem(
                                             new ProblemDetails().ToProblemDetails(
-                                            "Something went wrong", "30550615-0011", _correlationId));
+                                            "Something went wrong", "30550615-0021", _correlationId));
             }
             
         }
@@ -343,18 +446,48 @@ namespace SkyVault.WebApi.Workloads
                        SkyvaultContext dbContext,
                                   HttpContext context)
         {
-            _correlationId = CorrelationHandler.Get(context);
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
 
-            var customerProfileData = new CustomerProfileData(dbContext);
+                var customerProfileData = new CustomerProfileData(dbContext);
 
-            var result = customerProfileData.UpdateComMethod(comMethodRequest, _correlationId);
+                    var authorized = customerProfileData.CheckAccessToTheProfile(
+                        Convert.ToInt32(comMethodRequest.CustomerProfileId),
+                        Convert.ToInt32(comMethodRequest.SystemUserId),
+                        _correlationId
+                    );
 
-            if (!result.Succeeded)
+                    if(!authorized.Succeeded)
+                        return Results.Problem(
+                                            new ValidationProblemDetails().ToValidationProblemDetails(
+                                                authorized.Message, authorized.ErrorCode, _correlationId));
+
+                var result = customerProfileData.UpdateComMethod(comMethodRequest, _correlationId);
+
+                if (!result.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                                                result.Message, result.ErrorCode, _correlationId));
+
+                return Results.Ok(new SaveUpdateCustomerProfileResponse(comMethodRequest.CustomerProfileId));
+            }
+            catch (FormatException e)
+            {
+                e.LogException(_correlationId);
                 return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                                              result.Message, result.ErrorCode, _correlationId));
-
-            return Results.Ok(new SaveUpdateCustomerProfileResponse(comMethodRequest.CustomerProfileId));
+                                    new ValidationProblemDetails().ToValidationProblemDetails(
+                                        "Invalid type of data found", "30550615-0025", _correlationId));
+            }
+            catch (System.Exception e)
+            {
+                
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                            new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0024", _correlationId));
+            }
+            
         }
 
         #endregion
@@ -403,7 +536,6 @@ namespace SkyVault.WebApi.Workloads
 
             return profilePayload;
         }
-
         #endregion
         
     }

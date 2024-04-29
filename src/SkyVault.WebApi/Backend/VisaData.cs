@@ -55,17 +55,9 @@ namespace SkyVault.WebApi.Backend
             return new SkyResult<String>().SucceededWithValue("Visa Updated Successfully");
         }
 
-        public SkyResult<Visa> GetVisaById(int visaId, int systemUserId, string correlationId){
+        public SkyResult<Visa> GetVisaById(int visaId, string correlationId){
 
-            var systemUserRole = db.SystemUsers.Find(systemUserId)?.UserRole;
-
-            var result = db.Visas.Where(p => 
-                p.Id == visaId && 
-                (
-                    systemUserRole == "admin" ||
-                    systemUserRole == "su.admin" ||
-                    p.Passport.CustomerProfile.SystemUserId == systemUserId
-                )).FirstOrDefault();
+            var result = db.Visas.Where(p => p.Id == visaId).FirstOrDefault();
 
             if(result == null)
                 return new SkyResult<Visa>().Fail("No passport found", "1f7504d7-0005", correlationId);
