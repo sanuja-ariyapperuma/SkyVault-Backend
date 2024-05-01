@@ -6,24 +6,10 @@
     @foreach (var profile in (TempData["Dashboard.Results"] as IEnumerable<SearchProfileItem>)!)
     {
         <tr>
-            <td><a href="#" hx-post="@Url.Page("CustomerProfile", "/")"
-                   hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken", "CustomerId": "@profile.ProfileId"}'
-                   hx-trigger="click">@profile.LastName</a></td>
+            <td><a href="/customerprofile?id=@profile.ProfileId" target="_self">@profile.LastName</a></td>
             <td>@profile.OtherNames</td>
             <td>@profile.Salutation</td>
             <td>@profile.PassportNumber</td>
         </tr>
     }
 }
-<script>
-  // JavaScript code
-  document.getElementById('myForm').addEventListener('htmx:response', function(event) {
-    // Handle the response here
-    var responseUrl = event.detail.xhr.responseURL;
-    if (responseUrl) {
-      window.location.href = responseUrl;
-    } else {
-      console.error('Response URL not found');
-    }
-  });
-</script>

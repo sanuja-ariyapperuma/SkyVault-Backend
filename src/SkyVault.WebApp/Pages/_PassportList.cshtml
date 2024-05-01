@@ -1,3 +1,4 @@
+@using SkyVault.Payloads.CommonPayloads
 <table class="table">
     <thead>
     <tr>
@@ -9,22 +10,28 @@
     </tr>
     </thead>
     <tbody id="search-results">
-    <tr>
-        <td>
-            <a href="#" data-bs-toggle="modal" data-bs-target="#passportModal">Mr. John</a>
-        </td>
-        <td>
-            Smith
-        </td>
-        <td>
-            81311442 (Primary)
-        </td>
-        <td>
-            2021-04-01
-        </td>
-        <td>
-            2026-04-01
-        </td>
-    </tr>
+    @if (TempData["CustomerProfile.PassportList"] != null)
+    {
+        @foreach (var passport in (TempData["CustomerProfile.PassportList"] as Passport[])!)
+        {
+            <tr>
+                <td>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#passportModal">@passport.LastName</a>
+                </td>
+                <td>
+                    @passport.OtherNames
+                </td>
+                <td>
+                    @passport.PassportNumber
+                </td>
+                <td>
+                    @passport.DateOfBirth    
+                </td>
+                <td>
+                    @passport.ExpiryDate
+                </td>
+            </tr>
+        }
+    }
     </tbody>
 </table>
