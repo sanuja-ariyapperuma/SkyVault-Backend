@@ -75,7 +75,8 @@ namespace SkyVault.WebApi.Workloads
                     searchProfileRequest.SearchQuery, 
                     Convert.ToInt32(searchProfileRequest.SysUserId));
 
-                return Results.Ok(customerProfiles);
+                return Results.Ok(new SearchProfileResponse(searchProfileRequest.SearchQuery, 
+                    customerProfiles!));
             }
             catch(FormatException e){
                 e.LogException(_correlationId);

@@ -1,0 +1,15 @@
+@using SkyVault.Payloads.ResponsePayloads
+@model SkyVault.WebApp.Pages.IndexModel
+
+@if (TempData["Dashboard.Results"] != null)
+{
+    @foreach (var profile in (TempData["Dashboard.Results"] as IEnumerable<SearchProfileItem>)!)
+    {
+        <tr>
+            <td><a href="/customerprofile?id=@profile.ProfileId" target="_self">@profile.LastName</a></td>
+            <td>@profile.OtherNames</td>
+            <td>@profile.Salutation</td>
+            <td>@profile.PassportNumber</td>
+        </tr>
+    }
+}
