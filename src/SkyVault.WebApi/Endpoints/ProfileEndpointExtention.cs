@@ -40,6 +40,10 @@
             app.MapPut("/updateCommMethod", Workloads.ProfileWorkload.UpdateComMethod)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/checkpPassportNumber", Workloads.ProfileWorkload.CheckPassportExist)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
         }
     }
 }
