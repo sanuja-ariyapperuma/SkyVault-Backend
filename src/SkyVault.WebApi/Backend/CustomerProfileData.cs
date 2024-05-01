@@ -13,7 +13,6 @@ namespace SkyVault.WebApi.Backend
             db.CustomerProfiles.Include(p => p.Passports)
                 .ThenInclude(o => o.Visas)
                 .FirstOrDefault(p => p.Id == profileId && p.SystemUserId == systemUserId);
-
         public List<SearchProfileItem>? Search(string searchQuery, int systemUserId)
         {
             string systemUserRoles = db.SystemUsers.Find(systemUserId)!.UserRole!;
@@ -40,8 +39,6 @@ namespace SkyVault.WebApi.Backend
                 p.CustomerProfile.Salutation.SalutationName
             )).ToList();
         }
-
-
         public CustomerProfile Create(CustomerProfile newProfile)
         {
             var savedprofile = db.CustomerProfiles.Add(newProfile);
@@ -49,48 +46,6 @@ namespace SkyVault.WebApi.Backend
 
             return savedprofile.Entity;
         }
-
-        public SkyResult<String> ValidateProfile(PassportRequest passportRequest, string correlationId) 
-        {
-            var isSystemUserExists = db.SystemUsers.Any(s => s.Id == Convert.ToInt32(passportRequest.SystemUserId));
-            var isSalutationExists = db.Salutations.Any(s => s.Id == Convert.ToInt32(passportRequest.SalutationId));
-            var isNationalityExists = db.Nationalities.Any(s => s.Id == Convert.ToInt32(passportRequest.NationalityId));
-            var isCountryExists = db.Countries.Any(s => s.Id == Convert.ToInt32(passportRequest.CountryId));
-            var isPassportNumberExists = db.Passports.Any(s => s.PassportNumber == passportRequest.PassportNumber);
-
-            if (!String.IsNullOrWhiteSpace(passportRequest.ParentId)) 
-            {
-                var isParentExists = db.CustomerProfiles.Any(s => s.Id == Convert.ToInt32(passportRequest.ParentId));
-                if (!isParentExists)
-                    return new SkyResult<String>().Fail("Parent does not exist", "4cf0079e-0004", correlationId);
-            }
-
-            if (!String.IsNullOrWhiteSpace(passportRequest.CustomerProfileId)) 
-            {
-                var isCustomerProfileExists = db.CustomerProfiles.Any(s => s.Id == Convert.ToInt32(passportRequest.CustomerProfileId));
-                if (!isCustomerProfileExists)
-                    return new SkyResult<String>().Fail("Customer Profile does not exist", "4cf0079e-0004", correlationId);
-            }
-
-            if (!isSystemUserExists)
-                return new SkyResult<String>().Fail("System User does not exist", "4cf0079e-0000", correlationId);
-
-            if(!isSalutationExists)
-                return new SkyResult<String>().Fail("Salutation does not exist", "4cf0079e-0001", correlationId);
-
-            if (!isNationalityExists)
-                return new SkyResult<String>().Fail("National does not exist", "4cf0079e-0002", correlationId);
-
-            if (!isCountryExists)
-                return new SkyResult<String>().Fail("Country does not exist", "4cf0079e-0003", correlationId);
-
-            if (isPassportNumberExists)
-                return new SkyResult<String>().Fail("Passport Number already exists", "4cf0079e-0006", correlationId);
-
-
-            return new SkyResult<String>().SucceededWithValue("Validated");
-        }
-
         public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, string correlationId)
         {
             try
@@ -126,16 +81,15 @@ namespace SkyVault.WebApi.Backend
             }
             catch(Exception ex)
             {
-                return new SkyResult<CustomerProfile>().Fail(ex.Message, "4cf0079e-0005", correlationId);
+                return new SkyResult<CustomerProfile>().Fail(ex.Message, "4cf0079e-0008", correlationId);
             }
         }
-
         public SkyResult<String> UpdateComMethod(ComMethodRequest comMethodRequest, string correlationId) 
         {
             var isCommMethodExists = db.CommunicationMethods.Any(s => s.Id == Convert.ToInt32(comMethodRequest.PrefCommId));
 
             if (!isCommMethodExists)
-                return new SkyResult<String>().Fail("Communication Method does not exist", "4cf0079e-0007", correlationId);
+                return new SkyResult<String>().Fail("Communication Method does not exist", "4cf0079e-0009", correlationId);
 
             var result = db.CustomerProfiles.Where(c => 
                 c.Id == Convert.ToInt32(comMethodRequest.CustomerProfileId) &&
@@ -145,9 +99,60 @@ namespace SkyVault.WebApi.Backend
             );
 
             if (result == 0)
-                return new SkyResult<String>().Fail("No Profile Found or Unauthorize Update", "4cf0079e-0008", correlationId);
+                return new SkyResult<String>().Fail("No Profile Found or Unauthorize Update", "4cf0079e-0010", correlationId);
 
             return new SkyResult<String>().SucceededWithValue("Preffered Commiunication Method Updated");
+        }
+
+        public SkyResult<String> CheckAccessToTheProfile(int customerProfileId, int systemUserId, string correlationId)
+        {
+            var systemUserRole = db.SystemUsers.Find(systemUserId)?.UserRole;
+
+            var result = db.CustomerProfiles.Any(p => 
+                p.Id == customerProfileId && 
+                (
+                    systemUserRole == "admin" ||
+                    systemUserRole == "su.admin" ||
+                    p.SystemUserId == systemUserId
+                )
+            );
+
+            if(!result)
+                return new SkyResult<string>().Fail("Unauthorized", "4cf0079e-0011", correlationId);
+
+            return new SkyResult<string>().SucceededWithValue("Authorized");
+        }
+
+        public SkyResult<String> CheckAccessToTheProfileWithVisaId(int visaId, int systemUserId, string correlationId)
+        {
+            System.FormattableString query = $@"
+                SELECT cp.Id 
+                FROM customer_profiles cp
+                INNER JOIN passports p 
+                ON p.customer_profile_id = cp.id
+                INNER JOIN visas v 
+                ON v.passport_id = p.id
+                WHERE v.id = {visaId}
+                ";
+
+            var customerProfileId = db.CustomerProfiles.FromSql(query).Select(p => p.Id).FirstOrDefault();
+
+            return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
+        }
+        
+        public SkyResult<String> CheckAccessToTheProfileWithPassportId(int passportId, int systemUserId, string correlationId)
+        {
+            System.FormattableString query = $@"
+                SELECT cp.Id 
+                FROM customer_profiles cp
+                INNER JOIN passports p 
+                ON p.customer_profile_id = cp.id
+                WHERE p.id = {passportId}
+                ";
+
+            var customerProfileId = db.CustomerProfiles.FromSql(query).Select(p => p.Id).FirstOrDefault();
+
+            return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
         }
     }
 }

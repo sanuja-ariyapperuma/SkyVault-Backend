@@ -1,0 +1,95 @@
+@rootURL=https://localhost:7199
+
+//Get Passport by Id
+POST {{rootURL}}/getpassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "1",
+  "sysUserId": "1"
+}
+
+###
+
+//Check passport exists by passport number
+POST {{rootURL}}/checkpPassportNumber
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "passportnumber": "1"
+}
+
+###
+
+//Update Passport Details
+PUT {{rootURL}}/updatePassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "id": "2",
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "lastName": "Paker",
+  "otherNames": "Shawn",
+  "passportNumber": "74478546",
+  "gender": "M",
+  "dateOfBirth": "01/01/1996",
+  "placeOfBirth": "Gampaha",
+  "expiryDate": "01/01/2023",
+  "nationalityId": "2",
+  "countryId": "2",
+  "isPrimary": "1", 
+  "salutationId": "1"
+}
+
+###
+
+//Add new passport to existing Customer Profile 
+POST {{rootURL}}/addPassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "customerProfileId": "2",
+  "systemUserId": "1",
+  "lastName": "Ranaweera",
+  "otherNames": "Sunil Lanz",
+  "passportNumber": "21212121",
+  "gender": "F",
+  "dateOfBirth": "01/01/1995",
+  "placeOfBirth": "Colombo",
+  "expiryDate": "01/01/2024",
+  "nationalityId": "1",
+  "countryId": "1",
+  "isPrimary": "0", 
+  "salutationId": "2"
+}
+
+###
+
+//Create new customer profile with passport 
+POST {{rootURL}}/addPassport
+X-API-KEY: 7heBJBIPU25duYMFKrCf
+Content-Type: application/json
+
+{
+  "customerProfileId": "",
+  "systemUserId": "1",
+  "parentId": "",
+  "lastName": "Perera",
+  "otherNames": "Iraj",
+  "passportNumber": "43214321",
+  "gender": "F",
+  "dateOfBirth": "01/01/1994",
+  "placeOfBirth": "Nuwara Eliya",
+  "expiryDate": "01/01/2027",
+  "nationalityId": "1",
+  "countryId": "1",
+  "isPrimary": "1", 
+  "salutationId": "2"
+}
+
+###
