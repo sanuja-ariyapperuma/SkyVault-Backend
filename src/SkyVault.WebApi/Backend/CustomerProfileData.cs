@@ -12,7 +12,7 @@ namespace SkyVault.WebApi.Backend
         public CustomerProfile? Get(int profileId, int systemUserId) =>
             db.CustomerProfiles.Include(p => p.Passports)
                 .ThenInclude(o => o.Visas)
-                .FirstOrDefault(p => p.Id == profileId && p.SystemUserId == systemUserId);
+                .FirstOrDefault(p => p.Id == profileId);
         public List<SearchProfileItem>? Search(string searchQuery, int systemUserId)
         {
             string systemUserRoles = db.SystemUsers.Find(systemUserId)!.UserRole!;
