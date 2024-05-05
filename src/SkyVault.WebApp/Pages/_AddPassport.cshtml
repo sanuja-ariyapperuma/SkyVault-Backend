@@ -1,35 +1,33 @@
 @model CustomerProfileModel
 
-<form id="editPassportModalForm" name="editPassportModalForm">
+<form id="addPassportModalForm" name="addPassportModalForm">
     <input type="hidden" id="hdnCustomerId" name="hdnCustomerId" value="@TempData["CustomerProfile.ID"]"/>
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="passportModalLabel">Edit Passport Details</h5>
+            <h5 class="modal-title" id="addPassportModalLabel">Add Passport Details</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div id="passport-content" class="modal-body">
+        <div class="modal-body">
             <div class="row my-3">
                 <div class="col-md-6">
-                    <select id="editPassportSalutation" class="form-select customselect" aria-label="Salutation select">
-                        <option selected>Select Salutation</option>
+                    <select id="addSalutation" name="addSalutation" class="form-select customselect" aria-label="Salutation select">
+                        <option value="0" selected>Select Salutation</option>
                         <option value="1">Mr.</option>
                         <option value="2">Mrs.</option>
                         <option value="3">Ms.</option>
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" class="form-control customtext" placeholder="Last Name"
-                           value="@Model.Passport?.LastName"/>
+                    <input id="addLastName" name="addLastName" type="text" class="form-control customtext" placeholder="Last Name" value=""/>
                 </div>
             </div>
             <div class="row my-3">
                 <div class="col-md-6">
-                    <input type="text" class="form-control customtext" placeholder="Other Names"
-                           value="@Model.Passport?.OtherNames"/>
+                    <input id="addOtherNames" name="addOtherNames" type="text" class="form-control customtext" placeholder="Other Names" value=""/>
                 </div>
                 <div class="col-md-6">
-                    <select class="form-select customselect" aria-label="Nationality select">
-                        <option selected>Select Nationality</option>
+                    <select id="addNationality" name="addNationality" class="form-select customselect" aria-label="Nationality select">
+                        <option value="0" selected>Select Nationality</option>
                         <option value="1">Sri Lankan</option>
                         <option value="2">Finnish</option>
                         <option value="3">Polish</option>
@@ -38,35 +36,31 @@
             </div>
             <div class="row my-3">
                 <div class="col-md-6">
-                    <select class="form-select customselect" aria-label="Gender select">
-                        <option selected>Select Gender</option>
+                    <select id="addGender" name="addGender" class="form-select customselect" aria-label="Gender select">
+                        <option value="0" selected>Select Gender</option>
                         <option value="1">Male</option>
                         <option value="2">Female</option>
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <input type="text" class="form-control customtext" placeholder="Place of Birth"
-                           value="@Model.Passport?.PlaceOfBirth"/>
+                    <input id="addPlaceOfBirth" name="addPlaceOfBirth" type="text" class="form-control customtext" placeholder="Place of Birth" value=""/>
                 </div>
             </div>
             <div class="row my-4">
                 <div class="col-md-6">
-                    <input type="text" class="form-control customtext " placeholder="Passport Number"
-                           value="@Model.Passport?.PassportNo"/>
+                    <input id="addPassportNo" name="addPassportNo" type="text" class="form-control customtext " placeholder="Passport Number" value=""/>
                 </div>
                 <div class="col-md-6">
-                    <input type="date" class="form-control customdate" placeholder="Date of Birth"
-                           value="@Model.Passport?.DateOfBirth"/>
+                    <input id="addDateOfBirth" name="addDateOfBirth" type="date" class="form-control customdate" value="Date of Birthday"/>
                 </div>
             </div>
             <div class="row my-3">
                 <div class="col-md-6">
-                    <input type="date" class="form-control customdate" placeholder="Passport Expiry Date"
-                           value="@Model.Passport?.ExpiryDate" />
+                    <input id="addPassportExpiry" name="addPassportExpiry" type="date" class="form-control customdate" value="Passport Expiry Date"/>
                 </div>
                 <div class="col-md-6">
-                    <select class="form-select customselect" aria-label="Gender select">
-                        <option selected>Select Country</option>
+                    <select id="addCountry" name="addCountry" class="form-select customselect" aria-label="Gender select">
+                        <option value="0" selected>Select Country</option>
                         <option value="1">Sri Lanka</option>
                         <option value="2">Finland</option>
                     </select>
@@ -78,7 +72,11 @@
                 <img class="saveicon" src="~/img/icons/cancel_icon.png"/>
                 Close &nbsp;
             </button>
-            <button class="commonbtn">
+            <button class="commonbtn" data-bs-dismiss="modal"
+                    hx-post="@Url.Page("CustomerProfile", "AddPassport")"
+                    hx-trigger="click"
+                    hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken"}'
+                    hx-swap="none">
                 <img class="saveicon" src="~/img/icons/save_icon.png"/> Save &nbsp;
             </button>
         </div>

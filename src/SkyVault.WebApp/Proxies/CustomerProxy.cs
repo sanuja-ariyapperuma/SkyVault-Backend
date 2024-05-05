@@ -8,69 +8,48 @@ namespace SkyVault.WebApp.Proxies;
 
 public sealed class CustomerProxy(HttpClient httpClient)
 {
+    private SkyResult<T> HandleResponse<T>(HttpResponseMessage response)
+    {
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.BadRequest:
+            case HttpStatusCode.InternalServerError:
+            {
+                var failedPayload = response.Content.ReadFromJsonAsync<ProblemDetails>().Result;
+
+                return new SkyResult<T>()
+                    .Fail(message: failedPayload?.Detail,
+                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+            }
+            default:
+                response.EnsureSuccessStatusCode();
+                var payload = response.Content.ReadFromJsonAsync<T>().Result;
+                return new SkyResult<T>().SucceededWithValue(payload!);
+        }
+    }
+
+    public SkyResult<Passport> GetPassport(GetPassportRequest passportRequest)
+    {
+        var postResponse = httpClient.PostAsJsonAsync("/getpassport", passportRequest).Result;
+        return HandleResponse<Passport>(postResponse);
+    }
+
+    public SkyResult<SaveUpdateCustomerProfileResponse> SavePassport(PassportRequest passportRequest)
+    {
+        var postResponse = httpClient.PostAsJsonAsync("/addpassport", passportRequest).Result;
+        return HandleResponse<SaveUpdateCustomerProfileResponse>(postResponse);
+    }
+
     public SkyResult<SearchProfileResponse>? SearchProfile(SearchProfileRequest searchProfileRequest)
     {
         var postResponse = httpClient.PostAsJsonAsync("/searchprofile", searchProfileRequest).Result;
-        
-        switch (postResponse.StatusCode)
-        {
-            case HttpStatusCode.BadRequest:
-            {
-                var failedPayload = postResponse.Content.ReadFromJsonAsync<ValidationProblemDetails>().Result;
-            
-                return new SkyResult<SearchProfileResponse>()
-                    .Fail(message: failedPayload?.Detail,
-                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
-                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
-            }
-            case HttpStatusCode.InternalServerError:
-            {
-                var failedPayload = postResponse.Content.ReadFromJsonAsync<ProblemDetails>().Result;
-            
-                return new SkyResult<SearchProfileResponse>()
-                    .Fail(message: failedPayload?.Detail,
-                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
-                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
-            }
-        }
-        
-        postResponse.EnsureSuccessStatusCode();
-        
-        var payload = postResponse.Content.ReadFromJsonAsync<SearchProfileResponse>().Result;
-        
-        return new SkyResult<SearchProfileResponse>().SucceededWithValue(payload!);
+        return HandleResponse<SearchProfileResponse>(postResponse);
     }
 
     public SkyResult<ProfilePayload>? GetCustomerProfile(GetProfileRequest getProfileRequest)
     {
-        var postResponse = httpClient.PostAsJsonAsync("/getprofile", getProfileRequest).Result;    
-        
-        switch (postResponse.StatusCode)
-        {
-            case HttpStatusCode.BadRequest:
-            {
-                var failedPayload = postResponse.Content.ReadFromJsonAsync<ValidationProblemDetails>().Result;
-            
-                return new SkyResult<ProfilePayload>()
-                    .Fail(message: failedPayload?.Detail,
-                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
-                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
-            }
-            case HttpStatusCode.InternalServerError:
-            {
-                var failedPayload = postResponse.Content.ReadFromJsonAsync<ProblemDetails>().Result;
-            
-                return new SkyResult<ProfilePayload>()
-                    .Fail(message: failedPayload?.Detail,
-                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
-                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
-            }
-        }
-        
-        postResponse.EnsureSuccessStatusCode();
-        
-        var payload = postResponse.Content.ReadFromJsonAsync<ProfilePayload>().Result;
-        
-        return new SkyResult<ProfilePayload>().SucceededWithValue(payload!);
+        var postResponse = httpClient.PostAsJsonAsync("/getprofile", getProfileRequest).Result;
+        return HandleResponse<ProfilePayload>(postResponse);
     }
 }

@@ -98,7 +98,6 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\assets\" />
-      <Folder Include="wwwroot\js\" />
     </ItemGroup>
 
 </Project>
