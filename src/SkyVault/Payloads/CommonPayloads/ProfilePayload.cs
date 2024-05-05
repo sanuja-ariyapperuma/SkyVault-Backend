@@ -7,6 +7,7 @@
     string[]? FrequentFlyerNumbers,
     string? PreffdComMth,
     string? ParentId,
-    string? SystemUserId
+    string? SystemUserId,
+    Visa[]? Visas
         );
 }
