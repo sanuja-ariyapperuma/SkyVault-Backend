@@ -29,7 +29,7 @@ namespace SkyVault.WebApp.Pages
             {
                 TempData["CustomerProfile.ID"] = id;
                 TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
-                
+
                 return Page();
             }
 
@@ -41,9 +41,33 @@ namespace SkyVault.WebApp.Pages
             return RedirectPermanent("/error");
         }
 
-        public IActionResult OnGetPassport(string passportNo)
+        public IActionResult OnGetAddPassport([FromHeader(Name = "CUSTOMER_ID")] string? id)
         {
-            return Partial("_Passport");
+            base.Init();
+            
+            TempData["CustomerProfile.ID"] = id;
+            
+            return Partial("_AddPassport");
+        }
+
+        public IActionResult OnGetPassport([FromHeader(Name = "CUSTOMER_ID")] string? id,
+            [FromHeader(Name = "PASSPORT_NO")] string passportNo)
+        {
+            base.Init();
+
+            if (id == null) return Partial("_PassportList");
+
+            var result = customerProxy.GetPassport(new GetPassportRequest(id, base.SystemUserId, passportNo));
+
+            if (!result.Succeeded) return Partial("_Passport", this);
+
+            var passport = result.Value;
+
+            Passport = new PassportModel(passport?.Id, passport?.LastName, passport?.OtherNames,
+                passport?.PassportNumber, passport?.Gender, passport?.DateOfBirth, passport?.ExpiryDate,
+                passport?.PlaceOfBirth, passport?.NationalityId, passport?.IsPrimary, passport?.CountryId);
+
+            return Partial("_Passport", this);
         }
 
         public IActionResult OnGetVisa(string visaNo)
@@ -51,37 +75,37 @@ namespace SkyVault.WebApp.Pages
             return Partial("_Visa");
         }
 
-        public IActionResult OnGetPassportList([FromHeader(Name = "CUSTOMER_ID")]string? id)
+        public IActionResult OnGetPassportList([FromHeader(Name = "CUSTOMER_ID")] string? id)
         {
             base.Init();
-            
+
             if (id == null) return Partial("_PassportList");
-            
+
             var skyResult = customerProxy.GetCustomerProfile(
                 new GetProfileRequest(id, base.SystemUserId));
 
             if (skyResult is not { Succeeded: true }) return Partial("_PassportList");
-            
+
             TempData["CustomerProfile.ID"] = id;
             TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
 
             return Partial("_PassportList");
         }
 
-        public IActionResult OnGetVisaList([FromHeader(Name = "CUSTOMER_ID")]string? id)
+        public IActionResult OnGetVisaList([FromHeader(Name = "CUSTOMER_ID")] string? id)
         {
             base.Init();
-            
+
             if (id == null) return Partial("_VisaList");
-            
+
             var skyResult = customerProxy.GetCustomerProfile(
                 new GetProfileRequest(id, base.SystemUserId));
 
             if (skyResult is not { Succeeded: true }) return Partial("_VisaList");
-            
+
             TempData["CustomerProfile.ID"] = id;
             TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
-            
+
             return Partial("_VisaList");
         }
 

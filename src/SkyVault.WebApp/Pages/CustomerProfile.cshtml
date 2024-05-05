@@ -22,7 +22,12 @@
                         <div class="row bottomSaveButton my-3">
                             <div class="moveright">
                                 <button class="commonbtn"
-                                        data-bs-toggle="modal" data-bs-target="#addPassportModal">
+                                        data-bs-toggle="modal" data-bs-target="#addPassportModal"
+                                        hx-get="@Url.Page("CustomerProfile","AddPassport")"
+                                        hx-trigger="click"
+                                        hx-target="#divAddPassport"
+                                        hx-swap="delete"
+                                        hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken", "CUSTOMER_ID": "@TempData["CustomerProfile.ID"]"}'>
                                     <img class="plusicon" src="~/img/icons/plus_icon.png" alt=""/> Add Passport &nbsp;
                                 </button>
                             </div>
@@ -31,8 +36,8 @@
                              hx-get="@Url.Page("CustomerProfile", "PassportList")"
                              hx-trigger="refreshPassportList from:body"
                              hx-target="#passportList"
-                             hx-headers='{"CUSTOMER_ID": "@TempData["CustomerProfile.ID"]"}'>
-                            
+                             hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken", "CUSTOMER_ID": "@TempData["CustomerProfile.ID"]"}'>
+
                             <partial name="_PassportList" model="Model"/>
                         </div>
                     </div>
@@ -111,7 +116,6 @@
                                 </label>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -121,12 +125,22 @@
 </div>
 
 <!-- Passport Modal Start -->
-<partial name="_Passport" model="Model"/>
-<partial name="_AddPassport" model="Model"/>
+<div class="modal fade" id="addPassportModal" tabindex="-1" aria-labelledby="addPassportModalLabel" aria-hidden="true">
+    <div id="divAddPassport" class="modal-dialog modal-lg">
+        <partial name="_AddPassport" model="Model"/>
+    </div>
+</div>
+<div class="modal fade" id="passportModal" tabindex="-1" aria-labelledby="passportModalLabel" aria-hidden="true">
+    <div id="divEditPassport" class="modal-dialog modal-lg">
+        <partial name="_Passport" model="Model"/>
+    </div>
+</div>
 <!-- Passport Modal End -->
 
 <!-- VISA Modal Start -->
-<partial name="_Visa" model="Model"/>
+<div id="editVisa">
+    <partial name="_Visa" model="Model"/>
+</div>
 <!-- VISA Modal End -->
 
 <script src="js/pages/customerprofile.js"></script>

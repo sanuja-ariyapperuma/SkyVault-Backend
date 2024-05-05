@@ -16,7 +16,13 @@
         {
             <tr>
                 <td>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#passportModal">@passport.LastName</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#passportModal"
+                       hx-get="@Url.Page("CustomerProfile", "Passport")"
+                       hx-trigger="click"
+                       hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken", "CUSTOMER_ID": "@TempData["CustomerProfile.ID"]", "PASSPORT_NO":"@passport.PassportNumber"}'
+                       hx-target="#divEditPassport">
+                        @passport.LastName
+                    </a>
                 </td>
                 <td>
                     @passport.OtherNames
