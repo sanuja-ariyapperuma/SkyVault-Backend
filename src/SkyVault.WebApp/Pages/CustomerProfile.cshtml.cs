@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,7 +15,7 @@ namespace SkyVault.WebApp.Pages
     {
         public PassportModel? Passport { get; set; }
         public VisaModel? Visa { get; set; }
-        
+
         public IActionResult OnGet([FromQuery] string? id)
         {
             base.Init();
@@ -47,17 +48,103 @@ namespace SkyVault.WebApp.Pages
 
         public IActionResult OnGetVisa(string visaNo)
         {
-           return Partial("_Visa");
+            return Partial("_Visa");
         }
 
-        public IActionResult OnGetPassportList(string customerId)
+        public IActionResult OnGetPassportList([FromHeader(Name = "CUSTOMER_ID")]string? id)
         {
+            base.Init();
+            
+            if (id == null) return Partial("_PassportList");
+            
+            var skyResult = customerProxy.GetCustomerProfile(
+                new GetProfileRequest(id, base.SystemUserId));
+
+            if (skyResult is not { Succeeded: true }) return Partial("_PassportList");
+            
+            TempData["CustomerProfile.ID"] = id;
+            TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
+
             return Partial("_PassportList");
         }
-        
-        public IActionResult OnGetVisaList(string customerId)
+
+        public IActionResult OnGetVisaList([FromHeader(Name = "CUSTOMER_ID")]string? id)
         {
+            base.Init();
+            
+            if (id == null) return Partial("_VisaList");
+            
+            var skyResult = customerProxy.GetCustomerProfile(
+                new GetProfileRequest(id, base.SystemUserId));
+
+            if (skyResult is not { Succeeded: true }) return Partial("_VisaList");
+            
+            TempData["CustomerProfile.ID"] = id;
+            TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
+            
             return Partial("_VisaList");
+        }
+
+        public void OnPostAddPassport()
+        {
+            base.Init();
+
+            var form = Request.ReadFormAsync().Result;
+            var fieldCustomerId = form["hdnCustomerId"];
+            var fieldSalutation = form["addSalutation"];
+            var fieldLastName = form["addLastName"];
+            var fieldOtherNames = form["addOtherNames"];
+            var fieldNationality = form["addNationality"];
+            var fieldGender = form["addGender"];
+            var fieldPlaceOfBirth = form["addPlaceOfBirth"];
+            var fieldPassportNo = form["addPassportNo"];
+            var fieldDateOfBirth = form["addDateOfBirth"];
+            var fieldPassportExpiry = form["addPassportExpiry"];
+            var fieldCountry = form["addCountry"];
+
+            var validationMessage = new StringBuilder();
+
+            if (fieldSalutation[0] == "0")
+                validationMessage.Append("Salutation has not been selected.");
+            if (fieldLastName[0] == string.Empty)
+                validationMessage.Append("Last Name has not been specified. <br/>");
+            if (fieldOtherNames[0] == string.Empty)
+                validationMessage.Append("Other Names has not been specified.");
+            if (fieldNationality[0] == "0")
+                validationMessage.Append("Nationality has not been selected.");
+            if (fieldGender[0] == "0")
+                validationMessage.Append("Gender has not been selected.");
+            if (fieldPlaceOfBirth[0] == string.Empty)
+                validationMessage.Append("Place of Birth has not been specified.");
+            if (fieldPassportNo[0] == string.Empty)
+                validationMessage.Append("Passport has not been specified.");
+            if (fieldDateOfBirth[0] == string.Empty)
+                validationMessage.Append("Date of Birth has not been specified.");
+            if (fieldPassportExpiry[0] == string.Empty)
+                validationMessage.Append("Passport Expiry has not been specified.");
+            if (fieldCountry[0] == "0")
+                validationMessage.Append("Country has not been selected.");
+
+            if (validationMessage.Length > 0)
+            {
+                Response.Headers["HX-Trigger"] = "{\"validationErrors\":\"" + validationMessage.ToString() + "\"}";
+                return;
+            }
+
+            var passportData = new PassportRequest(string.Empty, fieldCustomerId, base.SystemUserId, string.Empty,
+                fieldLastName, fieldOtherNames, fieldPassportNo, fieldGender, fieldDateOfBirth, fieldPlaceOfBirth,
+                fieldPassportExpiry, fieldNationality, fieldCountry, string.Empty, fieldSalutation);
+
+            var result = customerProxy.SavePassport(passportData);
+
+            if (!result.Succeeded)
+            {
+                Response.Headers["HX-Trigger"] = "{\"validationErrors\":\"" + result.Message + "\"}";
+            }
+            else
+            {
+                Response.Headers["HX-Trigger"] = "refreshPassportList";
+            }
         }
     }
 }

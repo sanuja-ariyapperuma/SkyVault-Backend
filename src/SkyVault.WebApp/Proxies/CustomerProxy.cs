@@ -8,6 +8,39 @@ namespace SkyVault.WebApp.Proxies;
 
 public sealed class CustomerProxy(HttpClient httpClient)
 {
+    public SkyResult<SaveUpdateCustomerProfileResponse> SavePassport(PassportRequest passportRequest)
+    {
+        var postResponse = httpClient.PostAsJsonAsync("/addpassport", passportRequest).Result;
+        
+        switch (postResponse.StatusCode)
+        {
+            case HttpStatusCode.BadRequest:
+            {
+                var failedPayload = postResponse.Content.ReadFromJsonAsync<ValidationProblemDetails>().Result;
+            
+                return new SkyResult<SaveUpdateCustomerProfileResponse>()
+                    .Fail(message: failedPayload?.Detail,
+                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+            }
+            case HttpStatusCode.InternalServerError:
+            {
+                var failedPayload = postResponse.Content.ReadFromJsonAsync<ProblemDetails>().Result;
+            
+                return new SkyResult<SaveUpdateCustomerProfileResponse>()
+                    .Fail(message: failedPayload?.Detail,
+                        errorCode: failedPayload?.Extensions?["errorCode"]?.ToString(),
+                        correlationId: failedPayload?.Extensions?["correlationId"]?.ToString());
+            }
+        }
+        
+        postResponse.EnsureSuccessStatusCode();
+        
+        var payload = postResponse.Content.ReadFromJsonAsync<SaveUpdateCustomerProfileResponse>().Result;
+        
+        return new SkyResult<SaveUpdateCustomerProfileResponse>().SucceededWithValue(payload!);
+    }
+    
     public SkyResult<SearchProfileResponse>? SearchProfile(SearchProfileRequest searchProfileRequest)
     {
         var postResponse = httpClient.PostAsJsonAsync("/searchprofile", searchProfileRequest).Result;

@@ -9,7 +9,7 @@
         <th>Expiry Date</th>
     </tr>
     </thead>
-    <tbody id="search-results">
+    <tbody>
     @if (TempData["CustomerProfile.PassportList"] != null)
     {
         @foreach (var passport in (TempData["CustomerProfile.PassportList"] as Passport[])!)
@@ -25,7 +25,7 @@
                     @passport.PassportNumber
                 </td>
                 <td>
-                    @passport.DateOfBirth    
+                    @passport.DateOfBirth
                 </td>
                 <td>
                     @passport.ExpiryDate

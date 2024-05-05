@@ -21,12 +21,20 @@
                     <div class="accordion-body">
                         <div class="row bottomSaveButton my-3">
                             <div class="moveright">
-                                <button class="commonbtn">
+                                <button class="commonbtn"
+                                        data-bs-toggle="modal" data-bs-target="#addPassportModal">
                                     <img class="plusicon" src="~/img/icons/plus_icon.png" alt=""/> Add Passport &nbsp;
                                 </button>
                             </div>
                         </div>
-                        <partial name="_PassportList" model="Model"/>
+                        <div id="passportList"
+                             hx-get="@Url.Page("CustomerProfile", "PassportList")"
+                             hx-trigger="refreshPassportList from:body"
+                             hx-target="#passportList"
+                             hx-headers='{"CUSTOMER_ID": "@TempData["CustomerProfile.ID"]"}'>
+                            
+                            <partial name="_PassportList" model="Model"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -45,7 +53,9 @@
                                 </button>
                             </div>
                         </div>
-                        <partial name="_VisaList" model="Model"/>
+                        <div id="visaList">
+                            <partial name="_VisaList" model="Model"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -111,51 +121,12 @@
 </div>
 
 <!-- Passport Modal Start -->
-<div class="modal fade" id="passportModal" tabindex="-1" aria-labelledby="passportModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="passportModalLabel">Passport Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="passport-content" class="modal-body">
-                <partial name="_Passport" model="Model"/>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="commonbtn" data-bs-dismiss="modal">
-                    <img class="saveicon" src="~/img/icons/cancel_icon.png"/>
-                    Close &nbsp;
-                </button>
-                <button class="commonbtn">
-                    <img class="saveicon" src="~/img/icons/save_icon.png"/> Save &nbsp;
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_Passport" model="Model"/>
+<partial name="_AddPassport" model="Model"/>
 <!-- Passport Modal End -->
 
 <!-- VISA Modal Start -->
-<div class="modal fade" id="visaModal" tabindex="-1" aria-labelledby="visaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="visaModalLabel">VISA Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="visa-content" class="modal-body">
-                <partial name="_Visa" model="Model"/>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="commonbtn" data-bs-dismiss="modal">
-                    <img class="saveicon" src="~/img/icons/cancel_icon.png"/>
-                    Close &nbsp;
-                </button>
-                <button class="commonbtn">
-                    <img class="saveicon" src="~/img/icons/save_icon.png"/> Save &nbsp;
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_Visa" model="Model"/>
 <!-- VISA Modal End -->
+
+<script src="js/pages/customerprofile.js"></script>
