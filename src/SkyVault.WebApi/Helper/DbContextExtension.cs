@@ -3,7 +3,7 @@ using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Helper;
 
-internal static class DbContextExtension
+public static class DbContextExtension
 {
     public static SkyvaultContext CreateDbContext(this DbContext context)
     {
