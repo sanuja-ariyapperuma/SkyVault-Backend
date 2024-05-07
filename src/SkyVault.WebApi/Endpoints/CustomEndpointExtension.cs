@@ -1,8 +1,8 @@
 namespace SkyVault.WebApi.Endpoints;
 
-internal static class CustomerEndpointExtension
+internal static class CustomEndpointExtension
 {
-    public static void MapCustomerEndpoints(this WebApplication app)
+    public static void MapCustomEndpoints(this WebApplication app)
     {
         app.MapGet("/c-check", () => Task.FromResult("Health Check!"))
             .Produces(StatusCodes.Status200OK);

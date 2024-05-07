@@ -6,23 +6,23 @@ using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
 
-namespace SkyVault.WebApi.Workloads
+namespace SkyVault.WebApi.Workloads;
+
+public static class CustomWorkload
 {
-    internal static class CustomWorkload
+    public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
+        IMapper mapper, IConfiguration configuration, HttpContext context)
     {
-        public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
-            IMapper mapper, IConfiguration configuration, HttpContext context)
+        var correlationId = context.Items["X-Correlation-ID"]?.ToString();
+
+        List<Salutation> salutations = [];
+        List<Nationality> nationalities = [];
+        List<Country> countries = [];
+
+        try
         {
-            var correlationId = context.Items["X-Correlation-ID"]?.ToString();
-
-            List<Salutation> salutations = [];
-            List<Nationality> nationalities = [];
-            List<Country> countries = [];
-
-            try
+            var tasks = new Task[]
             {
-                var tasks = new Task[]
-                {
                     Task.Run(() =>
                     {
                         var commonData = new CommonData(dbContext.CreateDbContext());
@@ -38,29 +38,28 @@ namespace SkyVault.WebApi.Workloads
                         var commonData = new CommonData(dbContext.CreateDbContext());
                         countries = commonData.GetCountries();
                     })
-                };
+            };
 
-                Task.WaitAll(tasks);
+            Task.WaitAll(tasks);
 
-                var commonData = new CommonData(dbContext);
-                var genders = commonData.GetGender();
+            var commonData = new CommonData(dbContext);
+            var genders = commonData.GetGender();
 
-                var profileDefinition = new ProfileDefinitionResponse(
-                    mapper.Map<List<Payloads.CommonPayloads.Salutation>>(salutations),
-                    mapper.Map<List<Payloads.CommonPayloads.Nationality>>(nationalities),
-                    mapper.Map<List<Payloads.CommonPayloads.Gender>>(genders),
-                    mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
+            var profileDefinition = new ProfileDefinitionResponse(
+                mapper.Map<List<Payloads.CommonPayloads.Salutation>>(salutations),
+                mapper.Map<List<Payloads.CommonPayloads.Nationality>>(nationalities),
+                mapper.Map<List<Payloads.CommonPayloads.Gender>>(genders),
+                mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
 
-                return Results.Ok(profileDefinition);
-            }
-            catch (Exception e)
-            {
-                e.LogException(correlationId);
+            return Results.Ok(profileDefinition);
+        }
+        catch (Exception e)
+        {
+            e.LogException(correlationId);
 
-                return Results.Problem(new ProblemDetails().ToProblemDetails(
-                    "An unexpected error occurred. Please try again later.",
-                    "2adb05bf-0000", correlationId));
-            }
+            return Results.Problem(new ProblemDetails().ToProblemDetails(
+                "An unexpected error occurred. Please try again later.",
+                "2adb05bf-0000", correlationId));
         }
     }
 }
