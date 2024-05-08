@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Reflection.Metadata.Ecma335;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SkyVault.Exceptions;
@@ -63,19 +64,16 @@ namespace SkyVault.WebApi.Workloads
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(searchProfileRequest.SearchQuery))
-                    return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-                                               "Empty search query found", "30550615-0004", _correlationId));
 
                 _correlationId = CorrelationHandler.Get(context);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
 
                 var customerProfiles = customerProfileData.Search(
-                    searchProfileRequest.SearchQuery, 
+                    searchProfileRequest.SearchQuery!, 
                     Convert.ToInt32(searchProfileRequest.SysUserId));
 
-                return Results.Ok(new SearchProfileResponse(searchProfileRequest.SearchQuery, 
+                return Results.Ok(new SearchProfileResponse(searchProfileRequest.SearchQuery!, 
                     customerProfiles!));
             }
             catch(FormatException e){
@@ -210,8 +208,7 @@ namespace SkyVault.WebApi.Workloads
                 passport.Value.ExpiryDate.ToString(),
                 passport.Value.NationalityId.ToString(),
                 passport.Value.CountryId.ToString(),
-                passport.Value.IsPrimary,
-                null
+                passport.Value.IsPrimary
             ));
             }
             catch (FormatException e)
@@ -272,6 +269,7 @@ namespace SkyVault.WebApi.Workloads
                     result.Value.IssuedPlace,
                     result.Value.IssuedDate.ToString(),
                     result.Value.ExpireDate.ToString(),
+                    null,
                     null
                 ));
             }
@@ -525,16 +523,7 @@ namespace SkyVault.WebApi.Workloads
         {
             var passports = customerProfile.Passports.Select(passport =>
             {
-                var visas = passport.Visas.Select(visa => new Payloads.CommonPayloads.Visa(
-                    visa.Id.ToString(),
-                    visa.VisaNumber,
-                    visa.CountryId.ToString(),
-                    visa.IssuedPlace,
-                    visa.IssuedDate.ToShortDateString(),
-                    visa.ExpireDate.ToShortDateString(),
-                    ""
-                )).ToList();
-
+                
                 return new Payloads.CommonPayloads.Passport(
                     passport.Id.ToString(),
                     passport.LastName,
@@ -546,19 +535,34 @@ namespace SkyVault.WebApi.Workloads
                     passport.ExpiryDate?.ToShortDateString(),
                     passport.NationalityId.ToString(),
                     passport.CountryId.ToString(),
-                    passport.IsPrimary,
-                    visas.ToArray()
+                    passport.IsPrimary
                 );
-            }).ToList();
+            }).ToArray();
+
+            var visas = customerProfile
+            .Passports
+            .SelectMany(passport => passport.Visas)
+            .Select(visa => 
+                new Payloads.CommonPayloads.Visa(
+                    visa.Id.ToString(),
+                    visa.VisaNumber,
+                    visa.CountryId.ToString(),
+                    visa.IssuedPlace,
+                    visa.IssuedDate.ToShortDateString(),
+                    visa.ExpireDate.ToShortDateString(),
+                    "",
+                    visa.Passport.PassportNumber
+                )).ToArray();
 
             var profilePayload = new ProfilePayload(
                 customerProfile.Id.ToString(),
                 customerProfile.SalutationId.ToString(),
-                passports.ToArray(),
+                passports,
                 customerProfile.FrequentFlyerNumbers.Select(item => item.FlyerNumber).ToArray(),
                 customerProfile.Id.ToString(),
                 customerProfile.ParentId.ToString(),
-                customerProfile.SystemUserId.ToString()
+                customerProfile.SystemUserId.ToString(),
+                visas
             );
 
             return profilePayload;

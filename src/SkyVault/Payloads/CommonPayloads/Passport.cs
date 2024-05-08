@@ -11,6 +11,5 @@ public sealed record Passport(
     string? ExpiryDate,
     string? NationalityId,
     string? CountryId,
-    string? IsPrimary,
-    Visa[]? Visa
+    string? IsPrimary
     );

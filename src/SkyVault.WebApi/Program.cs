@@ -24,7 +24,7 @@ public class Program
         app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseMiddleware<BasicAuthMiddleware>();
         app.MapLoginEndpoints();
-        app.MapCustomerEndpoints();
+        app.MapCustomEndpoints();
         app.MapProfileEndpoints();
         app.MapHealthChecks("health");
         //app.UseMiddleware<ExceptionMiddleware>();
