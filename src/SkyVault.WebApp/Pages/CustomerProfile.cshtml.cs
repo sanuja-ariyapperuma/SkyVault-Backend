@@ -29,6 +29,7 @@ namespace SkyVault.WebApp.Pages
             {
                 TempData["CustomerProfile.ID"] = id;
                 TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
+                TempData["CustomerProfile.VisaList"] = skyResult.Value?.Visas;
 
                 return Page();
             }
@@ -55,7 +56,7 @@ namespace SkyVault.WebApp.Pages
         {
             base.Init();
 
-            if (id == null) return Partial("_PassportList");
+            if (id == null) return Partial("_Passport");
 
             var result = customerProxy.GetPassport(new GetPassportRequest(id, base.SystemUserId, passportNo));
 
@@ -70,9 +71,24 @@ namespace SkyVault.WebApp.Pages
             return Partial("_Passport", this);
         }
 
-        public IActionResult OnGetVisa(string visaNo)
+        public IActionResult OnGetVisa([FromHeader(Name = "CUSTOMER_ID")] string? id,
+            [FromHeader(Name = "VISA_NO")] string visaNo)
         {
-            return Partial("_Visa");
+            base.Init();
+
+            if (id == null) return Partial("_Visa");
+
+            var result = customerProxy.GetVisa(new GetVisaRequest(id, base.SystemUserId));
+
+            if (!result.Succeeded) return Partial("_Visa", this);
+
+            var passport = result.Value;
+
+            // Passport = new PassportModel(passport?.Id, passport?.LastName, passport?.OtherNames,
+            //     passport?.PassportNumber, passport?.Gender, passport?.DateOfBirth, passport?.ExpiryDate,
+            //     passport?.PlaceOfBirth, passport?.NationalityId, passport?.IsPrimary, passport?.CountryId);
+
+            return Partial("_Visa", this);
         }
 
         public IActionResult OnGetPassportList([FromHeader(Name = "CUSTOMER_ID")] string? id)
@@ -104,7 +120,7 @@ namespace SkyVault.WebApp.Pages
             if (skyResult is not { Succeeded: true }) return Partial("_VisaList");
 
             TempData["CustomerProfile.ID"] = id;
-            TempData["CustomerProfile.PassportList"] = skyResult.Value?.Passports;
+            TempData["CustomerProfile.VisaList"] = skyResult.Value?.Visas;
 
             return Partial("_VisaList");
         }

@@ -34,7 +34,13 @@ public sealed class CustomerProxy(HttpClient httpClient)
         var postResponse = httpClient.PostAsJsonAsync("/getpassport", passportRequest).Result;
         return HandleResponse<Passport>(postResponse);
     }
-
+    
+    public SkyResult<Visa> GetVisa(GetVisaRequest visaRequest)
+    {
+        var postResponse = httpClient.PostAsJsonAsync("/getvisa", visaRequest).Result;
+        return HandleResponse<Visa>(postResponse);
+    }
+    
     public SkyResult<SaveUpdateCustomerProfileResponse> SavePassport(PassportRequest passportRequest)
     {
         var postResponse = httpClient.PostAsJsonAsync("/addpassport", passportRequest).Result;

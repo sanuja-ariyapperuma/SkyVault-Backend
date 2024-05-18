@@ -1,49 +1,47 @@
 @model CustomerProfileModel
-<div class="modal fade" id="visaModal" tabindex="-1" aria-labelledby="visaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="visaModalLabel">VISA Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="visa-content" class="modal-body">
-
-                <div class="row my-3">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control customtext" placeholder="VISA Number"/>
-                    </div>
-                    <div class="col-md-6">
-                        <select class="form-select customselect" aria-label="Country">
-                            <option selected>Country Salutation</option>
-                            <option value="1">Sri Lanka</option>
-                            <option value="2">Finnish</option>
-                            <option value="3">Netherlands</option>
-                        </select>
-                    </div>
+<form id="editVisaModalForm" name="editVisaModalForm">
+    <input type="hidden" id="hdnCustomerId" name="hdnCustomerId" value="@TempData["CustomerProfile.ID"]"/>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="visaModalLabel">VISA Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div id="visa-content" class="modal-body">
+            <div class="row my-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control customtext" placeholder="VISA Number"/>
                 </div>
-                <div class="row my-3">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control customtext" placeholder="VISA Issues Place"/>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="date" class="form-control customdate" value="VISA Issued Date"/>
-                    </div>
-                </div>
-                <div class="row my-3">
-                    <div class="col-md-6">
-                        <input type="date" class="form-control customdate" value="VISA Expiry Date"/>
-                    </div>
+                <div class="col-md-6">
+                    <select class="form-select customselect" aria-label="Country">
+                        <option selected>Country Salutation</option>
+                        <option value="1">Sri Lanka</option>
+                        <option value="2">Finnish</option>
+                        <option value="3">Netherlands</option>
+                    </select>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="commonbtn" data-bs-dismiss="modal">
-                    <img class="saveicon" src="~/img/icons/cancel_icon.png"/>
-                    Close &nbsp;
-                </button>
-                <button class="commonbtn">
-                    <img class="saveicon" src="~/img/icons/save_icon.png"/> Save &nbsp;
-                </button>
+            <div class="row my-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control customtext" placeholder="VISA Issues Place"/>
+                </div>
+                <div class="col-md-6">
+                    <input type="date" class="form-control customdate" value="VISA Issued Date"/>
+                </div>
+            </div>
+            <div class="row my-3">
+                <div class="col-md-6">
+                    <input type="date" class="form-control customdate" value="VISA Expiry Date"/>
+                </div>
             </div>
         </div>
+        <div class="modal-footer">
+            <button type="button" class="commonbtn" data-bs-dismiss="modal">
+                <img class="saveicon" src="~/img/icons/cancel_icon.png"/>
+                Close &nbsp;
+            </button>
+            <button class="commonbtn">
+                <img class="saveicon" src="~/img/icons/save_icon.png"/> Save &nbsp;
+            </button>
+        </div>
     </div>
-</div>
+</form>
