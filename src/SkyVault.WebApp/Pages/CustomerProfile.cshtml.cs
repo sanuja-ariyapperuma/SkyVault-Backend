@@ -82,11 +82,10 @@ namespace SkyVault.WebApp.Pages
 
             if (!result.Succeeded) return Partial("_Visa", this);
 
-            var passport = result.Value;
+            var visa = result.Value;
 
-            // Passport = new PassportModel(passport?.Id, passport?.LastName, passport?.OtherNames,
-            //     passport?.PassportNumber, passport?.Gender, passport?.DateOfBirth, passport?.ExpiryDate,
-            //     passport?.PlaceOfBirth, passport?.NationalityId, passport?.IsPrimary, passport?.CountryId);
+            Visa = new VisaModel(visa?.Id, visa?.VisaNumber, visa?.IssuedPlace, visa?.IssuedDate, visa?.ExpireDate,
+                visa?.CountryId, visa?.PassportNumber);
 
             return Partial("_Visa", this);
         }
