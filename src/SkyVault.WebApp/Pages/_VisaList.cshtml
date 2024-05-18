@@ -1,14 +1,33 @@
+@using SkyVault.Payloads.CommonPayloads
 <table class="table">
     <thead>
     <tr>
         <th>VISA Number</th>
-        <th>Country For</th>
+        <th>Country Form</th>
         <th>VISA Issued Place</th>
         <th>VISA Issued Date</th>
         <th>VISA Expiry Date</th>
     </tr>
     </thead>
     <tbody id="search-results">
-    <tr><td>Passport not selected.</td></tr>
+    @if (TempData["CustomerProfile.VisaList"] != null)
+    {
+        @foreach (var visa in (TempData["CustomerProfile.VisaList"] as Visa[])!)
+        {
+            <tr>
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#visaModal"
+                       hx-get="@Url.Page("CustomerProfile", "Visa")"
+                       hx-trigger="click"
+                       hx-headers='{"XSRF-TOKEN": "@Model.AntiForgeryToken", "CUSTOMER_ID": "@TempData["CustomerProfile.ID"]", "VISA_NO":"@visa.VisaNumber"}'
+                       hx-target="#divEditVisa">
+                        @visa.VisaNumber
+                    </a></td>
+                <td>@visa.CountryId</td>
+                <td>@visa.IssuedPlace</td>
+                <td>@visa.IssuedDate</td>
+                <td>@visa.ExpireDate</td>
+            </tr>      
+        }
+    }
     </tbody>
 </table>

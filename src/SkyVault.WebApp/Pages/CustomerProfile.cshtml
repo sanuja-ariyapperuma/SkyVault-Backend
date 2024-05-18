@@ -138,8 +138,15 @@
 <!-- Passport Modal End -->
 
 <!-- VISA Modal Start -->
-<div id="editVisa">
-    <partial name="_Visa" model="Model"/>
+<div class="modal fade" id="addVisaModal" tabindex="-1" aria-labelledby="addVisaModalLabel" aria-hidden="true">
+    <div id="divAddVisa" class="modal-dialog modal-lg">
+        <partial name="_Visa" model="Model"/>
+    </div>
+</div>
+<div class="modal fade" id="visaModal" tabindex="-1" aria-labelledby="visaModalLabel" aria-hidden="true">
+    <div id="divEditVisa" class="modal-dialog modal-lg">
+        <partial name="_Visa" model="Model"/>
+    </div>
 </div>
 <!-- VISA Modal End -->
 

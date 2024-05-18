@@ -1,6 +1,6 @@
 ﻿namespace SkyVault.WebApi.Endpoints
 {
-    public static class ProfileEndpointExtention
+    public static class ProfileEndpointExtension
     {
         public static void MapProfileEndpoints(this WebApplication app)
         {
