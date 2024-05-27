@@ -26,6 +26,7 @@ body::after {
     display: flex;
     margin-top: 25px;
     width: 90%;
+    margin-bottom: 10px;
 }
 
 .searchbox {
@@ -76,4 +77,8 @@ body::after {
         text-decoration: none;
         color: white;
         outline: none !important;
+}
+
+.search-results-table{
+    width: 90%;
 }

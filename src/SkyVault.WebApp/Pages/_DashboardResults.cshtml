@@ -6,10 +6,10 @@
     @foreach (var profile in (TempData["Dashboard.Results"] as IEnumerable<SearchProfileItem>)!)
     {
         <tr>
-            <td><a href="/customerprofile?id=@profile.ProfileId" target="_self">@profile.LastName</a></td>
+            <td><a href="/customerprofile?id=@profile.ProfileId" target="_self">@profile.PassportNumber</a></td>
+            <td>@profile.LastName</td>
             <td>@profile.OtherNames</td>
             <td>@profile.Salutation</td>
-            <td>@profile.PassportNumber</td>
         </tr>
     }
 }
