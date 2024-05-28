@@ -1,4 +1,9 @@
+@using SkyVault.Payloads.CommonPayloads
 @model CustomerProfileModel
+@{
+    var countryList = TempData["ProfDef.Country"] as List<Country> ?? new List<Country>();
+}
+
 <form id="editVisaModalForm" name="editVisaModalForm">
     <input type="hidden" id="hdnCustomerId" name="hdnCustomerId" value="@TempData["CustomerProfile.ID"]"/>
     <div class="modal-content">
@@ -14,9 +19,13 @@
                 <div class="col-md-6">
                     <select class="form-select customselect" aria-label="Country">
                         <option selected>Country Salutation</option>
-                        <option value="1">Sri Lanka</option>
-                        <option value="2">Finnish</option>
-                        <option value="3">Netherlands</option>
+                        @if(countryList.Count > 0){
+                            @foreach(var country in countryList){
+                                <option value="@country.Id">@country.CountryCode - @country.Name</option>
+                            }
+                        }else{
+                            <option value="-1" selected>Something went wrong</option>
+                        }
                     </select>
                 </div>
             </div>
