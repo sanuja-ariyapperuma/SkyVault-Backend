@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SkyVault.Payloads.RequestPayloads;
+using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApp.Models;
 using SkyVault.WebApp.Proxies;
 
@@ -16,9 +17,22 @@ namespace SkyVault.WebApp.Pages
         public PassportModel? Passport { get; set; }
         public VisaModel? Visa { get; set; }
 
+        public ProfileDefinitionResponse? ProfileDefinitions { get; set; }
+
         public IActionResult OnGet([FromQuery] string? id)
         {
             base.Init();
+
+            var profileDefinitionResponse = customerProxy.GetProfileDefinitionData();
+
+            if(profileDefinitionResponse is {Succeeded:true})
+            {
+                TempData["ProfDef.Gender"] = profileDefinitionResponse.Value?.Genders;
+                TempData["ProfDef.Nationality"] = profileDefinitionResponse.Value?.Nationalities;
+                TempData["ProfDef.Salutations"] = profileDefinitionResponse.Value?.Salutations;
+                TempData["ProfDef.Country"] = profileDefinitionResponse.Value?.Countries;
+            }
+            
 
             if (id == null) return Page();
 
@@ -45,9 +59,9 @@ namespace SkyVault.WebApp.Pages
         public IActionResult OnGetAddPassport([FromHeader(Name = "CUSTOMER_ID")] string? id)
         {
             base.Init();
-            
+
             TempData["CustomerProfile.ID"] = id;
-            
+
             return Partial("_AddPassport");
         }
 
@@ -185,5 +199,7 @@ namespace SkyVault.WebApp.Pages
                 Response.Headers["HX-Trigger"] = "refreshPassportList";
             }
         }
+    
+        
     }
 }

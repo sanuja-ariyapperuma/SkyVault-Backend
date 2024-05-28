@@ -58,4 +58,10 @@ public sealed class CustomerProxy(HttpClient httpClient)
         var postResponse = httpClient.PostAsJsonAsync("/getprofile", getProfileRequest).Result;
         return HandleResponse<ProfilePayload>(postResponse);
     }
+
+    public SkyResult<ProfileDefinitionResponse>? GetProfileDefinitionData()
+    {
+        var getResponse = httpClient.GetAsync("/profilepage-commondata").Result;
+        return HandleResponse<ProfileDefinitionResponse>(getResponse);
+    }
 }

@@ -1,4 +1,11 @@
+@using SkyVault.Payloads.CommonPayloads
 @model CustomerProfileModel
+@{
+    var genderList = TempData["ProfDef.Gender"] as List<Gender> ?? new List<Gender>();
+    var nationalityList = TempData["ProfDef.Nationality"] as List<Nationality> ?? new List<Nationality>();
+    var salutationList = TempData["ProfDef.Salutations"] as List<Salutation> ?? new List<Salutation>();
+    var countryList = TempData["ProfDef.Country"] as List<Country> ?? new List<Country>();
+}
 
 <form id="addPassportModalForm" name="addPassportModalForm">
     <input type="hidden" id="hdnCustomerId" name="hdnCustomerId" value="@TempData["CustomerProfile.ID"]"/>
@@ -12,9 +19,15 @@
                 <div class="col-md-6">
                     <select id="addSalutation" name="addSalutation" class="form-select customselect" aria-label="Salutation select">
                         <option value="0" selected>Select Salutation</option>
-                        <option value="1">Mr.</option>
-                        <option value="2">Mrs.</option>
-                        <option value="3">Ms.</option>
+                        @if(salutationList.Count > 0)
+                        {
+                            @foreach(var salutation in salutationList)
+                            {
+                                <option value="@salutation.Id">@salutation.Name</option>
+                            }
+                        }else{
+                            <option value="-1" selected>Something went wrong</option>
+                        }
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -28,9 +41,13 @@
                 <div class="col-md-6">
                     <select id="addNationality" name="addNationality" class="form-select customselect" aria-label="Nationality select">
                         <option value="0" selected>Select Nationality</option>
-                        <option value="1">Sri Lankan</option>
-                        <option value="2">Finnish</option>
-                        <option value="3">Polish</option>
+                        @if(nationalityList.Count > 0){
+                            @foreach(var nationality in nationalityList){
+                                <option value="@nationality.Id">@nationality.Name</option>
+                            }
+                        }else{
+                            <option value="-1" selected>Something went wrong</option>
+                        }
                     </select>
                 </div>
             </div>
@@ -38,8 +55,15 @@
                 <div class="col-md-6">
                     <select id="addGender" name="addGender" class="form-select customselect" aria-label="Gender select">
                         <option value="0" selected>Select Gender</option>
-                        <option value="1">Male</option>
-                        <option value="2">Female</option>
+                        @if(genderList.Count > 0)
+                        {
+                            @foreach(var gender in genderList)
+                            {
+                                <option value="@gender.Id">@gender.Name</option>
+                            }
+                        }else{
+                            <option value="-1" selected>Something went wrong</option>
+                        }
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -61,8 +85,13 @@
                 <div class="col-md-6">
                     <select id="addCountry" name="addCountry" class="form-select customselect" aria-label="Gender select">
                         <option value="0" selected>Select Country</option>
-                        <option value="1">Sri Lanka</option>
-                        <option value="2">Finland</option>
+                        @if(countryList.Count > 0){
+                            @foreach(var country in countryList){
+                                <option value="@country.Id">@country.CountryCode - @country.Name</option>
+                            }
+                        }else{
+                            <option value="-1" selected>Something went wrong</option>
+                        }
                     </select>
                 </div>
             </div>
