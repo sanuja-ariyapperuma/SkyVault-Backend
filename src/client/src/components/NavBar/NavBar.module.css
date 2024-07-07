@@ -2,7 +2,7 @@
   @apply w-screen h-screen flex flex-row space-x-5;
 }
 .navContainer {
-  @apply h-screen w-1/6 flex flex-col p-5 rounded-r-3xl border-2 shadow-2xl;
+  @apply h-screen w-1/6 min-w-fit  flex flex-col p-5 rounded-r-3xl border-2 shadow-2xl;
 }
 .pagesContainer {
   @apply w-5/6;
@@ -23,13 +23,13 @@
   @apply text-sm text-gray-500;
 }
 .headerContainer {
-  @apply h-1/6;
+  @apply h-16;
 }
 .menuContainer {
-  @apply h-4/6 border-t-2 border-b-2;
+  @apply h-5/6 border-y-2;
 }
 .footerContainer {
-  @apply flex flex-col h-1/6 mt-3;
+  @apply flex h-16 flex-col my-3;
 }
 .userInformation {
   @apply flex flex-row space-x-2;
