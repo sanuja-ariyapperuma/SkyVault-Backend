@@ -1,0 +1,51 @@
+.mainContainer {
+  @apply w-screen h-screen flex flex-row space-x-5;
+}
+.navContainer {
+  @apply h-screen w-1/6 flex flex-col p-5 rounded-r-3xl border-2 shadow-2xl;
+}
+.pagesContainer {
+  @apply w-5/6;
+}
+.brandContainer {
+  @apply flex flex-row space-x-2;
+}
+.brandDetails {
+  @apply flex flex-col;
+}
+.brandLogo {
+  @apply w-20 h-auto object-contain;
+}
+.brandText {
+  @apply text-base font-bold;
+}
+.versionText {
+  @apply text-sm text-gray-500;
+}
+.headerContainer {
+  @apply h-1/6;
+}
+.menuContainer {
+  @apply h-4/6 border-t-2 border-b-2;
+}
+.footerContainer {
+  @apply flex flex-col h-1/6 mt-3;
+}
+.userInformation {
+  @apply flex flex-row space-x-2;
+}
+.userDisplayPicture {
+  @apply w-14 h-auto object-contain rounded-full;
+}
+.userInfo {
+  @apply flex flex-col justify-center;
+}
+.logoutButtonArea {
+  @apply mt-2 flex flex-row justify-center mb-2;
+}
+.logoutIcon {
+  @apply w-5;
+}
+.logoutButton {
+  @apply flex flex-row space-x-2;
+}
