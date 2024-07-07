@@ -16,7 +16,7 @@ public class Program
         builder.Services.AddHealthChecks();
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
-            options.UseMySql(builder.Configuration.GetConnectionString("MySQLConnection"), new MySqlServerVersion(new Version(8, 0)));
+            options.UseMySql(builder.Configuration.GetConnectionString("Localconnection"), new MySqlServerVersion(new Version(8, 0)));
         });
         builder.Services.AddAutoMapper(typeof(Program).Assembly,typeof(MappingProfile).Assembly);
 
