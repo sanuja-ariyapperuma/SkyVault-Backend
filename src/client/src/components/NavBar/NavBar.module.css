@@ -44,7 +44,7 @@
   @apply mt-2 flex flex-row justify-center mb-2;
 }
 .logoutIcon {
-  @apply w-5;
+  @apply w-5 object-contain;
 }
 .logoutButton {
   @apply flex flex-row space-x-2;
