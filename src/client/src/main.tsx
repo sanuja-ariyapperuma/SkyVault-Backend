@@ -4,9 +4,16 @@ import { RouterProvider } from "react-router-dom";
 
 import { router } from "./routes/routes.tsx";
 import { StrictMode } from "react";
+import { MsalProvider } from "@azure/msal-react";
+import { msalConfig } from "./authConfig.ts";
+import { PublicClientApplication } from "@azure/msal-browser";
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <MsalProvider instance={msalInstance}>
+      <RouterProvider router={router} />
+    </MsalProvider>
   </StrictMode>
 );

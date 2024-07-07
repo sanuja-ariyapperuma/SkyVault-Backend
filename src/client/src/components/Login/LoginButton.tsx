@@ -1,19 +1,25 @@
 import msIcon from "../../assets/icons/ms_icon.png";
 import localStyles from "./Login.module.css";
 
-const LoginButton = () => {
+type LoginButtonProps = {
+  onLogin: () => void;
+};
+
+const LoginButton = (props: LoginButtonProps) => {
   return (
     <div className={localStyles.loginButton}>
-      <div className={localStyles.microsoftIconContainer}>
-        <img
-          src={msIcon}
-          alt="Microsoft Icon"
-          className={localStyles.iconInLoginButton}
-        />
-      </div>
-      <div className={localStyles.loginText}>
-        <span>Login with Microsoft 365</span>
-      </div>
+      <button className="flex" onClick={props.onLogin}>
+        <div className={localStyles.microsoftIconContainer}>
+          <img
+            src={msIcon}
+            alt="Microsoft Icon"
+            className={localStyles.iconInLoginButton}
+          />
+        </div>
+        <div className={localStyles.loginText}>
+          <span>Login with Microsoft 365</span>
+        </div>
+      </button>
     </div>
   );
 };
