@@ -3,6 +3,7 @@ import Dashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
 import AuthenticateUser from "../components/Login/AuthenticateUser";
 import CustomError from "../pages/CustomError";
+import NavBar from "../components/NavBar/NavBar";
 
 export const router = createBrowserRouter([
   {
@@ -11,7 +12,13 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Dashboard />,
+        element: <NavBar />,
+        children: [
+          {
+            path: "/",
+            element: <Dashboard />,
+          },
+        ],
       },
     ],
     errorElement: <CustomError />,
