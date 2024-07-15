@@ -5,6 +5,7 @@ import localStyles from "./NavBar.module.css";
 import dashboardLogo from "../../assets/dashboard_logo.png";
 import defaultUserImage from "../../assets/default_user.jpg";
 import logoutIcon from "../../assets/icons/logout.webp";
+import NavItem from "./NavItem";
 
 const NavBar = () => {
   const { instance } = useMsal();
@@ -33,8 +34,7 @@ const NavBar = () => {
           </div>
         </div>
         <div className={localStyles.menuContainer}>
-          {/* Menu Area */}
-          Menus
+          <NavItem iconPath={""} navName={"Profile Management"} />
         </div>
         <div className={localStyles.footerContainer}>
           {/* Footer Area */}

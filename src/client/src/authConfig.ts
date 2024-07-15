@@ -35,3 +35,7 @@ export const msalConfig: Configuration = {
     },
   },
 };
+
+export const loginRequest = {
+  scopes: ["api://e401d532-a867-4131-82c6-fe18242da055/readwrite"],
+};

@@ -7,13 +7,17 @@ import { StrictMode } from "react";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig } from "./authConfig.ts";
 import { PublicClientApplication } from "@azure/msal-browser";
+import { Provider } from "react-redux";
+import { store } from "./store.ts";
 
 const msalInstance = new PublicClientApplication(msalConfig);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MsalProvider instance={msalInstance}>
-      <RouterProvider router={router} />
-    </MsalProvider>
+    <Provider store={store}>
+      <MsalProvider instance={msalInstance}>
+        <RouterProvider router={router} />
+      </MsalProvider>
+    </Provider>
   </StrictMode>
 );

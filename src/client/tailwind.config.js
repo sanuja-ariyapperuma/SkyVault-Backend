@@ -8,9 +8,9 @@ export default {
     extend: {
       colors: {
         ...defaultTheme.colors,
-        "login-orange": {
-          100: "#EB3C01",
-        },
+        "login-orange": "#EB3C01",
+        "button-primary": "#08577E",
+        "button-primary-hover": "#063e59",
       },
     },
   },

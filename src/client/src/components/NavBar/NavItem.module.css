@@ -1,0 +1,9 @@
+.navItem {
+  @apply p-2 flex flex-row space-x-2 text-white bg-button-primary rounded-lg;
+}
+.navItem:hover {
+  @apply cursor-pointer bg-button-primary-hover;
+}
+.navIcon {
+  @apply w-6;
+}

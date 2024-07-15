@@ -14,7 +14,7 @@
   @apply pr-5 pl-5 text-white;
 }
 .loginButton {
-  @apply flex flex-row bg-login-orange-100 p-2 rounded-md mt-5;
+  @apply flex flex-row bg-login-orange p-2 rounded-md mt-5;
 }
 .loginDescription {
   @apply flex text-center text-sm text-gray-500 mt-10;
