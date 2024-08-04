@@ -16,6 +16,9 @@
 .loginButton {
   @apply flex flex-row bg-login-orange p-2 rounded-md mt-5;
 }
+.loginButtonDisabled {
+  @apply flex flex-row bg-slate-400 p-2 rounded-md mt-5;
+}
 .loginDescription {
   @apply flex text-center text-sm text-gray-500 mt-10;
 }

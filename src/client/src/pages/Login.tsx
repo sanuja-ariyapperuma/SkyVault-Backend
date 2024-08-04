@@ -7,25 +7,39 @@ import {
   BrowserAuthError,
   InteractionRequiredAuthError,
 } from "@azure/msal-browser";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
 import { setAccessToken } from "../features/reducers/tokenSlice";
 import axios from "axios";
-import { baseURL } from "../features/services/apiCalls";
 
 const Login = () => {
   const { instance, accounts } = useMsal();
   const navigate = useNavigate();
-
   const dispatch: AppDispatch = useDispatch();
+  const baseURL = import.meta.env.VITE_API_BASE_URL as string;
+  const adScopes = import.meta.env.VITE_AD_SCOPE as string;
+
+  const [isHealthy, setIsHealthy] = useState(false);
 
   useEffect(() => {
-    if (accounts.length > 0) {
-      navigate("/");
-    }
-  });
+    axios
+      .get(`${baseURL}/health`)
+      .then((response) => {
+        if (response.status === 200) {
+          setIsHealthy(true);
+          if (accounts.length > 0) {
+            navigate("/");
+          }
+        } else {
+          console.error("API is not healthy");
+        }
+      })
+      .catch(() => {
+        console.error("API is not healthy");
+      });
+  }, [accounts]);
 
   const handleAPIAuthentication = (upn: string, accessToken: string) => {
     const body = {
@@ -46,20 +60,18 @@ const Login = () => {
   const loginToApp = async () => {
     await instance
       .loginPopup({
-        //scopes: ["user.read"],
-        scopes: ["api://e401d532-a867-4131-82c6-fe18242da055/access_as_user"],
+        scopes: [adScopes],
         account: accounts[0],
       })
       .then((response) => {
         dispatch(setAccessToken(response.accessToken));
+
         console.log("Access token acquired: ", response.accessToken);
+
         handleAPIAuthentication(
           response.account.username,
           response.accessToken
         );
-        // getUser({
-        //   upn: response.account.username,
-        // });
       })
       .catch((error) => {
         if (error instanceof InteractionRequiredAuthError) {
@@ -77,7 +89,7 @@ const Login = () => {
       });
   };
 
-  const handleLogin = () => {
+  const handleLogin = (): void => {
     loginToApp();
   };
 
@@ -92,7 +104,7 @@ const Login = () => {
         </p>
       </div>
 
-      <LoginButton onLogin={handleLogin} />
+      <LoginButton onLogin={handleLogin} isDisabled={!isHealthy} />
     </div>
   );
 };
