@@ -6,6 +6,8 @@ import dashboardLogo from "../../assets/dashboard_logo.png";
 import defaultUserImage from "../../assets/default_user.jpg";
 import logoutIcon from "../../assets/icons/logout.webp";
 import NavItem from "./NavItem";
+import { ToastContainer } from "react-toastify";
+import ConfirmBox from "../CommonComponents/ConfirmBox";
 
 const NavBar = () => {
   const { instance } = useMsal();
@@ -60,6 +62,7 @@ const NavBar = () => {
       <div className={localStyles.pagesContainer}>
         <Outlet />
       </div>
+      <ToastContainer />
     </div>
   );
 };

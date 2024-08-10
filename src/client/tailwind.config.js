@@ -11,6 +11,8 @@ export default {
         "login-orange": "#EB3C01",
         "button-primary": "#08577E",
         "button-primary-hover": "#063e59",
+        "primary-color": "#08577E",
+        "danger-color": "#EB3C01",
       },
     },
   },

@@ -9,6 +9,7 @@ import { msalConfig } from "./authConfig.ts";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { Provider } from "react-redux";
 import { store } from "./store.ts";
+import "react-toastify/ReactToastify.css";
 
 const msalInstance = new PublicClientApplication(msalConfig);
 

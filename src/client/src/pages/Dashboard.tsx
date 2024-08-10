@@ -42,29 +42,25 @@ const Dashboard = () => {
       const accessToken = response.accessToken;
 
       try {
-        try {
-          const response_1 = await axios.post<SearchResponse>(
-            `${baseURL}/searchprofile`,
-            body,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                ContentType: "application/json",
-              },
-            }
-          );
-          const options = response_1.data.profiles.map(
-            (profile): OptionsType => {
-              return {
-                value: profile.profileId,
-                label: `${profile.salutation} ${profile.lastName} ${profile.otherNames} | ${profile.passportNumber}`,
-              };
-            }
-          );
-          setOptions(options);
-        } catch (err) {
-          return console.error(err);
-        }
+        const response_1 = await axios.post<SearchResponse>(
+          `${baseURL}/searchprofile`,
+          body,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              ContentType: "application/json",
+            },
+          }
+        );
+        const options = response_1.data.profiles.map((profile): OptionsType => {
+          return {
+            value: profile.profileId,
+            label: `${profile.salutation} ${profile.lastName} ${profile.otherNames} | ${profile.passportNumber}`,
+          };
+        });
+        setOptions(options);
+      } catch (err) {
+        return console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -72,7 +68,6 @@ const Dashboard = () => {
   }, 500);
 
   const handleSelect = (newValue: SingleValue<OptionsType>) => {
-    console.log(newValue);
     navigate(`customer-profile/${newValue?.value}`);
   };
 
