@@ -3,7 +3,7 @@
     public sealed record ProfilePayload(
     string? Id,
     string? SalutationId,
-    Passport[]? Passports,
+    PassportModal[]? Passports,
     string[]? FrequentFlyerNumbers,
     string? PreffdComMth,
     string? ParentId,

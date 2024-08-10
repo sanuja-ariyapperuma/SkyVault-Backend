@@ -8,21 +8,21 @@ namespace SkyVault.WebApi.Backend
 {
     public sealed class SystemUserData(SkyvaultContext db)
     {
-        public SkyResult<SystemUser> CreateOrGetUser(ValidateUserRequest requestUser, string? correlationId)
+        public SkyResult<SystemUser> CreateOrGetUser(string[] requestUser, string? correlationId)
         {
             try
             {
-                var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
+                var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser[0]);
 
                 if (sysUser != null)
                     return new SkyResult<SystemUser>().SucceededWithValue(sysUser);
 
                 sysUser = new SystemUser
                 {
-                    FirstName = requestUser.FirstName,
-                    LastName = requestUser.LastName,
-                    SamProfileId = requestUser.Upn,
-                    UserRole = requestUser.Role
+                    FirstName = requestUser[2],
+                    LastName = requestUser[1],
+                    SamProfileId = requestUser[0],
+                    UserRole = requestUser[3]
                 };
                 
                 db.SystemUsers.Add(sysUser);

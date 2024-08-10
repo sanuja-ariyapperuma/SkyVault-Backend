@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.Payloads.ResponsePayloads;
+using SkyVault.Payloads.CommonPayloads;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -68,7 +69,7 @@ namespace SkyVault.WebApi.Backend
                 {
                     SystemUserId = Convert.ToInt32(passportRequest.SystemUserId),
                     SalutationId = Convert.ToInt32(passportRequest.SalutationId),
-                    PreferredCommId = 1,
+                    PreferredCommId = (int)PreferedCommiunicationMethod.None,
                     ParentId = String.IsNullOrWhiteSpace(passportRequest.ParentId) ? null : Convert.ToInt32(passportRequest.ParentId),
                     Passports = new List<Passport> { passport } 
                 };
@@ -82,6 +83,18 @@ namespace SkyVault.WebApi.Backend
             catch(Exception ex)
             {
                 return new SkyResult<CustomerProfile>().Fail(ex.Message, "4cf0079e-0008", correlationId);
+            }
+        }
+
+        public bool CheckPassportExists(string passportNumber, string correlationId) 
+        {
+            try
+            {
+                return db.Passports.Any(p => p.PassportNumber == passportNumber);
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
         public SkyResult<String> UpdateComMethod(ComMethodRequest comMethodRequest, string correlationId) 

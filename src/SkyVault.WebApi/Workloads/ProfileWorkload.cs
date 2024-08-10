@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
@@ -93,28 +94,57 @@ namespace SkyVault.WebApi.Workloads
             }
         }
 
+        private static bool IsPassportDataValid(PassportRequest passportRequest) 
+        {
+            if(
+                passportRequest.CountryId.IsNullOrEmpty() &&
+                passportRequest.DateOfBirth.IsNullOrEmpty() &&
+                passportRequest.ExpiryDate.IsNullOrEmpty() &&
+                passportRequest.PassportNumber.IsNullOrEmpty() &&
+                passportRequest.PassportNumber?.Length < 6 &&
+                passportRequest.OtherNames.IsNullOrEmpty() &&
+                passportRequest.OtherNames?.Length < 3 &&
+                passportRequest.LastName.IsNullOrEmpty() &&
+                passportRequest.LastName?.Length < 3 &&
+                passportRequest.Gender.IsNullOrEmpty() &&
+                passportRequest.SalutationId.IsNullOrEmpty() &&
+                passportRequest.SystemUserId.IsNullOrEmpty()
+                ) return false;
+
+            return true;
+        }
+
         public static IResult AddPassport([FromBody] PassportRequest passportRequest,
             SkyvaultContext dbContext,
             HttpContext context) 
         {
             try
             {
-                _correlationId = CorrelationHandler.Get(context);
-
                 var customerProfileData = new CustomerProfileData(dbContext);
-
                 SaveUpdateCustomerProfileResponse savedCustomerProfile;
 
-                if (String.IsNullOrWhiteSpace(passportRequest.CustomerProfileId)) 
+                if (String.IsNullOrEmpty(passportRequest.CustomerProfileId?.Trim())) 
                 {
+                    if (!IsPassportDataValid(passportRequest))
+                        return Results.BadRequest("Invalid data found");  
+
+                    var checkPassportExists = customerProfileData.CheckPassportExists(passportRequest.PassportNumber ?? "", _correlationId);
+
+                    if (checkPassportExists)
+                        return Results.BadRequest("A passport from the provided passport number is already existing");
+
                     var savedprofile = customerProfileData.SaveProfile(passportRequest, _correlationId);
 
                     if (!savedprofile.Succeeded)
                         return Results.Problem(
-                                            new ValidationProblemDetails().ToValidationProblemDetails(
-                                                    savedprofile.Message, savedprofile.ErrorCode, _correlationId));
+                            new ValidationProblemDetails().ToValidationProblemDetails(
+                            savedprofile.Message, savedprofile.ErrorCode, _correlationId));
                     
-                    savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savedprofile.Value!.Id.ToString());
+                    savedCustomerProfile = new SaveUpdateCustomerProfileResponse(
+                        savedprofile.Value!.Id.ToString(),
+                        savedprofile.Value.Passports.First().Id.ToString());
+
+                    return Results.Created<SaveUpdateCustomerProfileResponse>("AddPassport", savedCustomerProfile);
                 }
                 else 
                 {
@@ -138,10 +168,14 @@ namespace SkyVault.WebApi.Workloads
                                             new ValidationProblemDetails().ToValidationProblemDetails(
                                                     savepassport.Message, "30550615-0007", _correlationId));
 
-                    savedCustomerProfile = new SaveUpdateCustomerProfileResponse(savepassport.Value!.Id.ToString());
+                    savedCustomerProfile = new SaveUpdateCustomerProfileResponse(
+                        passportRequest.CustomerProfileId,
+                        savepassport.Value?.Id.ToString()
+                        );
+                    return Results.Ok(savedCustomerProfile);
                 }
 
-                return Results.Ok(savedCustomerProfile);
+                
             }
             catch (FormatException e)
             {
@@ -197,7 +231,7 @@ namespace SkyVault.WebApi.Workloads
 
 
 
-            return Results.Ok(new SkyVault.Payloads.CommonPayloads.Passport(
+            return Results.Ok(new SkyVault.Payloads.CommonPayloads.PassportModal(
                 passport.Value!.Id.ToString(),
                 passport.Value.LastName,
                 passport.Value.OtherNames,
@@ -524,7 +558,7 @@ namespace SkyVault.WebApi.Workloads
             var passports = customerProfile.Passports.Select(passport =>
             {
                 
-                return new Payloads.CommonPayloads.Passport(
+                return new Payloads.CommonPayloads.PassportModal(
                     passport.Id.ToString(),
                     passport.LastName,
                     passport.OtherNames,

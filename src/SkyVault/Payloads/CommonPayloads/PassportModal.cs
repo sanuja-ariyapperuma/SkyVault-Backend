@@ -1,6 +1,6 @@
 ﻿namespace SkyVault.Payloads.CommonPayloads;
 
-public sealed record Passport(
+public sealed record PassportModal(
     string? Id,
     string? LastName,
     string? OtherNames,

@@ -5,6 +5,7 @@ using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
+using System.Security.Claims;
 
 namespace SkyVault.WebApi.Workloads;
 
@@ -15,21 +16,25 @@ internal static class AuthenticationWorkload
     {
         var correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
-        var propertiesToCheck = new[]
+        var firstname = context.User.FindFirst("name")?.Value;
+        var lastName = context.User.FindFirst(ClaimTypes.Surname)?.Value;
+        var email = context.User.FindFirst(ClaimTypes.GivenName)?.Value;
+        var role = context.User.Identities.FirstOrDefault()?.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+        var roleClaim = context.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+        var role2 = context.User.Claims.Where(x => x.Type == "role")?.Select(c => c.Value);
+
+        //surname, givenname
+
+        var loginUser = new[]
         {
-            request.Upn, request.Email,
-            request.LastName, request.FirstName, request.Role
+            request.Upn,
+            lastName,
+            firstname,
+            "Staff"
         };
 
-        if (propertiesToCheck.Any(string.IsNullOrWhiteSpace))
-        {
-            return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-                "One or more required fields are missing. Please provide all required fields.",
-                "67010904-0000", correlationId));
-        }
-
         var systemUserData = new SystemUserData(dbContext);
-        var result = systemUserData.CreateOrGetUser(request, correlationId);
+        var result = systemUserData.CreateOrGetUser(loginUser, correlationId);
 
         if (!result.Succeeded)
             return Results.Problem(new ProblemDetails().ToProblemDetails(result.Message,
