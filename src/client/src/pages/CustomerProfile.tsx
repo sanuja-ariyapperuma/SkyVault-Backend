@@ -26,6 +26,11 @@ import {
   notifyError,
   notifySuccess,
 } from "../components/CommonComponents/Toasters";
+import VISAInfo from "../components/CreateProfile/VISAInfo";
+import {
+  SaveVISAType,
+  VISAType,
+} from "../features/Types/CustomerProfile/VISAType";
 
 const CustomerProfile = () => {
   const { profileId } = useParams();
@@ -35,13 +40,12 @@ const CustomerProfile = () => {
   const [country, setCountry] = useState<OptionsType[]>([]);
   const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
     useState<boolean>(true);
-
   const [customerProfileId, setCustomerProfileId] = useState<string | null>(
-    null
+    "34"
   );
 
   const [primaryPassport, setPrimaryPassport] = useState<PassportType>({
-    id: "",
+    id: "30",
     salutationId: "",
     lastName: "",
     otherNames: "",
@@ -101,6 +105,23 @@ const CustomerProfile = () => {
   const handleFieldChangeSecondaryPassport = (field: string, value: any) => {
     setSecondaryPassport({
       ...secondaryPassport,
+      [field]: value,
+    });
+  };
+
+  const [visa, setVisa] = useState<VISAType>({
+    id: "",
+    visaNumber: "",
+    countryId: "",
+    issuedPlace: "",
+    issuedDate: null,
+    expiryDate: null,
+    assignedToPrimaryPassport: true,
+  });
+
+  const handleFieldChangeVISA = (field: string, value: any) => {
+    setVisa({
+      ...visa,
       [field]: value,
     });
   };
@@ -246,6 +267,41 @@ const CustomerProfile = () => {
     return valid;
   };
 
+  const validateVISA = (visa: SaveVISAType): boolean => {
+    let valid = true;
+
+    if (!visa.CountryId) {
+      notifyError("Country is required");
+      valid = false;
+    }
+
+    if (!visa.ExpiryDate) {
+      notifyError("VISA expiry date is required");
+      valid = false;
+    }
+
+    if (!visa.IssuedDate) {
+      notifyError("VISA issued date is required");
+      valid = false;
+    }
+
+    if (!visa.IssuedPlace) {
+      notifyError("VISA issued place is required");
+      valid = false;
+    }
+
+    if (!visa.VisaNumber) {
+      notifyError("VISA number is required");
+      valid = false;
+    }
+    if (visa.ExpiryDate! < visa.IssuedDate!) {
+      notifyError("VISA expiry date cannot be less than issued date");
+      valid = false;
+    }
+
+    return valid;
+  };
+
   const savePassport = (passport: SavePassportRequestType): void => {
     const isValid = validatePassport(passport);
 
@@ -284,6 +340,38 @@ const CustomerProfile = () => {
       });
   };
 
+  const saveVISA = (visa: VISAType): void => {
+    const saveVisa = {
+      VisaNumber: visa.visaNumber,
+      CountryId: visa.countryId,
+      IssuedPlace: visa.issuedPlace,
+      IssuedDate: visa.issuedDate,
+      ExpiryDate: visa.expiryDate,
+      CustomerProfileId: customerProfileId,
+      SystemUserId: "9",
+      PassportId: visa.assignedToPrimaryPassport
+        ? primaryPassport.id
+        : secondaryPassport.id,
+    } as SaveVISAType;
+
+    const isValid = validateVISA(saveVisa);
+
+    if (!isValid) {
+      return;
+    }
+
+    axios
+      .post(`${baseURL}/AddVISA`, saveVisa)
+      .then((response) => {
+        console.log("Response", response);
+        notifySuccess("VISA added successfully");
+      })
+      .catch((error) => {
+        notifyError(`Sorry! ${error.message}`);
+        console.log("Error", error.response);
+      });
+  };
+
   const handleOnSavePrimaryPassport = (): void => {
     const passport: SavePassportRequestType = {
       Id: null,
@@ -304,6 +392,15 @@ const CustomerProfile = () => {
     };
 
     savePassport(passport);
+  };
+
+  const handleOnSaveVISA = (): void => {
+    if (!customerProfileId && !primaryPassport.id) {
+      notifyError("Primary passport must be saved first");
+      return;
+    }
+
+    saveVISA(visa);
   };
 
   const handleOnSaveSecondaryPassport = (): void => {
@@ -357,16 +454,9 @@ const CustomerProfile = () => {
             <div className={localStyles.buttonContainer}>
               {primaryPassport.id && !secondaryPassport.id && (
                 <button
-                  className={
-                    secondaryPassportEnabled
-                      ? globalStyles.customButton
-                      : globalStyles.customButtonDanger
-                  }
+                  className={globalStyles.customButton}
                   onClick={handleOnSecondaryPassportAddRemove}
                 >
-                  {/* {secondaryPassportEnabled
-                    ? "Add Secondary"
-                    : "Remove Secondary"} */}
                   Add Secondary
                 </button>
               )}
@@ -416,11 +506,19 @@ const CustomerProfile = () => {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            {/* <VISAInfo
-              country={country}
-              handleOnDateOfBirthChange={handleOnDateOfBirthChange}
-              handleOnCountrySelect={handleOnCountrySelect}
-            /> */}
+            {primaryPassport.id ? (
+              <>
+                <div className={localStyles.buttonContainer}>
+                  <ButtonPanel OnSave={handleOnSaveVISA} />
+                </div>
+                <VISAInfo
+                  country={country}
+                  handleFieldChange={handleFieldChangeVISA}
+                />
+              </>
+            ) : (
+              "Primary passport must be saved first"
+            )}
           </Typography>
         </AccordionDetails>
       </Accordion>

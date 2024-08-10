@@ -9,15 +9,40 @@ import CustomDatePicker from "../CommonComponents/CustomDatePicker";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
 import VISAList from "./VISAList";
 import CustomSelect from "../CommonComponents/CustomSelect";
+import { ChangeEvent, useState } from "react";
 
 type VISAInfoProps = {
   country: OptionsType[];
-  handleOnDateOfBirthChange: (newValue: Dayjs | null) => void;
-  handleOnCountrySelect: (value: string) => void;
+  handleFieldChange: (field: string, value: any) => void;
 };
 
 const VISAInfo = (props: VISAInfoProps) => {
-  const { country, handleOnDateOfBirthChange, handleOnCountrySelect } = props;
+  const { country, handleFieldChange } = props;
+  const [assignedToPrimaryPassport, setAssignedToPrimaryPassport] =
+    useState<boolean>(true);
+
+  const handleOnVISAExpiryChange = (newValue: Dayjs | null) => {
+    handleFieldChange("expiryDate", newValue);
+  };
+  const handleOnVISAIssuedDateChange = (newValue: Dayjs | null) => {
+    handleFieldChange("issuedDate", newValue);
+  };
+  const handleOnCountrySelect = (value: string) => {
+    handleFieldChange("countryId", value);
+  };
+  const handleOnVISANumberChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handleFieldChange("visaNumber", event.target.value);
+  };
+  const handleOnVISAIssuedPlaceChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    handleFieldChange("issuedPlace", event.target.value);
+  };
+  const handleOnAssignChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handleFieldChange("assignedToPrimaryPassport", assignedToPrimaryPassport);
+    setAssignedToPrimaryPassport(!assignedToPrimaryPassport);
+  };
+
   return (
     <div className={localStyles.visaContainer}>
       <div className={localStyles.accordionContent}>
@@ -26,15 +51,17 @@ const VISAInfo = (props: VISAInfoProps) => {
             type="text"
             placeholder="VISA Number"
             className={globalStyles.commonTextInput}
+            onChange={handleOnVISANumberChange}
           />
           <input
             type="text"
             placeholder="VISA Issued Place"
             className={globalStyles.commonTextInput}
+            onChange={handleOnVISAIssuedPlaceChange}
           />
           <CustomDatePicker
             label="VISA Expiry Date"
-            handleOnDateChange={handleOnDateOfBirthChange}
+            onDateChange={handleOnVISAExpiryChange}
           />
         </div>
         <div className={localStyles.accordionRight}>
@@ -45,16 +72,21 @@ const VISAInfo = (props: VISAInfoProps) => {
           />
           <CustomDatePicker
             label="VISA Issued Date"
-            handleOnDateChange={handleOnDateOfBirthChange}
+            onDateChange={handleOnVISAIssuedDateChange}
           />
           <FormControl>
-            <Checkbox label="Assign with primary passport" />
+            <Checkbox
+              label="Assign with primary passport"
+              checked={assignedToPrimaryPassport}
+              onChange={handleOnAssignChange}
+            />
             <FormHelperText>
               Uncheck to assign to secondary passport.
             </FormHelperText>
           </FormControl>
         </div>
       </div>
+      <br />
       <div className={localStyles.VISAListArea}>
         <VISAList />
       </div>

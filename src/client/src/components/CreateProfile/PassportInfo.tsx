@@ -7,7 +7,6 @@ import CustomSelect from "../CommonComponents/CustomSelect";
 import { ChangeEvent } from "react";
 import { Dayjs } from "dayjs";
 import { PassportType } from "../../features/Types/CustomerProfile/PassportType";
-import ConfirmBox from "../CommonComponents/ConfirmBox";
 
 type PassportInfoProps = {
   salutations: OptionsType[];

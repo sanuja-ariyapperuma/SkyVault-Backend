@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SkyVault.Exceptions;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 
@@ -14,9 +13,9 @@ namespace SkyVault.WebApi.Backend
                 var newvisa = new Visa
                 {
                     VisaNumber = visaRequest.VisaNumber!,
-                    IssuedPlace = visaRequest.VisaIssuedPlace!,
-                    IssuedDate = DateOnly.FromDateTime(DateTime.Parse(visaRequest.VisaissuedDate)),
-                    ExpireDate = DateOnly.FromDateTime(DateTime.Parse(visaRequest.VisaExpiryDate)),
+                    IssuedPlace = visaRequest.IssuedPlace!,
+                    IssuedDate = DateOnly.FromDateTime(DateTime.Parse(visaRequest.IssuedDate)),
+                    ExpireDate = DateOnly.FromDateTime(DateTime.Parse(visaRequest.ExpiryDate)),
                     CountryId = Convert.ToInt32(visaRequest.CountryId),
                     PassportId = Convert.ToInt32(visaRequest.PassportId)
                 };
@@ -42,11 +41,11 @@ namespace SkyVault.WebApi.Backend
                     v.Passport.CustomerProfile.SystemUserId == Convert.ToInt32(visaRequest.SystemUserId))
                .ExecuteUpdate(updates =>
                     updates.SetProperty(visa => visa.VisaNumber, visaRequest.VisaNumber)
-                        .SetProperty(visa => visa.IssuedPlace, visaRequest.VisaIssuedPlace)
+                        .SetProperty(visa => visa.IssuedPlace, visaRequest.IssuedPlace)
                         .SetProperty(visa => visa.IssuedDate, DateOnly.FromDateTime(
-                            DateTime.Parse(visaRequest.VisaissuedDate)))
+                            DateTime.Parse(visaRequest.IssuedDate)))
                         .SetProperty(visa => visa.ExpireDate, DateOnly.FromDateTime(
-                            DateTime.Parse(visaRequest.VisaExpiryDate)))
+                            DateTime.Parse(visaRequest.ExpiryDate)))
                         .SetProperty(visa => visa.CountryId, Convert.ToInt32(visaRequest.CountryId)));
 
             if (results == 0)

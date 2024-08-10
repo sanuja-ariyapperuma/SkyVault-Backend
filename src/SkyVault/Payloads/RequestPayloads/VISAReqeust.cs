@@ -11,9 +11,9 @@ namespace SkyVault.Payloads.RequestPayloads;
         string? SystemUserId,
         string? PassportId,
         string? VisaNumber,
-        string? VisaIssuedPlace,
-        string? VisaissuedDate,
-        string? VisaExpiryDate,
+        string? IssuedPlace,
+        string? IssuedDate,
+        string? ExpiryDate,
         string? CountryId
-        );
+    );
 

@@ -1,9 +1,21 @@
 export type VISAType = {
-  vISANumber: string;
+  id: string;
+  visaNumber: string;
   countryId: string;
-  vISAIssuedPlace: string;
-  vISAIssuedDate: Date;
-  vISAExpiryDate: Date;
+  issuedPlace: string;
+  issuedDate: Date | null;
+  expiryDate: Date | null;
   assignedToPrimaryPassport: boolean;
-  isExpired: boolean;
+};
+
+export type SaveVISAType = {
+  Id: string;
+  VisaNumber: string;
+  CountryId: string;
+  IssuedPlace: string;
+  IssuedDate: Date | null;
+  ExpiryDate: Date | null;
+  CustomerProfileId: string | null;
+  SystemUserId: string;
+  PassportId: string;
 };
