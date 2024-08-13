@@ -5,18 +5,28 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import { useState } from "react";
 
-const ConfirmBox = () => {
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
+type ConfirmDialogProps = {
+  open: boolean;
+  content?: string;
+  onClose: () => void;
+  onConfirm: () => void;
+};
+
+const ConfirmBox = (props: ConfirmDialogProps) => {
+  const { open, content, onClose, onConfirm } = props;
 
   const handleConfirmClick = () => {
-    setOpen(!open);
+    onConfirm();
+  };
+
+  const handleDisagreeClick = () => {
+    onClose();
   };
 
   return (
     <Dialog
       open={open}
-      onClose={handleConfirmClick}
+      onClose={handleDisagreeClick}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -25,14 +35,14 @@ const ConfirmBox = () => {
       </DialogTitle> */}
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          {message}
+          {content}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleConfirmClick}>Disagree</Button>
-        <Button onClick={handleConfirmClick} autoFocus>
-          Agree
+        <Button onClick={handleDisagreeClick} autoFocus>
+          Close
         </Button>
+        <Button onClick={handleConfirmClick}>Confirm</Button>
       </DialogActions>
     </Dialog>
   );

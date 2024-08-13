@@ -15,9 +15,9 @@ const ButtonPanel = (props: ButtonPanelProps) => {
       <button className={globalStyles.customButton} onClick={handleOnSaveClick}>
         <SaveIcon />
       </button>
-      <button className={globalStyles.customButtonEdit}>
+      {/* <button className={globalStyles.customButtonEdit}>
         <ModeEditIcon />
-      </button>
+      </button> */}
     </div>
   );
 };

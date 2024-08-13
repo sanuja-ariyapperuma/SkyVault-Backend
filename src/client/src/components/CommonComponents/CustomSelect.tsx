@@ -10,20 +10,22 @@ type CustomSelectProps = {
 };
 
 const CustomSelect = (props: CustomSelectProps) => {
-  const { options, onChange, placeholder } = props;
+  const { options, onChange, placeholder, initialValue } = props;
 
   const [val, setVal] = useState<OptionsType | null>(null);
 
   useEffect(() => {
-    if (props.initialValue) {
+    if (initialValue) {
       const selectedOption = options.find(
-        (option) => option.value === props.initialValue
+        (option) => option.value === initialValue
       );
       if (selectedOption) {
         setVal(selectedOption);
       }
+    } else {
+      setVal(null);
     }
-  }, []);
+  }, [initialValue]);
 
   const handleChange = (
     _event: React.SyntheticEvent,
@@ -46,7 +48,6 @@ const CustomSelect = (props: CustomSelectProps) => {
       renderInput={(params) => (
         <TextField {...params} label={placeholder} variant="standard" />
       )}
-      //onChange={handleChange}
       onChange={handleChange}
     />
   );

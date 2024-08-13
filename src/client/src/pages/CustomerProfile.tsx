@@ -28,9 +28,20 @@ import {
 } from "../components/CommonComponents/Toasters";
 import VISAInfo from "../components/CreateProfile/VISAInfo";
 import {
+  SaveVISAResponseType,
   SaveVISAType,
   VISAType,
 } from "../features/Types/CustomerProfile/VISAType";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  replaceVISAList,
+  addSingleVISA,
+  updateSingle,
+  removeSingleVISA,
+} from "../features/reducers/VISAListReducer";
+import { useConfirmDialog } from "../hooks/useConfirmDialog";
+import ConfirmBox from "../components/CommonComponents/ConfirmBox";
+import FrequentFlyNumberAccordion from "../components/CreateProfile/FrequentFlyNumberAccordion";
 
 const CustomerProfile = () => {
   const { profileId } = useParams();
@@ -40,6 +51,11 @@ const CustomerProfile = () => {
   const [country, setCountry] = useState<OptionsType[]>([]);
   const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
     useState<boolean>(true);
+
+  const dispatch = useDispatch();
+
+  const { dialogProps, openDialog } = useConfirmDialog();
+
   const [customerProfileId, setCustomerProfileId] = useState<string | null>(
     "34"
   );
@@ -59,7 +75,7 @@ const CustomerProfile = () => {
   });
 
   const [secondaryPassport, setSecondaryPassport] = useState<PassportType>({
-    id: "",
+    id: "31",
     salutationId: "",
     lastName: "",
     otherNames: "",
@@ -115,9 +131,13 @@ const CustomerProfile = () => {
     countryId: "",
     issuedPlace: "",
     issuedDate: null,
-    expiryDate: null,
+    expireDate: null,
     assignedToPrimaryPassport: true,
+    countryName: "",
+    passportNumber: "",
   });
+
+  //const [visaList, setVisaList] = useState<VISAType[]>([]);
 
   const handleFieldChangeVISA = (field: string, value: any) => {
     setVisa({
@@ -129,6 +149,7 @@ const CustomerProfile = () => {
   const handleOnSecondaryPassportAddRemove = () => {
     if (secondaryPassportEnabled) {
       setSecondaryPassport({
+        // use spread operator
         id: "",
         salutationId: primaryPassport.salutationId,
         lastName: primaryPassport.lastName,
@@ -197,11 +218,29 @@ const CustomerProfile = () => {
     }
   };
 
+  const fetchVISAs = async () => {
+    console.log("Profile ID", profileId);
+    try {
+      const visaData = await axios.post<VISAType[]>(
+        `${baseURL}/getVISAByCustomer`,
+        {
+          CustomerProfileId: customerProfileId,
+          SystemUserId: "9",
+        }
+      );
+      //console.log("Visa data", visaData);
+      //setVisaList(visaData.data);
+      dispatch(replaceVISAList(visaData.data));
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+
   useEffect(() => {
     fetchCommonData();
-
-    if (profileId) {
+    if (customerProfileId) {
       //fetch customer profile
+      fetchVISAs();
     } else {
       //setCustomerProfile(initialCustomerProfile);
     }
@@ -294,6 +333,7 @@ const CustomerProfile = () => {
       notifyError("VISA number is required");
       valid = false;
     }
+
     if (visa.ExpiryDate! < visa.IssuedDate!) {
       notifyError("VISA expiry date cannot be less than issued date");
       valid = false;
@@ -346,7 +386,7 @@ const CustomerProfile = () => {
       CountryId: visa.countryId,
       IssuedPlace: visa.issuedPlace,
       IssuedDate: visa.issuedDate,
-      ExpiryDate: visa.expiryDate,
+      ExpiryDate: visa.expireDate,
       CustomerProfileId: customerProfileId,
       SystemUserId: "9",
       PassportId: visa.assignedToPrimaryPassport
@@ -361,10 +401,88 @@ const CustomerProfile = () => {
     }
 
     axios
-      .post(`${baseURL}/AddVISA`, saveVisa)
+      .post<SaveVISAResponseType>(`${baseURL}/AddVISA`, saveVisa)
       .then((response) => {
         console.log("Response", response);
         notifySuccess("VISA added successfully");
+
+        visa.id = response.data.VisaId;
+        visa.countryName =
+          country.find((c) => c.value === visa.countryId)?.label ?? "";
+        visa.passportNumber = visa.assignedToPrimaryPassport
+          ? primaryPassport.passportNumber
+          : secondaryPassport.passportNumber;
+
+        dispatch(addSingleVISA(visa));
+
+        setVisa({
+          id: "",
+          visaNumber: "",
+          countryId: "",
+          issuedPlace: "",
+          issuedDate: null,
+          expireDate: null,
+          assignedToPrimaryPassport: true,
+          countryName: "",
+          passportNumber: "",
+        });
+      })
+      .catch((error) => {
+        notifyError(`Sorry! ${error.message}`);
+        console.log("Error", error.response);
+      });
+  };
+
+  const updateVISA = (visa: VISAType): void => {
+    const saveVisa = {
+      VisaNumber: visa.visaNumber,
+      CountryId: visa.countryId,
+      IssuedPlace: visa.issuedPlace,
+      IssuedDate: visa.issuedDate,
+      ExpiryDate: visa.expireDate,
+      CustomerProfileId: customerProfileId,
+      SystemUserId: "9",
+      PassportId: visa.assignedToPrimaryPassport
+        ? primaryPassport.id
+        : secondaryPassport.id,
+    } as SaveVISAType;
+
+    const isValid = validateVISA(saveVisa);
+
+    if (!isValid) {
+      return;
+    }
+
+    axios
+      .put<SaveVISAResponseType>(`${baseURL}/updatevisa/${visa.id}`, saveVisa)
+      .then((response) => {
+        if (response.status == 200) {
+          visa.countryName =
+            country.find((c) => c.value === visa.countryId)?.label ?? "";
+          visa.passportNumber = visa.assignedToPrimaryPassport
+            ? primaryPassport.passportNumber
+            : secondaryPassport.passportNumber;
+
+          dispatch(updateSingle(visa));
+
+          setVisa({
+            id: "",
+            visaNumber: "",
+            countryId: "",
+            issuedPlace: "",
+            issuedDate: null,
+            expireDate: null,
+            assignedToPrimaryPassport: true,
+            countryName: "",
+            passportNumber: "",
+          });
+
+          notifySuccess("VISA updated successfully");
+        } else {
+          notifyError(
+            "Something went wrong. VISA did not updated successfully"
+          );
+        }
       })
       .catch((error) => {
         notifyError(`Sorry! ${error.message}`);
@@ -400,7 +518,11 @@ const CustomerProfile = () => {
       return;
     }
 
-    saveVISA(visa);
+    if (!visa.id) {
+      saveVISA(visa);
+    } else {
+      updateVISA(visa);
+    }
   };
 
   const handleOnSaveSecondaryPassport = (): void => {
@@ -430,8 +552,41 @@ const CustomerProfile = () => {
     savePassport(passport);
   };
 
+  const handleOnVISAEditClick = (editingVisa: VISAType) => {
+    console.log("Editing VISA", editingVisa);
+    if (editingVisa) {
+      setVisa(editingVisa);
+    }
+  };
+
+  const handleVISADelete = (id: string) => {
+    openDialog("Are you sure you want to delete this VISA?", () =>
+      deleteVISA(id)
+    );
+  };
+
+  const deleteVISA = (id: string) => {
+    axios
+      .delete(`${baseURL}/deletevisa/${id}`, {
+        data: { SystemUserId: "9", CustomerProfileId: customerProfileId },
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          dispatch(removeSingleVISA(id));
+          notifySuccess("VISA deleted successfully");
+        } else {
+          notifyError("Something went wrong. VISA did not delete successfully");
+        }
+      })
+      .catch((error) => {
+        notifyError(`Sorry! ${error.message}`);
+        console.log("Error", error.response);
+      });
+  };
+
   return (
     <div className={localStyles.profileManagementContainer}>
+      <ConfirmBox {...dialogProps} />
       <div className={localStyles.topHeading}>
         <h2 className={localStyles.pageHeader}>
           {profileId ? "Update Profile" : "Create Profile"}
@@ -450,102 +605,44 @@ const CustomerProfile = () => {
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            <div className={localStyles.buttonContainer}>
-              {primaryPassport.id && !secondaryPassport.id && (
-                <button
-                  className={globalStyles.customButton}
-                  onClick={handleOnSecondaryPassportAddRemove}
-                >
-                  Add Secondary
-                </button>
-              )}
-              <ButtonPanel OnSave={handleOnSavePrimaryPassport} />
-            </div>
-
-            <PassportInfo
-              salutations={salutations}
-              gender={gender}
-              nationality={nationality}
-              country={country}
-              customerPassport={primaryPassport}
-              handleFieldChange={handleFieldChange}
-            />
-            <div>
-              {!secondaryPassportEnabled && (
-                <div className={localStyles.secondaryPassportArea}>
-                  <b>Secondary Passport Information</b>
-                  <div className={localStyles.buttonContainer}>
-                    <ButtonPanel OnSave={handleOnSaveSecondaryPassport} />
-                  </div>
-                  <PassportInfo
-                    salutations={salutations}
-                    gender={gender}
-                    nationality={nationality}
-                    country={country}
-                    customerPassport={secondaryPassport}
-                    handleFieldChange={handleFieldChangeSecondaryPassport}
-                  />
-                </div>
-              )}
-            </div>
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
-          aria-controls="panel2-content"
-          id="panel2-header"
-        >
-          <Typography>
-            <span className={localStyles.accordionHeader}>
-              VISA Information (Optional)
-            </span>
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            {primaryPassport.id ? (
-              <>
-                <div className={localStyles.buttonContainer}>
-                  <ButtonPanel OnSave={handleOnSaveVISA} />
-                </div>
-                <VISAInfo
-                  country={country}
-                  handleFieldChange={handleFieldChangeVISA}
-                />
-              </>
-            ) : (
-              "Primary passport must be saved first"
+          <div className={localStyles.buttonContainer}>
+            {primaryPassport.id && !secondaryPassport.id && (
+              <button
+                className={globalStyles.customButton}
+                onClick={handleOnSecondaryPassportAddRemove}
+              >
+                Add Secondary
+              </button>
             )}
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
-          aria-controls="panel2-content"
-          id="panel2-header"
-        >
-          <Typography>
-            <span className={localStyles.accordionHeader}>
-              Frequent Flyer (Optional)
-            </span>
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            <div className={localStyles.accordionContent}>
-              <div className={localStyles.accordionLeft}>
-                <input
-                  type="text"
-                  placeholder="Frequent Flyer Number"
-                  className={globalStyles.commonTextInput}
+            <ButtonPanel OnSave={handleOnSavePrimaryPassport} />
+          </div>
+
+          <PassportInfo
+            salutations={salutations}
+            gender={gender}
+            nationality={nationality}
+            country={country}
+            customerPassport={primaryPassport}
+            handleFieldChange={handleFieldChange}
+          />
+          <div>
+            {!secondaryPassportEnabled && (
+              <div className={localStyles.secondaryPassportArea}>
+                <b>Secondary Passport Information</b>
+                <div className={localStyles.buttonContainer}>
+                  <ButtonPanel OnSave={handleOnSaveSecondaryPassport} />
+                </div>
+                <PassportInfo
+                  salutations={salutations}
+                  gender={gender}
+                  nationality={nationality}
+                  country={country}
+                  customerPassport={secondaryPassport}
+                  handleFieldChange={handleFieldChangeSecondaryPassport}
                 />
               </div>
-            </div>
-          </Typography>
+            )}
+          </div>
         </AccordionDetails>
       </Accordion>
       <Accordion>
@@ -554,38 +651,63 @@ const CustomerProfile = () => {
           aria-controls="panel2-content"
           id="panel2-header"
         >
-          <Typography>
-            <span className={localStyles.accordionHeader}>
-              Preferred Communication Method
-            </span>
+          <Typography className={localStyles.accordionHeader}>
+            VISA Information (Optional)
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            <div className={localStyles.accordionContent}>
-              <RadioGroup
-                defaultValue="None"
-                name="radio-buttons-group"
-                sx={{ display: "flex", flexDirection: "row" }}
-              >
-                <FormControlLabel
-                  value="None"
-                  control={<Radio />}
-                  label="None"
-                />
-                <FormControlLabel
-                  value="WhatsApp"
-                  control={<Radio />}
-                  label="WhatsApp"
-                />
-                <FormControlLabel
-                  value="Email"
-                  control={<Radio />}
-                  label="Email"
-                />
-              </RadioGroup>
-            </div>
+          {primaryPassport.id ? (
+            <>
+              <div className={localStyles.buttonContainer}>
+                <ButtonPanel OnSave={handleOnSaveVISA} />
+              </div>
+              <VISAInfo
+                country={country}
+                handleFieldChange={handleFieldChangeVISA}
+                OnVISAEditClick={handleOnVISAEditClick}
+                initialVisa={visa}
+                onVISADeleteClick={handleVISADelete}
+              />
+            </>
+          ) : (
+            "Primary passport must be saved first"
+          )}
+        </AccordionDetails>
+      </Accordion>
+      <FrequentFlyNumberAccordion
+        CustomerProfileId={customerProfileId ?? ""}
+        SystemUser={"9"}
+      />
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ArrowDropDownIcon />}
+          aria-controls="panel2-content"
+          id="panel2-header"
+        >
+          <Typography className={localStyles.accordionHeader}>
+            Preferred Communication Method
           </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div className={localStyles.accordionContent}>
+            <RadioGroup
+              defaultValue="None"
+              name="radio-buttons-group"
+              sx={{ display: "flex", flexDirection: "row" }}
+            >
+              <FormControlLabel value="None" control={<Radio />} label="None" />
+              <FormControlLabel
+                value="WhatsApp"
+                control={<Radio />}
+                label="WhatsApp"
+              />
+              <FormControlLabel
+                value="Email"
+                control={<Radio />}
+                label="Email"
+              />
+            </RadioGroup>
+          </div>
         </AccordionDetails>
       </Accordion>
       {/* <div className={localStyles.footerButtonArea}>

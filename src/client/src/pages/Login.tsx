@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
-import { setAccessToken } from "../features/reducers/tokenSlice";
 import axios from "axios";
 
 const Login = () => {
@@ -64,8 +63,6 @@ const Login = () => {
         account: accounts[0],
       })
       .then((response) => {
-        dispatch(setAccessToken(response.accessToken));
-
         console.log("Access token acquired: ", response.accessToken);
 
         handleAPIAuthentication(

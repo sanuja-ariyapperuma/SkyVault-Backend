@@ -23,7 +23,7 @@ namespace SkyVault.WebApi.Backend
                 db.Visas.Add(newvisa);
                 db.SaveChanges();
 
-                return new SkyResult<String>().SucceededWithValue("Visa Added Successfully");
+                return new SkyResult<String>().SucceededWithValue(newvisa.Id.ToString());
             }
             catch (Exception ex)
             {
@@ -32,13 +32,13 @@ namespace SkyVault.WebApi.Backend
             }
         }
 
-        public SkyResult<String> UpdateVisa(VisaReqeust visaRequest, string correlationId) 
+        public SkyResult<String> UpdateVisa(string visaId, VisaReqeust visaRequest, string correlationId) 
         {
             var results = db.Visas
                .Where(v => 
-                    v.Id == Convert.ToInt32(visaRequest.Id) &&
-                    v.PassportId == Convert.ToInt32(visaRequest.PassportId) &&
-                    v.Passport.CustomerProfile.SystemUserId == Convert.ToInt32(visaRequest.SystemUserId))
+                    v.Id == Convert.ToInt32(visaId) &&
+                    v.Passport.CustomerProfile.SystemUserId == Convert.ToInt32(visaRequest.SystemUserId)
+                    )
                .ExecuteUpdate(updates =>
                     updates.SetProperty(visa => visa.VisaNumber, visaRequest.VisaNumber)
                         .SetProperty(visa => visa.IssuedPlace, visaRequest.IssuedPlace)
@@ -46,7 +46,9 @@ namespace SkyVault.WebApi.Backend
                             DateTime.Parse(visaRequest.IssuedDate)))
                         .SetProperty(visa => visa.ExpireDate, DateOnly.FromDateTime(
                             DateTime.Parse(visaRequest.ExpiryDate)))
-                        .SetProperty(visa => visa.CountryId, Convert.ToInt32(visaRequest.CountryId)));
+                        .SetProperty(visa => visa.CountryId, Convert.ToInt32(visaRequest.CountryId))
+                        .SetProperty(visa => visa.PassportId, Convert.ToInt32(visaRequest.PassportId))
+                        );
 
             if (results == 0)
                 return new SkyResult<String>().Fail("Failed to update visa", "0daa030e-0005", correlationId);
@@ -62,6 +64,33 @@ namespace SkyVault.WebApi.Backend
                 return new SkyResult<Visa>().Fail("No passport found", "1f7504d7-0005", correlationId);
 
             return new SkyResult<Visa>().SucceededWithValue(result);
+        }
+        public SkyResult<List<Visa>> GetVisaByCustomerProfileId(int customerProfileId, string correlationId)
+        {
+            var result = db.Visas
+                .Include(v => v.Country)
+                .Include(v => v.Passport)
+                .ThenInclude(p => p.CustomerProfile)
+                .Where(v => v.Passport.CustomerProfileId == customerProfileId)
+                .OrderByDescending(v => v.IssuedDate)
+                .ToList();
+
+            if (result.Count == 0)
+                return new SkyResult<List<Visa>>().Fail("No VISA found", "1f7504d7-0005", correlationId);
+
+            return new SkyResult<List<Visa>>().SucceededWithValue(result);
+        }
+
+        public SkyResult<bool> DeleteVisa(int deletingVisa, string correlationId)
+        {
+            var result = db.Visas
+                .Where(v => v.Id == deletingVisa)
+                .ExecuteDelete();
+
+            if (result == 0)
+                return new SkyResult<bool>().Fail("Failed to delete visa", "0daa030e-0006", correlationId);
+
+            return new SkyResult<bool>().SucceededWithValue(true);
         }
     }
 }

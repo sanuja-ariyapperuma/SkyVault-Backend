@@ -6,46 +6,82 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-const VISAList = () => {
-  const createData = (
-    visaNumber: string,
-    countryName: string,
-    expiryDate: string,
-    assignedPassportNumber: string
-  ) => {
-    return { visaNumber, countryName, expiryDate, assignedPassportNumber };
+import globalStyles from "../CommonComponents/Common.module.css";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { VISAType } from "../../features/Types/CustomerProfile/VISAType";
+
+type VISAListProps = {
+  OnEditClick: (editingVisa: VISAType) => void;
+  OnDeleteClick: (id: string) => void;
+};
+
+const VISAList = (props: VISAListProps) => {
+  const { OnEditClick, OnDeleteClick } = props;
+
+  const { visas } = useSelector((state: RootState) => state.visaListR);
+
+  const handleVisaEditClick = (id: string) => {
+    const editingVisa = visas.find((visa) => visa.id === id);
+    OnEditClick(editingVisa!);
   };
 
-  const rows = [
-    createData("A1234322333223", "Finland", "2023-12-12", "N98767898"),
-    createData("A1234322338888", "Netherlands", "2023-12-12", "N98767898"),
-  ];
+  const handleVisaDeleteClick = (id: string) => {
+    OnDeleteClick(id);
+  };
 
   return (
     <div>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table sx={{ minWidth: 650 }} aria-label="visa list">
           <TableHead>
             <TableRow>
               <TableCell>VISA Number</TableCell>
               <TableCell align="right">Country</TableCell>
+              <TableCell align="right">VISA Issued Date</TableCell>
               <TableCell align="right">VISA Expiry Date</TableCell>
               <TableCell align="right">Assigned Passport Number</TableCell>
+              <TableCell align="right">Edit / Delete</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {visas.map((visa) => (
               <TableRow
-                key={row.visaNumber}
+                key={visa.visaNumber}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.visaNumber}
+                  {visa.visaNumber}
                 </TableCell>
-                <TableCell align="right">{row.countryName}</TableCell>
-                <TableCell align="right">{row.expiryDate}</TableCell>
+                <TableCell align="right">{visa.countryName}</TableCell>
                 <TableCell align="right">
-                  {row.assignedPassportNumber}
+                  {visa.issuedDate?.toString() ?? ""}
+                </TableCell>
+                <TableCell align="right">
+                  {visa.expireDate?.toString() ?? ""}
+                </TableCell>
+                <TableCell align="right">{visa.passportNumber}</TableCell>
+                <TableCell align="right">
+                  {
+                    //visas.expireDate && visas.expireDate > today &&
+                    <>
+                      <button
+                        className={globalStyles.customButtonEdit}
+                        onClick={() => handleVisaEditClick(visa.id)}
+                      >
+                        <ModeEditIcon />
+                      </button>
+                      &nbsp;
+                      <button
+                        className={globalStyles.customButtonDanger}
+                        onClick={() => handleVisaDeleteClick(visa.id)}
+                      >
+                        <DeleteIcon />
+                      </button>
+                    </>
+                  }
                 </TableCell>
               </TableRow>
             ))}

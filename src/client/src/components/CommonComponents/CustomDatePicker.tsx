@@ -12,21 +12,26 @@ type CustomDatePickerProps = {
 const CustomDatePicker = (props: CustomDatePickerProps) => {
   const [val, setVal] = useState<Dayjs | null>(null);
 
+  const { initialValue, onDateChange, label } = props;
+
   useEffect(() => {
-    if (props.initialValue) {
-      setVal(dayjs(props.initialValue));
+    dayjs.locale("en-gb");
+    if (initialValue) {
+      setVal(dayjs(initialValue));
+    } else {
+      setVal(null);
     }
-  });
+  }, [initialValue]);
 
   const handleOnDateChange = (newValue: Dayjs | null) => {
     setVal(newValue);
-    props.onDateChange(newValue);
+    onDateChange(newValue);
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
       <DatePicker
-        label={props.label}
+        label={label}
         sx={{
           "& .MuiOutlinedInput-root": {
             "& fieldset": {

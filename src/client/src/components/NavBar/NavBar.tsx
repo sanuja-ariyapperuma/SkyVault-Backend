@@ -7,7 +7,7 @@ import defaultUserImage from "../../assets/default_user.jpg";
 import logoutIcon from "../../assets/icons/logout.webp";
 import NavItem from "./NavItem";
 import { ToastContainer } from "react-toastify";
-import ConfirmBox from "../CommonComponents/ConfirmBox";
+//import ConfirmBox from "../CommonComponents/ConfirmBox";
 
 const NavBar = () => {
   const { instance } = useMsal();

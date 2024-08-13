@@ -2,10 +2,12 @@ export type VISAType = {
   id: string;
   visaNumber: string;
   countryId: string;
+  countryName: string;
   issuedPlace: string;
   issuedDate: Date | null;
-  expiryDate: Date | null;
+  expireDate: Date | null;
   assignedToPrimaryPassport: boolean;
+  passportNumber: string;
 };
 
 export type SaveVISAType = {
@@ -18,4 +20,8 @@ export type SaveVISAType = {
   CustomerProfileId: string | null;
   SystemUserId: string;
   PassportId: string;
+};
+
+export type SaveVISAResponseType = {
+  VisaId: string;
 };
