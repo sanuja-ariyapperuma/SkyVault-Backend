@@ -13,7 +13,6 @@ import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import axios from "axios";
 import {
   SaveVISAResponseType,
-  SaveVISAType,
   VISAType,
 } from "../../features/Types/CustomerProfile/VISAType";
 import { baseURL } from "../../features/services/apiCalls";
@@ -24,7 +23,10 @@ import {
   updateSingle,
 } from "../../features/reducers/VISAListReducer";
 import { useEffect, useState } from "react";
-import { validateVISA } from "../../features/Helpers/helper";
+import {
+  convertVisaTypeToSaveVisaType,
+  validateVISA,
+} from "../../features/Helpers/helper";
 import { useDispatch } from "react-redux";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
 
@@ -38,6 +40,17 @@ type VISAAccordionProps = {
 
 const VISAAccordion = (props: VISAAccordionProps) => {
   const dispatch = useDispatch();
+  const initialVisa: VISAType = {
+    id: "",
+    visaNumber: "",
+    countryId: "",
+    issuedPlace: "",
+    issuedDate: null,
+    expireDate: null,
+    assignedToPrimaryPassport: true,
+    countryName: "",
+    passportNumber: "",
+  };
   useEffect(() => {
     if (customerProfileId) {
       fetchVISAs();
@@ -50,17 +63,7 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     secondaryPassportId,
     openDialog,
   } = props;
-  const [visa, setVisa] = useState<VISAType>({
-    id: "",
-    visaNumber: "",
-    countryId: "",
-    issuedPlace: "",
-    issuedDate: null,
-    expireDate: null,
-    assignedToPrimaryPassport: true,
-    countryName: "",
-    passportNumber: "",
-  });
+  const [visa, setVisa] = useState<VISAType>(initialVisa);
   const handleOnSaveVISA = (): void => {
     if (!customerProfileId) {
       notifyError("Primary passport must be saved first");
@@ -74,27 +77,20 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     }
   };
   const saveVISA = (visa: VISAType): void => {
-    const saveVisa = {
-      VisaNumber: visa.visaNumber,
-      CountryId: visa.countryId,
-      IssuedPlace: visa.issuedPlace,
-      IssuedDate: visa.issuedDate,
-      ExpiryDate: visa.expireDate,
-      CustomerProfileId: customerProfileId,
-      SystemUserId: "9",
-      PassportId: visa.assignedToPrimaryPassport
-        ? primaryPassportId
-        : secondaryPassportId,
-    } as SaveVISAType;
+    const savingVisa = convertVisaTypeToSaveVisaType(visa);
+    savingVisa.CustomerProfileId = customerProfileId;
+    savingVisa.PassportId = visa.assignedToPrimaryPassport
+      ? primaryPassportId
+      : secondaryPassportId;
 
-    const isValid = validateVISA(saveVisa);
+    const isValid = validateVISA(savingVisa);
 
     if (!isValid) {
       return;
     }
 
     axios
-      .post<SaveVISAResponseType>(`${baseURL}/AddVISA`, saveVisa)
+      .post<SaveVISAResponseType>(`${baseURL}/AddVISA`, savingVisa)
       .then((response) => {
         console.log("Response", response);
         notifySuccess("VISA added successfully");
@@ -109,45 +105,32 @@ const VISAAccordion = (props: VISAAccordionProps) => {
 
         dispatch(addSingleVISA(visa));
 
-        setVisa({
-          id: "",
-          visaNumber: "",
-          countryId: "",
-          issuedPlace: "",
-          issuedDate: null,
-          expireDate: null,
-          assignedToPrimaryPassport: true,
-          countryName: "",
-          passportNumber: "",
-        });
+        setVisa(initialVisa);
       })
       .catch((error) => {
         notifyError(`Sorry! ${error.message}`);
         console.log("Error", error.response);
       });
   };
-  const updateVISA = (visa: VISAType): void => {
-    const saveVisa = {
-      VisaNumber: visa.visaNumber,
-      CountryId: visa.countryId,
-      IssuedPlace: visa.issuedPlace,
-      IssuedDate: visa.issuedDate,
-      ExpiryDate: visa.expireDate,
-      CustomerProfileId: customerProfileId,
-      SystemUserId: "9",
-      PassportId: visa.assignedToPrimaryPassport
-        ? primaryPassportId
-        : secondaryPassportId,
-    } as SaveVISAType;
 
-    const isValid = validateVISA(saveVisa);
+  const updateVISA = (visa: VISAType): void => {
+    const updatingVisa = convertVisaTypeToSaveVisaType(visa);
+    updatingVisa.CustomerProfileId = customerProfileId;
+    updatingVisa.PassportId = visa.assignedToPrimaryPassport
+      ? primaryPassportId
+      : secondaryPassportId;
+
+    const isValid = validateVISA(updatingVisa);
 
     if (!isValid) {
       return;
     }
 
     axios
-      .put<SaveVISAResponseType>(`${baseURL}/updatevisa/${visa.id}`, saveVisa)
+      .put<SaveVISAResponseType>(
+        `${baseURL}/updatevisa/${visa.id}`,
+        updatingVisa
+      )
       .then((response) => {
         if (response.status == 200) {
           visa.countryName =
@@ -159,17 +142,7 @@ const VISAAccordion = (props: VISAAccordionProps) => {
 
           dispatch(updateSingle(visa));
 
-          setVisa({
-            id: "",
-            visaNumber: "",
-            countryId: "",
-            issuedPlace: "",
-            issuedDate: null,
-            expireDate: null,
-            assignedToPrimaryPassport: true,
-            countryName: "",
-            passportNumber: "",
-          });
+          setVisa(initialVisa);
 
           notifySuccess("VISA updated successfully");
         } else {

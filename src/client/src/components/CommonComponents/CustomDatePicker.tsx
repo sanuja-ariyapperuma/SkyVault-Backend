@@ -2,7 +2,6 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useEffect, useState } from "react";
-import engb from "dayjs/locale/en-gb";
 
 type CustomDatePickerProps = {
   label: string;

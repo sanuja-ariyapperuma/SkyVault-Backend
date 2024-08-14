@@ -1,6 +1,6 @@
 import { notifyError } from "../../components/CommonComponents/Toasters";
 import { SavePassportRequestType } from "../Types/CustomerProfile/CustomerProfileType";
-import { SaveVISAType } from "../Types/CustomerProfile/VISAType";
+import { SaveVISAType, VISAType } from "../Types/CustomerProfile/VISAType";
 
 export const validatePassport = (
   passport: SavePassportRequestType
@@ -125,4 +125,18 @@ export const validateVISA = (visa: SaveVISAType): boolean => {
   }
 
   return valid;
+};
+
+export const convertVisaTypeToSaveVisaType = (visa: VISAType): SaveVISAType => {
+  return {
+    Id: visa.id,
+    VisaNumber: visa.visaNumber,
+    CountryId: visa.countryId,
+    IssuedPlace: visa.issuedPlace,
+    IssuedDate: visa.issuedDate,
+    ExpiryDate: visa.expireDate,
+    CustomerProfileId: "",
+    SystemUserId: "9",
+    PassportId: "",
+  };
 };
