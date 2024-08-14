@@ -8,7 +8,6 @@ import Typography from "@mui/material/Typography";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import axios from "axios";
-import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
 
 import localStyles from "../components/CreateProfile/CustomerProfile.module.css";
 import { baseURL } from "../features/services/apiCalls";
@@ -32,7 +31,7 @@ import {
   SaveVISAType,
   VISAType,
 } from "../features/Types/CustomerProfile/VISAType";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   replaceVISAList,
   addSingleVISA,
@@ -42,6 +41,7 @@ import {
 import { useConfirmDialog } from "../hooks/useConfirmDialog";
 import ConfirmBox from "../components/CommonComponents/ConfirmBox";
 import FrequentFlyNumberAccordion from "../components/CreateProfile/FrequentFlyNumberAccordion";
+import ComMethodAccordion from "../components/CreateProfile/ComMethodAccordion";
 
 const CustomerProfile = () => {
   const { profileId } = useParams();
@@ -678,38 +678,10 @@ const CustomerProfile = () => {
         CustomerProfileId={customerProfileId ?? ""}
         SystemUser={"9"}
       />
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
-          aria-controls="panel2-content"
-          id="panel2-header"
-        >
-          <Typography className={localStyles.accordionHeader}>
-            Preferred Communication Method
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <div className={localStyles.accordionContent}>
-            <RadioGroup
-              defaultValue="None"
-              name="radio-buttons-group"
-              sx={{ display: "flex", flexDirection: "row" }}
-            >
-              <FormControlLabel value="None" control={<Radio />} label="None" />
-              <FormControlLabel
-                value="WhatsApp"
-                control={<Radio />}
-                label="WhatsApp"
-              />
-              <FormControlLabel
-                value="Email"
-                control={<Radio />}
-                label="Email"
-              />
-            </RadioGroup>
-          </div>
-        </AccordionDetails>
-      </Accordion>
+      <ComMethodAccordion
+        CustomerProfileId={customerProfileId ?? ""}
+        SystemUser="9"
+      />
       {/* <div className={localStyles.footerButtonArea}>
         <ButtonPanel OnSave={handleOnSavePrimaryPassport} />
       </div> */}

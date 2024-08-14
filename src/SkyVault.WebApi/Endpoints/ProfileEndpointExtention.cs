@@ -41,10 +41,6 @@
                .Produces(StatusCodes.Status200OK)
                .Produces(StatusCodes.Status401Unauthorized);
 
-            app.MapPut("/updateCommMethod", Workloads.ProfileWorkload.UpdateComMethod)
-                .Produces(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status401Unauthorized);
-
             //app.MapPost("/checkpPassportNumber", Workloads.ProfileWorkload.CheckPassportExist)
             //    .Produces(StatusCodes.Status200OK)
             //    .Produces(StatusCodes.Status401Unauthorized);
@@ -66,6 +62,14 @@
                 .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPost("/getFFNByCustomer", Workloads.ProfileWorkload.GetFFNByCustomerId)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/updateCommMethod", Workloads.ProfileWorkload.UpdateComMethod)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/getCommMethod", Workloads.ProfileWorkload.GetComMethod)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
         }

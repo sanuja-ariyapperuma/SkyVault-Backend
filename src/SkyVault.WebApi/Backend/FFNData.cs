@@ -7,7 +7,7 @@ namespace SkyVault.WebApi.Backend
 {
     public class FFNData(SkyvaultContext db)
     {
-        public SkyResult<String> AddFFN(int customerId, string ffn,  string correlationId)
+        public SkyResult<string> AddFFN(int customerId, string ffn, string correlationId)
         {
             try
             {
@@ -21,15 +21,15 @@ namespace SkyVault.WebApi.Backend
                 db.FrequentFlyerNumbers.Add(newFFN);
                 db.SaveChanges();
 
-                return new SkyResult<String>().SucceededWithValue(newFFN.Id.ToString());
+                return new SkyResult<string>().SucceededWithValue(newFFN.Id.ToString());
             }
             catch (Exception ex)
             {
-                return new SkyResult<String>().Fail(ex.Message, "0daa030e-0004", correlationId);
+                return new SkyResult<string>().Fail(ex.Message, "0daa030e-0004", correlationId);
             }
         }
 
-        public SkyResult<String> UpdateFFN(int ffnId, string ffn, string correlationId)
+        public SkyResult<string> UpdateFFN(int ffnId, string ffn, string correlationId)
         {
             var results = db.FrequentFlyerNumbers
                .Where(ffn => ffn.Id == ffnId)
@@ -38,24 +38,24 @@ namespace SkyVault.WebApi.Backend
                );
 
             if (results == 0)
-                return new SkyResult<String>().Fail("Failed to update Frequent Flying Number", "0daa030e-0005", correlationId);
+                return new SkyResult<string>().Fail("Failed to update Frequent Flying Number", "0daa030e-0005", correlationId);
 
-            return new SkyResult<String>().SucceededWithValue(ffnId.ToString());
+            return new SkyResult<string>().SucceededWithValue(ffnId.ToString());
         }
 
-        public SkyResult<String> DeleteFFN(int ffnId, string correlationId)
+        public SkyResult<string> DeleteFFN(int ffnId, string correlationId)
         {
             var ffn = db.FrequentFlyerNumbers
                 .Where(ffn => ffn.Id == ffnId)
                 .FirstOrDefault();
 
             if (ffn == null)
-                return new SkyResult<String>().Fail("Frequent Flying Number not found", "0daa030e-0006", correlationId);
+                return new SkyResult<string>().Fail("Frequent Flying Number not found", "0daa030e-0006", correlationId);
 
             db.FrequentFlyerNumbers.Remove(ffn);
             db.SaveChanges();
 
-            return new SkyResult<String>().SucceededWithValue("Frequent Flying Number deleted successfully");
+            return new SkyResult<string>().SucceededWithValue("Frequent Flying Number deleted successfully");
         }
 
         public SkyResult<List<FFNResponse>> GetFFNByCustomerId(int customerId, string correlationId)

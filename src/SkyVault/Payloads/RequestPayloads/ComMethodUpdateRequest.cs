@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SkyVault.Payloads.RequestPayloads;
 
-public record ComMethodRequest(
+public record ComMethodUpdateRequest(
     string? CustomerProfileId,
     string? SystemUserId,
     string? PrefCommId

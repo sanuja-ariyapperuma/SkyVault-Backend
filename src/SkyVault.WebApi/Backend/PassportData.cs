@@ -37,7 +37,7 @@ namespace SkyVault.WebApi.Backend
             }
         }
 
-        public SkyResult<String> UpdatePassport(PassportRequest passportRequest, string correlationId)
+        public SkyResult<string> UpdatePassport(PassportRequest passportRequest, string correlationId)
         {
             try
             {
@@ -64,34 +64,35 @@ namespace SkyVault.WebApi.Backend
                         );
 
                 if (rowsAffected == 0)
-                    return new SkyResult<String>().Fail("Failed to update passport", "1f7504d7-0000", correlationId);
+                    return new SkyResult<string>().Fail("Failed to update passport", "1f7504d7-0000", correlationId);
 
-                return new SkyResult<String>().SucceededWithValue("Successfully Updated");
+                return new SkyResult<string>().SucceededWithValue("Successfully Updated");
             }
             catch (Exception ex)
             {
-                return new SkyResult<String>().Fail(ex.Message, "1f7504d7-0001", correlationId);
+                return new SkyResult<string>().Fail(ex.Message, "1f7504d7-0001", correlationId);
             }
         }
-        public SkyResult<Passport> GetPassportById(int passportId, string correlationId){
+        public SkyResult<Passport> GetPassportById(int passportId, string correlationId)
+        {
 
-            var result = db.Passports.Where(p => 
+            var result = db.Passports.Where(p =>
                 p.Id == passportId).FirstOrDefault();
 
-            if(result == null)
+            if (result == null)
                 return new SkyResult<Passport>().Fail("No passport found", "1f7504d7-0005", correlationId);
 
             return new SkyResult<Passport>().SucceededWithValue(result);
         }
-    
-        public SkyResult<String> CheckPassportExists(string passportNumber, string correlationId)
+
+        public SkyResult<string> CheckPassportExists(string passportNumber, string correlationId)
         {
             var isPassportExists = db.Passports.Any(p => p.PassportNumber == passportNumber);
 
-            if(isPassportExists)
-                return new SkyResult<String>().Fail("Passport Number Already Exists", "1f7504d7-0006", correlationId);
+            if (isPassportExists)
+                return new SkyResult<string>().Fail("Passport Number Already Exists", "1f7504d7-0006", correlationId);
 
-            return new SkyResult<String>().SucceededWithValue("Passport Number can be use");
+            return new SkyResult<string>().SucceededWithValue("Passport Number can be use");
         }
     }
 }

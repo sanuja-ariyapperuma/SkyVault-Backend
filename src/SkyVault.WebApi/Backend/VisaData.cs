@@ -6,7 +6,7 @@ namespace SkyVault.WebApi.Backend
 {
     public sealed class VisaData(SkyvaultContext db)
     {
-        public SkyResult<String> AddVisa(VisaReqeust visaRequest, string correlationId) 
+        public SkyResult<string> AddVisa(VisaReqeust visaRequest, string correlationId)
         {
             try
             {
@@ -23,19 +23,19 @@ namespace SkyVault.WebApi.Backend
                 db.Visas.Add(newvisa);
                 db.SaveChanges();
 
-                return new SkyResult<String>().SucceededWithValue(newvisa.Id.ToString());
+                return new SkyResult<string>().SucceededWithValue(newvisa.Id.ToString());
             }
             catch (Exception ex)
             {
 
-                return new SkyResult<String>().Fail(ex.Message, "0daa030e-0004", correlationId);
+                return new SkyResult<string>().Fail(ex.Message, "0daa030e-0004", correlationId);
             }
         }
 
-        public SkyResult<String> UpdateVisa(string visaId, VisaReqeust visaRequest, string correlationId) 
+        public SkyResult<string> UpdateVisa(string visaId, VisaReqeust visaRequest, string correlationId)
         {
             var results = db.Visas
-               .Where(v => 
+               .Where(v =>
                     v.Id == Convert.ToInt32(visaId) &&
                     v.Passport.CustomerProfile.SystemUserId == Convert.ToInt32(visaRequest.SystemUserId)
                     )
@@ -51,16 +51,17 @@ namespace SkyVault.WebApi.Backend
                         );
 
             if (results == 0)
-                return new SkyResult<String>().Fail("Failed to update visa", "0daa030e-0005", correlationId);
+                return new SkyResult<string>().Fail("Failed to update visa", "0daa030e-0005", correlationId);
 
-            return new SkyResult<String>().SucceededWithValue("Visa Updated Successfully");
+            return new SkyResult<string>().SucceededWithValue("Visa Updated Successfully");
         }
 
-        public SkyResult<Visa> GetVisaById(int visaId, string correlationId){
+        public SkyResult<Visa> GetVisaById(int visaId, string correlationId)
+        {
 
             var result = db.Visas.Where(p => p.Id == visaId).FirstOrDefault();
 
-            if(result == null)
+            if (result == null)
                 return new SkyResult<Visa>().Fail("No passport found", "1f7504d7-0005", correlationId);
 
             return new SkyResult<Visa>().SucceededWithValue(result);

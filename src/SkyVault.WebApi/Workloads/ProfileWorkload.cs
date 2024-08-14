@@ -525,7 +525,8 @@ namespace SkyVault.WebApi.Workloads
             
         }
 
-        public static IResult UpdateComMethod([FromBody] ComMethodRequest comMethodRequest,
+        public static IResult UpdateComMethod(
+            [FromBody] ComMethodUpdateRequest comMethodRequest,
                        SkyvaultContext dbContext,
                                   HttpContext context)
         {
@@ -570,6 +571,47 @@ namespace SkyVault.WebApi.Workloads
                                             new ProblemDetails().ToProblemDetails(
                                             "Something went wrong", "30550615-0024", _correlationId));
             }
+            
+        }
+
+        public static IResult GetComMethod([FromBody] GetComMethodRequest comMethodRequest,
+                       SkyvaultContext dbContext,
+                                  HttpContext context) 
+        {
+            try
+            {
+                _correlationId = CorrelationHandler.Get(context);
+
+                var customerProfileData = new CustomerProfileData(dbContext);
+
+                var authorized = customerProfileData.CheckAccessToTheProfile(
+                    Convert.ToInt32(comMethodRequest.CustomerProfileId),
+                    Convert.ToInt32(comMethodRequest.SystemUserId),
+                    _correlationId
+                );
+
+                if (!authorized.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                            authorized.Message, authorized.ErrorCode, _correlationId));
+
+                var result = customerProfileData.GetComMethod(Convert.ToInt32(comMethodRequest.CustomerProfileId), _correlationId);
+
+                if (!result.Succeeded)
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                            result.Message, result.ErrorCode, _correlationId));
+
+                return Results.Ok(result.Value);
+            }
+            catch (Exception e) 
+            {
+                e.LogException(_correlationId);
+                return Results.Problem(
+                                            new ProblemDetails().ToProblemDetails(
+                                            "Something went wrong", "30550615-0024", _correlationId));
+            }
+
             
         }
 
