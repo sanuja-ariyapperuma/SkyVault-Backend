@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0" version="24.7.7">
+  <diagram name="Page-1" id="xp_xXrWwUaIhguSqALmB">
+    <mxGraphModel dx="1434" dy="947" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="nysItMvCREgRZ4TnlXNh-1" value="Root State&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;System User&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="210" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-2" value="&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Create Profile State&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;CustomerProfileId&lt;/li&gt;&lt;li&gt;ParentProfileId&lt;/li&gt;&lt;ul&gt;&lt;li&gt;ParentName&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;PrimaryPassportId&lt;/li&gt;&lt;li&gt;SecondaryPassportId&lt;/li&gt;&lt;li style=&quot;&quot;&gt;Countries&lt;/li&gt;&lt;li style=&quot;&quot;&gt;Salutations&lt;/li&gt;&lt;li style=&quot;&quot;&gt;Gender&lt;/li&gt;&lt;li style=&quot;&quot;&gt;Nationalities&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="280" y="170" width="170" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-3" value="" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="nysItMvCREgRZ4TnlXNh-2" target="nysItMvCREgRZ4TnlXNh-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="40" y="370" as="sourcePoint" />
+            <mxPoint x="90" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-4" value="Passport State&lt;div&gt;&lt;ul&gt;&lt;li style=&quot;text-align: left;&quot;&gt;Primary Passport&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;Secondary Passport&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="450" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-5" value="" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="nysItMvCREgRZ4TnlXNh-4" target="nysItMvCREgRZ4TnlXNh-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="450" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-6" value="VISA State&lt;div&gt;&lt;ul&gt;&lt;li style=&quot;text-align: left;&quot;&gt;VISA Information&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;VISA List&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="570" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-7" value="" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="nysItMvCREgRZ4TnlXNh-6" target="nysItMvCREgRZ4TnlXNh-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="320" y="580" as="sourcePoint" />
+            <mxPoint x="370" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-8" value="FFN State&lt;div&gt;&lt;ul&gt;&lt;li style=&quot;text-align: left;&quot;&gt;FFN Information&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;FFN List&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="700" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-9" value="" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="nysItMvCREgRZ4TnlXNh-8" target="nysItMvCREgRZ4TnlXNh-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="530" as="sourcePoint" />
+            <mxPoint x="440" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-10" value="ComMethod State&lt;div&gt;&lt;ul&gt;&lt;li style=&quot;text-align: left;&quot;&gt;FFN Information&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;FFN List&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="830" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-11" value="" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="nysItMvCREgRZ4TnlXNh-10" target="nysItMvCREgRZ4TnlXNh-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="230" y="520" as="sourcePoint" />
+            <mxPoint x="280" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-12" value="&lt;ul&gt;&lt;li&gt;CustomerProfileId&lt;/li&gt;&lt;li&gt;PrimaryPassportId&lt;/li&gt;&lt;li&gt;SecondaryPassportId&lt;/li&gt;&lt;li&gt;Countries&lt;/li&gt;&lt;li&gt;Salutations&#39;Gender&lt;/li&gt;&lt;li&gt;Nationalities&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="390" y="380" width="186" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-13" value="&lt;ul&gt;&lt;li&gt;CustomerProfileId&lt;/li&gt;&lt;li&gt;PrimaryPassportId&lt;/li&gt;&lt;li&gt;SecondaryPassportID&lt;/li&gt;&lt;li&gt;Countries&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="390" y="540" width="176" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-14" value="&lt;ul&gt;&lt;li&gt;CustomerProfileId&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="690" width="156" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="nysItMvCREgRZ4TnlXNh-15" value="&lt;ul&gt;&lt;li&gt;CustomerProfileId&lt;/li&gt;&lt;/ul&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="405" y="820" width="156" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

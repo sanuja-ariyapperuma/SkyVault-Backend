@@ -154,6 +154,8 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
   };
 
   const getAllFFN = (CustomerProfileId: string) => {
+    if (!CustomerProfileId) return;
+
     axios
       .post(`${baseURL}/getFFNByCustomer`, {
         SystemUser: SystemUser,

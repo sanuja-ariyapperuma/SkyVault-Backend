@@ -69,6 +69,8 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
   };
 
   const getComMethodOnCustomerProfile = () => {
+    if (!CustomerProfileId) return;
+
     axios
       .post(`${baseURL}/getCommMethod`, {
         SystemUserId: SystemUser,
