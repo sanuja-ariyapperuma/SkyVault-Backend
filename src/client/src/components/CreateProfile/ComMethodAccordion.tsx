@@ -58,7 +58,6 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
         PrefCommId: comMethod.toString(),
       })
       .then((response) => {
-        console.log(response);
         notifySuccess("Communication method updated successfully");
         setComMethod(comMethod);
       })
@@ -77,7 +76,6 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
         CustomerProfileId: CustomerProfileId,
       })
       .then((response) => {
-        console.log(response);
         setComMethod(parseInt(response.data));
       })
       .catch((error) => {

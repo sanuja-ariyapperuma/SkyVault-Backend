@@ -71,8 +71,6 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
         SystemUser: SystemUser,
       })
       .then((response) => {
-        console.log("FFN Id : ", response.data);
-
         let updatingItem = fFNList.find(
           (ffn) => ffn.FFNId === frequentFlyerNumber?.FFNId
         );
@@ -101,8 +99,6 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
         SystemUser: SystemUser,
       })
       .then((response) => {
-        console.log("FFN Id : ", response.data);
-
         const newFFNList = [...fFNList];
         newFFNList.push({
           FFN: frequentFlyerNumber?.FFN,
@@ -128,8 +124,6 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
         },
       })
       .then((response) => {
-        console.log("FFN Id : ", response.data);
-
         const newFFNList = fFNList.filter((ffn) => ffn.FFNId !== id);
         setFFNList(newFFNList);
 

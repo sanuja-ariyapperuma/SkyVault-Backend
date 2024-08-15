@@ -128,7 +128,6 @@ const PassportAccordion = (props: PassportAccordionProps) => {
         }
 
         notifySuccess("Passport added successfully");
-        console.log("Response", response);
       })
       .catch((error) => {
         notifyError(`Sorry! ${error.message}`);

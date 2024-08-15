@@ -92,7 +92,6 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     axios
       .post<SaveVISAResponseType>(`${baseURL}/AddVISA`, savingVisa)
       .then((response) => {
-        console.log("Response", response);
         notifySuccess("VISA added successfully");
 
         visa.id = response.data.VisaId;
@@ -192,13 +191,9 @@ const VISAAccordion = (props: VISAAccordionProps) => {
       });
   };
   const fetchVISAs = async () => {
-    console.log(customerProfileId);
-
     if (!customerProfileId) {
       return;
     }
-
-    console.log("fetchVISAs 2");
 
     try {
       const visaData = await axios.post<VISAType[]>(

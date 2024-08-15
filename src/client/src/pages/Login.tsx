@@ -63,8 +63,6 @@ const Login = () => {
         account: accounts[0],
       })
       .then((response) => {
-        console.log("Access token acquired: ", response.accessToken);
-
         handleAPIAuthentication(
           response.account.username,
           response.accessToken

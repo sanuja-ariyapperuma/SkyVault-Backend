@@ -20,7 +20,6 @@ export const visaSlice = createSlice({
       state.visas.unshift(action.payload);
     },
     removeSingleVISA: (state, action: PayloadAction<string>) => {
-      console.log("Removing VISA with id: ", action.payload);
       state.visas = state.visas.filter((visa) => visa.id !== action.payload);
     },
     updateSingle: (state, action: PayloadAction<VISAType>) => {
