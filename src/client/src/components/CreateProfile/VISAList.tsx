@@ -42,7 +42,7 @@ const VISAList = (props: VISAListProps) => {
               <TableCell align="right">Country</TableCell>
               <TableCell align="right">VISA Issued Date</TableCell>
               <TableCell align="right">VISA Expiry Date</TableCell>
-              <TableCell align="right">Assigned Passport Number</TableCell>
+              <TableCell align="right">Assigned Passport</TableCell>
               <TableCell align="right">Edit / Delete</TableCell>
             </TableRow>
           </TableHead>
@@ -62,7 +62,11 @@ const VISAList = (props: VISAListProps) => {
                 <TableCell align="right">
                   {visa.expireDate?.toString() ?? ""}
                 </TableCell>
-                <TableCell align="right">{visa.passportNumber}</TableCell>
+                <TableCell align="right">
+                  {visa.assignedToPrimaryPassport
+                    ? "Primary Passport"
+                    : "Secondary Passport"}
+                </TableCell>
                 <TableCell align="right">
                   {
                     //visas.expireDate && visas.expireDate > today &&

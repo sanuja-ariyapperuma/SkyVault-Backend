@@ -1,5 +1,8 @@
 import { notifyError } from "../../components/CommonComponents/Toasters";
-import { SavePassportRequestType } from "../Types/CustomerProfile/CustomerProfileType";
+import {
+  PassportType,
+  SavePassportRequestType,
+} from "../Types/CustomerProfile/PassportType";
 import { SaveVISAType, VISAType } from "../Types/CustomerProfile/VISAType";
 
 export const validatePassport = (
@@ -138,5 +141,27 @@ export const convertVisaTypeToSaveVisaType = (visa: VISAType): SaveVISAType => {
     CustomerProfileId: "",
     SystemUserId: "9",
     PassportId: "",
+  };
+};
+
+export const convertPassportTypeToSavePassportRequestType = (
+  passport: PassportType
+): SavePassportRequestType => {
+  return {
+    Id: passport.id,
+    CustomerProfileId: "",
+    SystemUserId: "9",
+    ParentId: "",
+    LastName: passport.lastName,
+    OtherNames: passport.otherNames,
+    PassportNumber: passport.passportNumber,
+    Gender: passport.genderId,
+    DateOfBirth: passport.dateOfBirth?.toString() ?? "",
+    PlaceOfBirth: passport.placeOfBirth,
+    ExpiryDate: passport.passportExpiryDate?.toString() ?? "",
+    NationalityId: passport.nationalityId,
+    CountryId: passport.countryId,
+    IsPrimary: passport.IsPrimary,
+    SalutationId: passport.salutationId,
   };
 };

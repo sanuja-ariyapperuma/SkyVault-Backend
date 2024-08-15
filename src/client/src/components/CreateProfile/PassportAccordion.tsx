@@ -12,12 +12,14 @@ import PassportInfo from "./PassportInfo";
 import customerProfileStyles from "./CustomerProfile.module.css";
 import globalStyles from "./../CommonComponents/Common.module.css";
 
-import { PassportType } from "../../features/Types/CustomerProfile/PassportType";
 import {
+  PassportType,
   SavePassportRequestType,
   SavePassportResponseType,
-} from "../../features/Types/CustomerProfile/CustomerProfileType";
+} from "../../features/Types/CustomerProfile/PassportType";
+
 import {
+  convertPassportTypeToSavePassportRequestType,
   validatePassport,
   validatePassportFields,
 } from "../../features/Helpers/helper";
@@ -32,17 +34,25 @@ type PassportAccordionProps = {
   customerProfileId: string;
   setCountry: (country: OptionsType[]) => void;
   country: OptionsType[];
+  setPrimaryPassportSavedId: (id: string) => void;
+  setSecondaryPassportSavedId: (id: string) => void;
 };
 
 const PassportAccordion = (props: PassportAccordionProps) => {
-  const { setCustomerProfileId, customerProfileId, country, setCountry } =
-    props;
+  const {
+    setCustomerProfileId,
+    customerProfileId,
+    country,
+    setCountry,
+    setPrimaryPassportSavedId,
+    setSecondaryPassportSavedId,
+  } = props;
   const [salutations, setSalutations] = useState<OptionsType[]>([]);
   const [gender, setGender] = useState<OptionsType[]>([]);
   const [nationality, setNationality] = useState<OptionsType[]>([]);
   //const [country, setCountry] = useState<OptionsType[]>([]);
 
-  const [primaryPassport, setPrimaryPassport] = useState<PassportType>({
+  const initialPassportData = {
     id: "",
     salutationId: "",
     lastName: "",
@@ -54,38 +64,16 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     dateOfBirth: null,
     passportExpiryDate: null,
     countryId: "",
-  });
-
-  const initialPassportDate = {
-    Id: null,
-    CustomerProfileId: null,
-    SystemUserId: "9",
-    ParentId: "",
-    LastName: primaryPassport.lastName,
-    OtherNames: primaryPassport.otherNames,
-    PassportNumber: primaryPassport.passportNumber,
-    Gender: primaryPassport.genderId,
-    DateOfBirth: primaryPassport.dateOfBirth?.toString() ?? "",
-    PlaceOfBirth: primaryPassport.placeOfBirth,
-    ExpiryDate: primaryPassport.passportExpiryDate?.toString() ?? "",
-    NationalityId: primaryPassport.nationalityId,
-    CountryId: primaryPassport.countryId,
-    IsPrimary: "1",
-    SalutationId: primaryPassport.salutationId,
   };
 
+  const [primaryPassport, setPrimaryPassport] = useState<PassportType>({
+    ...initialPassportData,
+    IsPrimary: "1",
+  });
+
   const [secondaryPassport, setSecondaryPassport] = useState<PassportType>({
-    id: "",
-    salutationId: "",
-    lastName: "",
-    otherNames: "",
-    nationalityId: "",
-    genderId: "",
-    placeOfBirth: "",
-    passportNumber: "",
-    dateOfBirth: null,
-    passportExpiryDate: null,
-    countryId: "",
+    ...initialPassportData,
+    IsPrimary: "0",
   });
 
   const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
@@ -95,6 +83,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     if (secondaryPassportEnabled) {
       setSecondaryPassport({
         ...primaryPassport,
+        IsPrimary: "0",
         id: "",
         passportNumber: "",
         passportExpiryDate: null,
@@ -104,7 +93,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   };
 
   const handleOnSavePrimaryPassport = (): void => {
-    const passport: SavePassportRequestType = initialPassportDate;
+    const passport: SavePassportRequestType =
+      convertPassportTypeToSavePassportRequestType(primaryPassport);
     savePassport(passport);
   };
 
@@ -126,6 +116,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
             ...prevState,
             id: responseData.passportId,
           }));
+          setPrimaryPassportSavedId(responseData.passportId);
         }
 
         if (passport.IsPrimary === "0") {
@@ -133,6 +124,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
             ...prevState,
             id: responseData.passportId,
           }));
+          setSecondaryPassportSavedId(responseData.passportId);
         }
 
         notifySuccess("Passport added successfully");
@@ -166,7 +158,9 @@ const PassportAccordion = (props: PassportAccordionProps) => {
       return;
     }
 
-    const passport: SavePassportRequestType = initialPassportDate;
+    const passport: SavePassportRequestType =
+      convertPassportTypeToSavePassportRequestType(secondaryPassport);
+    passport.CustomerProfileId = customerProfileId;
     savePassport(passport);
   };
 

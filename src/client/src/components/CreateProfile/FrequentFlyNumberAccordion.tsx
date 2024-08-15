@@ -47,12 +47,7 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
     getAllFFN(CustomerProfileId);
   }, []);
 
-  const [fFNList, setFFNList] = useState<FFNListType[]>([
-    {
-      FFN: "",
-      FFNId: 0,
-    },
-  ]);
+  const [fFNList, setFFNList] = useState<FFNListType[]>([]);
 
   const [frequentFlyerNumber, setFrequentFlyerNumber] = useState<FFNListType>({
     FFN: "",
@@ -83,8 +78,10 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
         );
 
         if (updatingItem) {
-          updatingItem.FFN = frequentFlyerNumber?.FFN as string;
+          updatingItem.FFN = frequentFlyerNumber?.FFN;
         }
+
+        setFrequentFlyerNumber({ FFN: "", FFNId: undefined });
 
         notifySuccess("Frequent Flyer Number updated successfully");
       })

@@ -100,7 +100,7 @@ const VISAInfo = (props: VISAInfoProps) => {
           <FormControl>
             <Checkbox
               label="Assign with primary passport"
-              checked={!initialVisa.assignedToPrimaryPassport}
+              checked={initialVisa.assignedToPrimaryPassport}
               onChange={handleOnAssignChange}
             />
             <FormHelperText>

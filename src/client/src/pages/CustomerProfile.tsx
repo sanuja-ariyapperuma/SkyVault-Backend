@@ -14,15 +14,18 @@ const CustomerProfile = () => {
 
   const [country, setCountry] = useState<OptionsType[]>([]);
   const { dialogProps, openDialog } = useConfirmDialog();
-  const [customerProfileId, setCustomerProfileId] = useState<string | null>(
-    "1"
-  );
-  const [primaryPassportId, setPrimaryPassportId] = useState<string | null>(
-    "1"
-  );
+  const [customerProfileId, setCustomerProfileId] = useState<string | null>("");
+  const [primaryPassportId, setPrimaryPassportId] = useState<string | null>("");
   const [secondaryPassportId, setSecondaryPassportId] = useState<string | null>(
     ""
   );
+
+  const setPrimaryPassportSavedId = (id: string) => {
+    setPrimaryPassportId(id);
+  };
+  const setSecondaryPassportSavedId = (id: string) => {
+    setSecondaryPassportId(id);
+  };
 
   return (
     <div className={localStyles.profileManagementContainer}>
@@ -37,6 +40,8 @@ const CustomerProfile = () => {
         customerProfileId={customerProfileId ?? ""}
         setCountry={setCountry}
         country={country}
+        setPrimaryPassportSavedId={setPrimaryPassportSavedId}
+        setSecondaryPassportSavedId={setSecondaryPassportSavedId}
       />
       <VISAAccordion
         customerProfileId={customerProfileId ?? ""}

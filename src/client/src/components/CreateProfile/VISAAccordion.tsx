@@ -192,7 +192,14 @@ const VISAAccordion = (props: VISAAccordionProps) => {
       });
   };
   const fetchVISAs = async () => {
-    console.log("Profile ID", customerProfileId);
+    console.log(customerProfileId);
+
+    if (!customerProfileId) {
+      return;
+    }
+
+    console.log("fetchVISAs 2");
+
     try {
       const visaData = await axios.post<VISAType[]>(
         `${baseURL}/getVISAByCustomer`,
