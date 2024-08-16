@@ -156,12 +156,12 @@ export const convertPassportTypeToSavePassportRequestType = (
     OtherNames: passport.otherNames,
     PassportNumber: passport.passportNumber,
     Gender: passport.genderId,
-    DateOfBirth: passport.dateOfBirth?.toString() ?? "",
+    DateOfBirth: passport.dateOfBirth?.toLocaleDateString("en-gb") ?? "",
     PlaceOfBirth: passport.placeOfBirth,
-    ExpiryDate: passport.passportExpiryDate?.toString() ?? "",
+    ExpiryDate: passport.passportExpiryDate?.toLocaleDateString("en-gb") ?? "",
     NationalityId: passport.nationalityId,
     CountryId: passport.countryId,
-    IsPrimary: passport.IsPrimary,
+    IsPrimary: passport.isPrimary,
     SalutationId: passport.salutationId,
   };
 };

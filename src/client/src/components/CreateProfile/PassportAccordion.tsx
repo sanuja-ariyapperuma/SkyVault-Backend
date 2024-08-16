@@ -50,7 +50,12 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   const [salutations, setSalutations] = useState<OptionsType[]>([]);
   const [gender, setGender] = useState<OptionsType[]>([]);
   const [nationality, setNationality] = useState<OptionsType[]>([]);
-  //const [country, setCountry] = useState<OptionsType[]>([]);
+
+  useEffect(() => {
+    if (customerProfileId) {
+      getPassportData();
+    }
+  }, [customerProfileId]);
 
   const initialPassportData = {
     id: "",
@@ -68,22 +73,62 @@ const PassportAccordion = (props: PassportAccordionProps) => {
 
   const [primaryPassport, setPrimaryPassport] = useState<PassportType>({
     ...initialPassportData,
-    IsPrimary: "1",
+    isPrimary: "1",
   });
 
   const [secondaryPassport, setSecondaryPassport] = useState<PassportType>({
     ...initialPassportData,
-    IsPrimary: "0",
+    isPrimary: "0",
   });
 
   const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
     useState<boolean>(true);
 
+  const getPassportData = () => {
+    axios
+      .post<PassportType[] | null>(`${baseURL}/getPassportsByCustomerId`, {
+        CustomerProfileId: customerProfileId,
+        SystemUserId: "9",
+      })
+      .then((response) => {
+        response.data?.map((passport) => {
+          if (passport.isPrimary === "1") {
+            setPrimaryPassport({
+              ...passport,
+              passportExpiryDate: passport.passportExpiryDate
+                ? new Date(passport.passportExpiryDate)
+                : null,
+              dateOfBirth: passport.dateOfBirth
+                ? new Date(passport.dateOfBirth)
+                : null,
+            });
+            setPrimaryPassportSavedId(passport.id);
+          }
+
+          if (passport.isPrimary === "0") {
+            setSecondaryPassport({
+              ...passport,
+              passportExpiryDate: passport.passportExpiryDate
+                ? new Date(passport.passportExpiryDate)
+                : null,
+              dateOfBirth: passport.dateOfBirth
+                ? new Date(passport.dateOfBirth)
+                : null,
+            });
+            setSecondaryPassportSavedId(passport.id);
+          }
+        });
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
+  };
+
   const handleOnSecondaryPassportAddRemove = () => {
     if (secondaryPassportEnabled) {
       setSecondaryPassport({
         ...primaryPassport,
-        IsPrimary: "0",
+        isPrimary: "0",
         id: "",
         passportNumber: "",
         passportExpiryDate: null,
@@ -95,19 +140,27 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   const handleOnSavePrimaryPassport = (): void => {
     const passport: SavePassportRequestType =
       convertPassportTypeToSavePassportRequestType(primaryPassport);
+    passport.CustomerProfileId = customerProfileId;
     savePassport(passport);
   };
 
   const savePassport = (passport: SavePassportRequestType): void => {
     const isValid = validatePassport(passport);
 
-    if (!isValid) {
-      return;
-    }
+    if (!isValid) return;
+
+    const url = passport.Id
+      ? `${baseURL}/UpdatePassport`
+      : `${baseURL}/AddPassport`;
 
     axios
-      .post<SavePassportResponseType>(`${baseURL}/AddPassport`, passport)
+      .post<SavePassportResponseType>(url, passport)
       .then((response) => {
+        if (passport.Id) {
+          notifySuccess("Passport updated successfully");
+          return;
+        }
+
         const responseData = response.data;
 
         if (passport.IsPrimary === "1") {
@@ -254,7 +307,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
           handleFieldChange={handleFieldChange}
         />
         <div>
-          {!secondaryPassportEnabled && (
+          {(!secondaryPassportEnabled || secondaryPassport.id) && (
             <div className={customerProfileStyles.secondaryPassportArea}>
               <b>Secondary Passport Information</b>
               <div className={customerProfileStyles.buttonContainer}>

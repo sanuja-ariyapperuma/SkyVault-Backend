@@ -18,45 +18,6 @@ namespace SkyVault.WebApi.Workloads
 
         #region Workloads
 
-        //public static IResult GetProfile(
-        //    [FromBody] GetProfileRequest getProfile,
-        //    SkyvaultContext dbContext,
-        //    HttpContext context
-        //)
-        //{
-        //    try
-        //    {
-        //        _correlationId = CorrelationHandler.Get(context);
-
-        //        var customerProfileData = new CustomerProfileData(dbContext);
-
-        //        var customerProfile = customerProfileData.Get(
-        //            Convert.ToInt32(getProfile?.id), Convert.ToInt32(getProfile?.sysUserId));
-
-        //        if (customerProfile == null)
-        //            return Results.Problem(
-        //                new ValidationProblemDetails().ToValidationProblemDetails(
-        //                    "No profile found", "30550615-0001", _correlationId));
-
-        //        return Results.Ok(ToProfilePayload(customerProfile));
-        //    }
-        //    catch (FormatException e)
-        //    {
-        //        e.LogException(_correlationId);
-
-        //        return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-        //            "Incorrect format of data found", "30550615-0002", _correlationId
-        //        ));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        e.LogException(_correlationId);
-
-        //        return Results.Problem(new ProblemDetails().ToProblemDetails(
-        //            "An unexpected error occurred. Please try again later.", "30550615-0003", _correlationId));
-        //    }
-        //}
-
         public static IResult SearchProfiles(
             [FromBody] SearchProfileRequest searchProfileRequest,
             SkyvaultContext dbContext,
@@ -93,25 +54,7 @@ namespace SkyVault.WebApi.Workloads
             }
         }
 
-        private static bool IsPassportDataValid(PassportRequest passportRequest) 
-        {
-            if(
-                passportRequest.CountryId.IsNullOrEmpty() &&
-                passportRequest.DateOfBirth.IsNullOrEmpty() &&
-                passportRequest.ExpiryDate.IsNullOrEmpty() &&
-                passportRequest.PassportNumber.IsNullOrEmpty() &&
-                passportRequest.PassportNumber?.Length < 6 &&
-                passportRequest.OtherNames.IsNullOrEmpty() &&
-                passportRequest.OtherNames?.Length < 3 &&
-                passportRequest.LastName.IsNullOrEmpty() &&
-                passportRequest.LastName?.Length < 3 &&
-                passportRequest.Gender.IsNullOrEmpty() &&
-                passportRequest.SalutationId.IsNullOrEmpty() &&
-                passportRequest.SystemUserId.IsNullOrEmpty()
-                ) return false;
-
-            return true;
-        }
+       
 
         public static IResult AddPassport([FromBody] PassportRequest passportRequest,
             SkyvaultContext dbContext,
@@ -196,7 +139,7 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
-        public static IResult GetPassport(
+        public static IResult GetPassports(
             [FromBody] GetPassportRequest passportRequest,
             SkyvaultContext dbContext,
             HttpContext context
@@ -210,9 +153,9 @@ namespace SkyVault.WebApi.Workloads
 
             var customer_profile_data = new CustomerProfileData(dbContext);
 
-            var authorization = customer_profile_data.CheckAccessToTheProfileWithPassportId(
-                Convert.ToInt32(passportRequest.id),
-                Convert.ToInt32(passportRequest.sysUserId),
+            var authorization = customer_profile_data.CheckAccessToTheProfile(
+                Convert.ToInt32(passportRequest.CustomerProfileId),
+                Convert.ToInt32(passportRequest.SystemUserId),
                 _correlationId
                 );
 
@@ -221,28 +164,23 @@ namespace SkyVault.WebApi.Workloads
                                    new ValidationProblemDetails().ToValidationProblemDetails(
                                         "Unauthorized", "30550615-0010", _correlationId));
 
-            var passport = passportData.GetPassportById(Convert.ToInt32(passportRequest.id), _correlationId);
+            var passport = passportData.GetPassportByCustomerProfileId(Convert.ToInt32(passportRequest.CustomerProfileId), _correlationId);
 
-            if (passport == null)
-                return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                        "No passport found", "30550615-0011", _correlationId));
+            return Results.Ok(passport.Value?.Select(p => new PassportResponse(
+                    p.Id.ToString(),
+                    p.LastName,
+                    p.OtherNames,
+                    p.PassportNumber,
+                    p.Gender,
+                    p.DateOfBirth.ToString(),
+                    p.PlaceOfBirth,
+                    p.ExpiryDate.ToString(),
+                    p.NationalityId.ToString(),
+                    p.CountryId.ToString(),
+                    p.IsPrimary.ToString(),
+                    p.CustomerProfile.SalutationId.ToString()
+            )));
 
-
-
-            return Results.Ok(new SkyVault.Payloads.CommonPayloads.PassportModal(
-                passport.Value!.Id.ToString(),
-                passport.Value.LastName,
-                passport.Value.OtherNames,
-                passport.Value.PassportNumber,
-                passport.Value.Gender,
-                passport.Value.DateOfBirth.ToString(),
-                passport.Value.PlaceOfBirth,
-                passport.Value.ExpiryDate.ToString(),
-                passport.Value.NationalityId.ToString(),
-                passport.Value.CountryId.ToString(),
-                passport.Value.IsPrimary
-            ));
             }
             catch (FormatException e)
             {
@@ -262,68 +200,6 @@ namespace SkyVault.WebApi.Workloads
             
 
         }
-
-        //public static IResult GetVisa(
-        //    [FromBody] GetVisaRequest visaReqeust,
-        //    SkyvaultContext dbContext,
-        //    HttpContext context){
-
-        //    try
-        //    {
-        //        _correlationId = CorrelationHandler.Get(context);
-
-        //        var visaData = new VisaData(dbContext);
-        //        var customer_profile_data = new CustomerProfileData(dbContext);
-
-        //        var authorization = customer_profile_data.CheckAccessToTheProfileWithVisaId(
-        //            Convert.ToInt32(visaReqeust.Id),
-        //            Convert.ToInt32(visaReqeust.systemUserId),
-        //            _correlationId
-        //            );
-
-        //        if(!authorization.Succeeded)
-        //            return Results.Problem(
-        //                               new ValidationProblemDetails().ToValidationProblemDetails(
-        //                                    "Unauthorized", "30550615-0014", _correlationId));
-                
-        //        var result = visaData.GetVisaById(
-        //            Convert.ToInt32(visaReqeust.Id),
-        //            _correlationId);
-
-        //        if(!result.Succeeded)
-        //            return Results.Problem(
-        //                                new ValidationProblemDetails().ToValidationProblemDetails(
-        //                                    "No Visa found", "30550615-0015", _correlationId));
-
-        //        return Results.Ok(new SkyVault.Payloads.CommonPayloads.Visa(
-        //            result.Value!.Id.ToString(),
-        //            result.Value.VisaNumber,
-        //            result.Value.CountryId.ToString(),
-        //            result.Value.IssuedPlace,
-        //            result.Value.IssuedDate.ToString(),
-        //            result.Value.ExpireDate.ToString(),
-        //            null,
-        //            null
-        //        ));
-        //    }
-        //    catch (FormatException e)
-        //    {
-        //        e.LogException(_correlationId);
-        //        return Results.Problem(
-        //                            new ValidationProblemDetails().ToValidationProblemDetails(
-        //                                "Invalid type of data found", "30550615-0016", _correlationId));
-        //    }
-        //    catch (System.Exception e)
-        //    {
-        //        e.LogException(_correlationId);
-        //        return Results.Problem(
-        //                                new ProblemDetails().ToProblemDetails(
-        //                                    "Something went wrong", "30550615-0017", _correlationId));
-        //    }
-
-
-
-        //}
 
         public static IResult UpdatePassport(
                 [FromBody] PassportRequest passportRequest,
@@ -403,7 +279,7 @@ namespace SkyVault.WebApi.Workloads
                     Convert.ToInt32(visaRequest.CustomerProfileId),
                     _correlationId);
 
-                return Results.Ok(result.Value.Select(visa => new Payloads.CommonPayloads.Visa(
+                return Results.Ok(result.Value?.Select(visa => new Payloads.CommonPayloads.Visa(
                     visa.Id.ToString(),
                     visa.VisaNumber,
                     visa.CountryId.ToString(),
@@ -614,32 +490,6 @@ namespace SkyVault.WebApi.Workloads
             
         }
 
-        public static IResult CheckPassportExist(
-            [FromBody] GetPassportRequest passportRequest,
-            SkyvaultContext dbContext,
-            HttpContext context)
-        {
-            
-            _correlationId = CorrelationHandler.Get(context);
-
-            if(passportRequest.passportNumber == null || String.IsNullOrWhiteSpace(passportRequest.passportNumber))
-                return Results.Problem(
-                                            new ValidationProblemDetails().ToValidationProblemDetails(
-                                                "Passport Number cannot be empty", "30550615-0026", _correlationId));
-
-            var passportData = new PassportData(dbContext);
-
-            var isPassportExists = passportData.CheckPassportExists(passportRequest.passportNumber,_correlationId);
-
-            if(!isPassportExists.Succeeded)
-                return Results.Problem(
-                                    new ValidationProblemDetails().ToValidationProblemDetails(
-                                        "Passport Number already exists", "30550615-0027", _correlationId));
-
-            return Results.Ok("Passport Number available");
-
-        }
-
         public static IResult DeleteVisa(
             [FromRoute] string visaId,
             [FromBody] DeleteVisaRequest deleteVisaRequest,
@@ -843,55 +693,26 @@ namespace SkyVault.WebApi.Workloads
 
         #region Private Methods
 
-        //private static ProfilePayload ToProfilePayload(CustomerProfile customerProfile)
-        //{
-        //    var passports = customerProfile.Passports.Select(passport =>
-        //    {
-                
-        //        return new Payloads.CommonPayloads.PassportModal(
-        //            passport.Id.ToString(),
-        //            passport.LastName,
-        //            passport.OtherNames,
-        //            passport.PassportNumber,
-        //            passport.Gender,
-        //            passport.DateOfBirth.ToShortDateString(),
-        //            passport.PlaceOfBirth,
-        //            passport.ExpiryDate?.ToShortDateString(),
-        //            passport.NationalityId.ToString(),
-        //            passport.CountryId.ToString(),
-        //            passport.IsPrimary
-        //        );
-        //    }).ToArray();
+        private static bool IsPassportDataValid(PassportRequest passportRequest)
+        {
+            if (
+                passportRequest.CountryId.IsNullOrEmpty() &&
+                passportRequest.DateOfBirth.IsNullOrEmpty() &&
+                passportRequest.ExpiryDate.IsNullOrEmpty() &&
+                passportRequest.PassportNumber.IsNullOrEmpty() &&
+                passportRequest.PassportNumber?.Length < 6 &&
+                passportRequest.OtherNames.IsNullOrEmpty() &&
+                passportRequest.OtherNames?.Length < 3 &&
+                passportRequest.LastName.IsNullOrEmpty() &&
+                passportRequest.LastName?.Length < 3 &&
+                passportRequest.Gender.IsNullOrEmpty() &&
+                passportRequest.SalutationId.IsNullOrEmpty() &&
+                passportRequest.SystemUserId.IsNullOrEmpty()
+                ) return false;
 
-        //    var visas = customerProfile
-        //    .Passports
-        //    .SelectMany(passport => passport.Visas)
-        //    .Select(visa => 
-        //        new Payloads.CommonPayloads.Visa(
-        //            visa.Id.ToString(),
-        //            visa.VisaNumber,
-        //            visa.CountryId.ToString(),
-        //            visa.IssuedPlace,
-        //            visa.IssuedDate.ToShortDateString(),
-        //            visa.ExpireDate.ToShortDateString(),
-        //            "",
-        //            visa.Passport.PassportNumber
-        //        )).ToArray();
-
-        //    var profilePayload = new ProfilePayload(
-        //        customerProfile.Id.ToString(),
-        //        customerProfile.SalutationId.ToString(),
-        //        passports,
-        //        customerProfile.FrequentFlyerNumbers.Select(item => item.FlyerNumber).ToArray(),
-        //        customerProfile.Id.ToString(),
-        //        customerProfile.ParentId.ToString(),
-        //        customerProfile.SystemUserId.ToString(),
-        //        visas
-        //    );
-
-        //    return profilePayload;
-        //}
+            return true;
+        }
         #endregion
-        
+
     }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import localStyles from "../components/CreateProfile/CustomerProfile.module.css";
 import { OptionsType } from "../features/Types/Dashboard/dashboardTypes";
@@ -11,6 +11,12 @@ import VISAAccordion from "../components/CreateProfile/VISAAccordion";
 
 const CustomerProfile = () => {
   const { profileId } = useParams();
+
+  useEffect(() => {
+    if (profileId) {
+      setCustomerProfileId(profileId);
+    }
+  });
 
   const [country, setCountry] = useState<OptionsType[]>([]);
   const { dialogProps, openDialog } = useConfirmDialog();

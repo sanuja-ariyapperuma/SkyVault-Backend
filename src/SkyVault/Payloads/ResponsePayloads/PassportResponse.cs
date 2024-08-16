@@ -1,15 +1,16 @@
-﻿namespace SkyVault.Payloads.CommonPayloads;
+﻿namespace SkyVault.Payloads.ResponsePayloads;
 
-public sealed record PassportModal(
+public sealed record PassportResponse(
     string? Id,
     string? LastName,
     string? OtherNames,
     string? PassportNumber,
-    string? Gender,
+    string? GenderId,
     string? DateOfBirth,
     string? PlaceOfBirth,
-    string? ExpiryDate,
+    string? PassportExpiryDate,
     string? NationalityId,
     string? CountryId,
-    string? IsPrimary
+    string? IsPrimary,
+    string? SalutationId
     );

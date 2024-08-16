@@ -10,7 +10,7 @@ export type PassportType = {
   dateOfBirth: Date | null;
   passportExpiryDate: Date | null;
   countryId: string;
-  IsPrimary: string;
+  isPrimary: string;
 };
 
 export type SavePassportRequestType = {

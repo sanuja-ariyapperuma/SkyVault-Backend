@@ -73,16 +73,23 @@ namespace SkyVault.WebApi.Backend
                 return new SkyResult<string>().Fail(ex.Message, "1f7504d7-0001", correlationId);
             }
         }
-        public SkyResult<Passport> GetPassportById(int passportId, string correlationId)
+        public SkyResult<List<Passport>> GetPassportByCustomerProfileId(int customerProfileId, string correlationId)
         {
 
-            var result = db.Passports.Where(p =>
-                p.Id == passportId).FirstOrDefault();
+            try
+            {
+                var result = db.Passports
+                    .Include(c => c.CustomerProfile)
+                    .Where(p => p.CustomerProfileId == customerProfileId).ToList();
 
-            if (result == null)
-                return new SkyResult<Passport>().Fail("No passport found", "1f7504d7-0005", correlationId);
+                return new SkyResult<List<Passport>>().SucceededWithValue(result);
+            }
+            catch (Exception)
+            {
 
-            return new SkyResult<Passport>().SucceededWithValue(result);
+                return new SkyResult<List<Passport>>().Fail("Failed to get passport", "1f7504d7-0002", correlationId);
+                
+            }
         }
 
         public SkyResult<string> CheckPassportExists(string passportNumber, string correlationId)

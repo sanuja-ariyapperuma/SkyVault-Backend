@@ -32,6 +32,8 @@ const VISAList = (props: VISAListProps) => {
     OnDeleteClick(id);
   };
 
+  console.log(visas);
+
   return (
     <div>
       <TableContainer component={Paper}>

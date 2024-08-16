@@ -24,7 +24,6 @@ import localStylea from "./FrequentFlyerNumberAccordion.module.css";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import axios from "axios";
 import { baseURL } from "../../features/services/apiCalls";
-import { set } from "lodash";
 import ConfirmBox from "../CommonComponents/ConfirmBox";
 import { useConfirmDialog } from "../../hooks/useConfirmDialog";
 
@@ -45,7 +44,7 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
 
   useEffect(() => {
     getAllFFN(CustomerProfileId);
-  }, []);
+  }, [CustomerProfileId]);
 
   const [fFNList, setFFNList] = useState<FFNListType[]>([]);
 

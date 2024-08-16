@@ -40,6 +40,15 @@ type VISAAccordionProps = {
 
 const VISAAccordion = (props: VISAAccordionProps) => {
   const dispatch = useDispatch();
+
+  const {
+    customerProfileId,
+    country,
+    primaryPassportId,
+    secondaryPassportId,
+    openDialog,
+  } = props;
+
   const initialVisa: VISAType = {
     id: "",
     visaNumber: "",
@@ -51,18 +60,13 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     countryName: "",
     passportNumber: "",
   };
+
   useEffect(() => {
+    console.log("Customer Profile ID VISA ", customerProfileId);
     if (customerProfileId) {
       fetchVISAs();
     }
-  }, []);
-  const {
-    customerProfileId,
-    country,
-    primaryPassportId,
-    secondaryPassportId,
-    openDialog,
-  } = props;
+  }, [customerProfileId]);
   const [visa, setVisa] = useState<VISAType>(initialVisa);
   const handleOnSaveVISA = (): void => {
     if (!customerProfileId) {

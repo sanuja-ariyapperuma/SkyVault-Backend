@@ -35,7 +35,7 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
 
   useEffect(() => {
     getComMethodOnCustomerProfile();
-  }, []);
+  }, [CustomerProfileId]);
 
   const onComMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (CustomerProfileId === "") {

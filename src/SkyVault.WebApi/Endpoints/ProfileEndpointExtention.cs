@@ -21,9 +21,9 @@
             //    .Produces(StatusCodes.Status200OK)
             //    .Produces(StatusCodes.Status401Unauthorized);
 
-            //app.MapPut("/updatepassport", Workloads.ProfileWorkload.UpdatePassport)
-            //    .Produces(StatusCodes.Status200OK)
-            //    .Produces(StatusCodes.Status401Unauthorized);
+            app.MapPost("/UpdatePassport", Workloads.ProfileWorkload.UpdatePassport)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPost("/addvisa", Workloads.ProfileWorkload.AddVisa)
                 .Produces(StatusCodes.Status200OK)
@@ -70,6 +70,10 @@
                 .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPost("/getCommMethod", Workloads.ProfileWorkload.GetComMethod)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/getPassportsByCustomerId", Workloads.ProfileWorkload.GetPassports)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
         }
