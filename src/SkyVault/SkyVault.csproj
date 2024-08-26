@@ -9,4 +9,8 @@
         <FileVersion>24.04.01</FileVersion>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Serilog" Version="4.0.1" />
+    </ItemGroup>
+
 </Project>

@@ -1,5 +1,5 @@
 import { useMsal } from "@azure/msal-react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import localStyles from "./NavBar.module.css";
 import dashboardLogo from "../../assets/dashboard_logo.png";
@@ -7,23 +7,49 @@ import defaultUserImage from "../../assets/default_user.jpg";
 import logoutIcon from "../../assets/icons/logout.webp";
 import NavItem from "./NavItem";
 import { ToastContainer } from "react-toastify";
-//import ConfirmBox from "../CommonComponents/ConfirmBox";
+import { useCookies } from "react-cookie";
+import { useEffect, useState } from "react";
+import { getDisplayName, getUserRole } from "../../features/Helpers/helper";
 
 const NavBar = () => {
-  const { instance } = useMsal();
+  const { instance, accounts } = useMsal();
+
+  const [cookie, setCookie, removeCookie] = useCookies(["TravelChannel"]);
+  const [fullName, setFullName] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("");
+
+  const navigate = useNavigate();
 
   const logout = () => {
-    instance.logoutPopup({
+    const logoutRequest = {
+      account: accounts[0],
       postLogoutRedirectUri: "/",
+    };
+    instance.logoutRedirect(logoutRequest).then(() => {
+      removeCookie("TravelChannel");
     });
   };
+
+  useEffect(() => {
+    if (cookie.TravelChannel) {
+      setFullName(getDisplayName(cookie));
+      setUserRole(getUserRole(cookie));
+    } else {
+      console.error("Cookie not found");
+    }
+  }, [cookie]);
 
   return (
     <div className={localStyles.mainContainer}>
       <div className={localStyles.navContainer}>
         <div className={localStyles.headerContainer}>
           {/* Header Area */}
-          <div className={localStyles.brandContainer}>
+          <div
+            className={localStyles.brandContainer}
+            onClick={() => navigate("/")}
+            role="button"
+            style={{ cursor: "pointer" }}
+          >
             <img
               className={localStyles.brandLogo}
               src={dashboardLogo}
@@ -47,8 +73,8 @@ const NavBar = () => {
               alt="user"
             />
             <div className={localStyles.userInfo}>
-              <span className={localStyles.brandText}>John Doe</span>
-              <span className={localStyles.versionText}>Administrator</span>
+              <span className={localStyles.brandText}>{fullName}</span>
+              <span className={localStyles.versionText}>{userRole}</span>
             </div>
           </div>
           <div className={localStyles.logoutButtonArea}>

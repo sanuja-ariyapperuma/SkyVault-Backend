@@ -49,8 +49,6 @@ namespace SkyVault.WebApi.Backend
         }
         public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, string correlationId)
         {
-            try
-            {
                 var passport = new Passport
                 {
                     PassportNumber = passportRequest.PassportNumber!,
@@ -79,13 +77,8 @@ namespace SkyVault.WebApi.Backend
 
                 return new SkyResult<CustomerProfile>().SucceededWithValue(savedprofile.Entity);
 
-            }
-            catch (Exception ex)
-            {
-                return new SkyResult<CustomerProfile>().Fail(ex.Message, "4cf0079e-0008", correlationId);
-            }
+            
         }
-
         public bool CheckPassportExists(string passportNumber, string correlationId)
         {
             try
@@ -116,7 +109,6 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<string>().SucceededWithValue("Preffered Commiunication Method Updated");
         }
-
         public SkyResult<string> CheckAccessToTheProfile(int customerProfileId, int systemUserId, string correlationId)
         {
             var systemUserRole = db.SystemUsers.Find(systemUserId)?.UserRole;
@@ -131,11 +123,10 @@ namespace SkyVault.WebApi.Backend
             );
 
             if (!result)
-                return new SkyResult<string>().Fail("Unauthorized", "4cf0079e-0011", correlationId);
+                return new SkyResult<string>().Fail("Sorry! You are not authorized to access this profile", "4cf0079e-0011", correlationId);
 
             return new SkyResult<string>().SucceededWithValue("Authorized");
         }
-
         public SkyResult<string> CheckAccessToTheProfileWithVisaId(int visaId, int systemUserId, string correlationId)
         {
             FormattableString query = $@"
@@ -152,7 +143,6 @@ namespace SkyVault.WebApi.Backend
 
             return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
         }
-
         public SkyResult<PreferedCommiunicationMethod> GetComMethod(int customerProfileId, string correlationId)
         {
             var result = db.CustomerProfiles.Where(c =>
@@ -164,7 +154,6 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<PreferedCommiunicationMethod>().SucceededWithValue((PreferedCommiunicationMethod)result);
         }
-
         public SkyResult<string> CheckAccessToTheProfileWithPassportId(int passportId, int systemUserId, string correlationId)
         {
             FormattableString query = $@"
@@ -178,6 +167,24 @@ namespace SkyVault.WebApi.Backend
             var customerProfileId = db.CustomerProfiles.FromSql(query).Select(p => p.Id).FirstOrDefault();
 
             return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
+        }
+        public SkyResult<List<FamilyMembersResponse>> GetFamilyMembers(int customerId, string correlationId) 
+        {
+            var result = db.Passports
+                    .Include(p => p.CustomerProfile)
+                    .Where(p => p.CustomerProfile.ParentId == customerId && p.IsPrimary == "1")
+                    .Select(p => new FamilyMembersResponse
+                    (
+                        p.CustomerProfile.Id,
+                        p.LastName,
+                        p.OtherNames,
+                        p.PassportNumber,
+                        p.CustomerProfile.ParentId == null
+                    )).ToList();
+
+
+            return new SkyResult<List<FamilyMembersResponse>>().SucceededWithValue(result);
+
         }
     }
 }

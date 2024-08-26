@@ -1,54 +1,87 @@
+using Azure.Core;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
 using SkyVault.Exceptions;
+using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text.Json.Nodes;
+using System.Text.Json;
+using System.Text;
 
 namespace SkyVault.WebApi.Workloads;
 
 internal static class AuthenticationWorkload
 {
-    public static IResult AuthenticateUser([FromBody] ValidateUserRequest request,
-        HttpContext context, SkyvaultContext dbContext)
+
+    public static IResult AuthenticateUser(
+        [FromBody] LoginUserRequest request,
+        HttpContext context, 
+        SkyvaultContext dbContext
+        )
     {
+        var accessToken = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
         var correlationId = context.Items["X-Correlation-ID"]?.ToString();
+
+        if (request.Upn == null)
+            return Results.Problem(new ProblemDetails().ToProblemDetails("Cannot find the upn",
+                "", correlationId));
+
+        if (request.UserRole == null)
+            return Results.Problem(new ProblemDetails().ToProblemDetails("Cannot find the user role",
+                "", correlationId));
+
+        var systemUserData = new SystemUserData(dbContext);
+
 
         var firstname = context.User.FindFirst("name")?.Value;
         var lastName = context.User.FindFirst(ClaimTypes.Surname)?.Value;
-        var email = context.User.FindFirst(ClaimTypes.GivenName)?.Value;
-        var role = context.User.Identities.FirstOrDefault()?.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
-        var roleClaim = context.User.Claims.FirstOrDefault(x => x.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
-        var role2 = context.User.Claims.Where(x => x.Type == "role")?.Select(c => c.Value);
 
-        //surname, givenname
-
-        var loginUser = new[]
+        Payloads.CommonPayloads.SystemUserRole userRole = request.UserRole switch 
         {
-            request.Upn,
-            lastName,
-            firstname,
-            "Staff"
+            "SuperAdmin" => Payloads.CommonPayloads.SystemUserRole.SuperAdmin,
+            "Admin" => Payloads.CommonPayloads.SystemUserRole.Admin,
+            "Staff" => Payloads.CommonPayloads.SystemUserRole.Staff,
+            _ => throw new ArgumentException("Invalid role")
         };
 
-        var systemUserData = new SystemUserData(dbContext);
+        var loginUser = new SystemUserCreateOrUpdateDto(request.Upn, firstname, lastName, userRole);
+
         var result = systemUserData.CreateOrGetUser(loginUser, correlationId);
 
         if (!result.Succeeded)
             return Results.Problem(new ProblemDetails().ToProblemDetails(result.Message,
                 result.ErrorCode, result.CorrelationId));
 
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = true, // Only send over HTTPS
+            SameSite = SameSiteMode.Lax, // Mitigates CSRF attacks
+            Expires = DateTime.UtcNow.AddMinutes(60) // Match token expiry
+        };
+
         var sysUser = result.Value;
 
-        return Results.Ok(new WelcomeUserResponse(
-            sysUser!.Id.ToString(),
-            sysUser!.SamProfileId,
+        var cookieData = new AuthenticatedUser(
             $"{sysUser.FirstName} {sysUser.LastName}",
-            DateTime.Today.ToLongDateString(),
-            sysUser.UserRole,
-            sysUser.SamProfileId
-        ));
+            sysUser.UserRole!.ToString(),
+            accessToken!
+        );
+
+        var serializedCookieData = JsonSerializer.Serialize(cookieData);  
+        var encodedCookieData = Convert.ToBase64String(Encoding.UTF8.GetBytes(serializedCookieData));
+
+        // Set the access token in a cookie
+        context.Response.Cookies.Append("TravelChannel", encodedCookieData, cookieOptions);
+
+        return Results.Ok();
     }
 }

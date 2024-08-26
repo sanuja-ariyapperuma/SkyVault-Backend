@@ -14,6 +14,11 @@ export const visaSlice = createSlice({
   initialState,
   reducers: {
     replaceVISAList: (state, action: PayloadAction<VISAType[]>) => {
+      if (action.payload.length === 0) {
+        state.visas = [];
+        return;
+      }
+
       state.visas = action.payload;
     },
     addSingleVISA: (state, action: PayloadAction<VISAType>) => {

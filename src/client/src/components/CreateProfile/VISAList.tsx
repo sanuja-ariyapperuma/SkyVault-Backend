@@ -32,8 +32,6 @@ const VISAList = (props: VISAListProps) => {
     OnDeleteClick(id);
   };
 
-  console.log(visas);
-
   return (
     <div>
       <TableContainer component={Paper}>
@@ -49,48 +47,49 @@ const VISAList = (props: VISAListProps) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {visas.map((visa) => (
-              <TableRow
-                key={visa.visaNumber}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {visa.visaNumber}
-                </TableCell>
-                <TableCell align="right">{visa.countryName}</TableCell>
-                <TableCell align="right">
-                  {visa.issuedDate?.toString() ?? ""}
-                </TableCell>
-                <TableCell align="right">
-                  {visa.expireDate?.toString() ?? ""}
-                </TableCell>
-                <TableCell align="right">
-                  {visa.assignedToPrimaryPassport
-                    ? "Primary Passport"
-                    : "Secondary Passport"}
-                </TableCell>
-                <TableCell align="right">
-                  {
-                    //visas.expireDate && visas.expireDate > today &&
-                    <>
-                      <button
-                        className={globalStyles.customButtonEdit}
-                        onClick={() => handleVisaEditClick(visa.id)}
-                      >
-                        <ModeEditIcon />
-                      </button>
-                      &nbsp;
-                      <button
-                        className={globalStyles.customButtonDanger}
-                        onClick={() => handleVisaDeleteClick(visa.id)}
-                      >
-                        <DeleteIcon />
-                      </button>
-                    </>
-                  }
-                </TableCell>
-              </TableRow>
-            ))}
+            {visas.length > 0 &&
+              visas.map((visa) => (
+                <TableRow
+                  key={visa.visaNumber}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {visa.visaNumber}
+                  </TableCell>
+                  <TableCell align="right">{visa.countryName}</TableCell>
+                  <TableCell align="right">
+                    {visa.issuedDate?.toString() ?? ""}
+                  </TableCell>
+                  <TableCell align="right">
+                    {visa.expireDate?.toString() ?? ""}
+                  </TableCell>
+                  <TableCell align="right">
+                    {visa.assignedToPrimaryPassport
+                      ? "Primary Passport"
+                      : "Secondary Passport"}
+                  </TableCell>
+                  <TableCell align="right">
+                    {
+                      //visas.expireDate && visas.expireDate > today &&
+                      <>
+                        <button
+                          className={globalStyles.customButtonEdit}
+                          onClick={() => handleVisaEditClick(visa.id)}
+                        >
+                          <ModeEditIcon />
+                        </button>
+                        &nbsp;
+                        <button
+                          className={globalStyles.customButtonDanger}
+                          onClick={() => handleVisaDeleteClick(visa.id)}
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </>
+                    }
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

@@ -9,3 +9,9 @@ export type UserType = {
   displayName: string;
   role: UserRole;
 };
+
+export type AuthenticatedUser = {
+  DisplayName: string;
+  UserRole: string;
+  accessToken: string;
+};

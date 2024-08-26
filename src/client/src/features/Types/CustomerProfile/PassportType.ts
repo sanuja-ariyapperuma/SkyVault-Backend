@@ -7,8 +7,8 @@ export type PassportType = {
   genderId: string;
   placeOfBirth: string;
   passportNumber: string;
-  dateOfBirth: Date | null;
-  passportExpiryDate: Date | null;
+  dateOfBirth: string;
+  passportExpiryDate: string;
   countryId: string;
   isPrimary: string;
 };

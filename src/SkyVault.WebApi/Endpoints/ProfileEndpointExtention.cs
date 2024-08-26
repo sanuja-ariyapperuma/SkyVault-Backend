@@ -76,6 +76,10 @@
             app.MapPost("/getPassportsByCustomerId", Workloads.ProfileWorkload.GetPassports)
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/getFamilyMembers", Workloads.ProfileWorkload.GetFamilyMembers)
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
         }
     }
 }

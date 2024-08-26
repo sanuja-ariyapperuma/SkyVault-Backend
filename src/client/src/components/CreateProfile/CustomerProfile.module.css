@@ -40,3 +40,6 @@
 .footerButtonArea {
   @apply flex flex-row justify-end;
 }
+.buttonIcon {
+  @apply mb-1;
+}

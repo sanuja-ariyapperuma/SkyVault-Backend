@@ -9,8 +9,6 @@ namespace SkyVault.WebApi.Backend
         public SkyResult<Passport> AddNewPassport(PassportRequest newPassport, string correlationId)
         {
 
-            try
-            {
                 var passport = new Passport
                 {
                     PassportNumber = newPassport.PassportNumber!,
@@ -30,17 +28,10 @@ namespace SkyVault.WebApi.Backend
                 db.SaveChanges();
 
                 return new SkyResult<Passport>().SucceededWithValue(savepassport.Entity);
-            }
-            catch (Exception ex)
-            {
-                return new SkyResult<Passport>().Fail(ex.Message, "1f7504d7-0004", correlationId);
-            }
         }
 
         public SkyResult<string> UpdatePassport(PassportRequest passportRequest, string correlationId)
         {
-            try
-            {
 
                 var rowsAffected = db.Passports
                     .Include(p => p.CustomerProfile)
@@ -64,32 +55,17 @@ namespace SkyVault.WebApi.Backend
                         );
 
                 if (rowsAffected == 0)
-                    return new SkyResult<string>().Fail("Failed to update passport", "1f7504d7-0000", correlationId);
+                    return new SkyResult<string>().Fail("No records updated", "1f7504d7-0000", correlationId);
 
                 return new SkyResult<string>().SucceededWithValue("Successfully Updated");
-            }
-            catch (Exception ex)
-            {
-                return new SkyResult<string>().Fail(ex.Message, "1f7504d7-0001", correlationId);
-            }
         }
         public SkyResult<List<Passport>> GetPassportByCustomerProfileId(int customerProfileId, string correlationId)
         {
-
-            try
-            {
                 var result = db.Passports
                     .Include(c => c.CustomerProfile)
                     .Where(p => p.CustomerProfileId == customerProfileId).ToList();
 
                 return new SkyResult<List<Passport>>().SucceededWithValue(result);
-            }
-            catch (Exception)
-            {
-
-                return new SkyResult<List<Passport>>().Fail("Failed to get passport", "1f7504d7-0002", correlationId);
-                
-            }
         }
 
         public SkyResult<string> CheckPassportExists(string passportNumber, string correlationId)

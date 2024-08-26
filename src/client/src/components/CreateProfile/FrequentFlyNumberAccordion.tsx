@@ -23,9 +23,9 @@ import ButtonPanel from "../CommonComponents/ButtonPanel";
 import localStylea from "./FrequentFlyerNumberAccordion.module.css";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import axios from "axios";
-import { baseURL } from "../../features/services/apiCalls";
 import ConfirmBox from "../CommonComponents/ConfirmBox";
 import { useConfirmDialog } from "../../hooks/useConfirmDialog";
+import { baseURL } from "../../features/Helpers/helper";
 
 type FFNListType = {
   FFN: string;
@@ -43,7 +43,12 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
   const { dialogProps, openDialog } = useConfirmDialog();
 
   useEffect(() => {
-    getAllFFN(CustomerProfileId);
+    if (CustomerProfileId) {
+      getAllFFN(CustomerProfileId);
+    } else {
+      setFFNList([]);
+      setFrequentFlyerNumber({ FFN: "" });
+    }
   }, [CustomerProfileId]);
 
   const [fFNList, setFFNList] = useState<FFNListType[]>([]);
@@ -69,7 +74,7 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
         FFN: frequentFlyerNumber?.FFN,
         SystemUser: SystemUser,
       })
-      .then((response) => {
+      .then(() => {
         let updatingItem = fFNList.find(
           (ffn) => ffn.FFNId === frequentFlyerNumber?.FFNId
         );
@@ -122,7 +127,7 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
           SystemUser: SystemUser,
         },
       })
-      .then((response) => {
+      .then(() => {
         const newFFNList = fFNList.filter((ffn) => ffn.FFNId !== id);
         setFFNList(newFFNList);
 
@@ -200,73 +205,85 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
           id="panel2-header"
         >
           <Typography className={CustomerProfileStyles.accordionHeader}>
-            Frequent Flyer (Optional)
+            <span className={CustomerProfileStyles.accordionHeader}>
+              Frequent Flyer (Optional)
+            </span>
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <div className={CustomerProfileStyles.accordionContent}>
-            <div className={CustomerProfileStyles.accordionLeft}>
-              <div className={localStylea.frequentFlyerNumberInputArea}>
-                <input
-                  type="text"
-                  placeholder="Frequent Flyer Number"
-                  className={globalStyles.commonTextInput}
-                  value={frequentFlyerNumber?.FFN}
-                  onChange={(e) => handleOnInputChange(e.target.value)}
-                />
-                <ButtonPanel OnSave={onSave} />
-              </div>
-              <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 300 }} aria-label="FFN list">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Frequent Flyer Number</TableCell>
-                      <TableCell>Edit / Delete</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {fFNList.map((FFN) => (
-                      <TableRow
-                        key={FFN.FFNId}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell width={400} component="th" scope="row">
-                          {FFN.FFN}
-                        </TableCell>
-                        <TableCell
-                          sx={{ minWidth: 120 }}
-                          width={100}
-                          scope="row"
-                        >
-                          {
-                            //visas.expireDate && visas.expireDate > today &&
-                            <>
-                              <button
-                                className={globalStyles.customButtonEdit}
-                                onClick={() => handleEdit(FFN.FFNId as number)}
-                              >
-                                <ModeEditIcon />
-                              </button>
-                              &nbsp;
-                              <button
-                                className={globalStyles.customButtonDanger}
-                                onClick={() => handleFFNDelete(FFN.FFNId)}
-                              >
-                                <DeleteIcon />
-                              </button>
-                            </>
-                          }
-                        </TableCell>
+        {CustomerProfileId ? (
+          <AccordionDetails>
+            <div className={CustomerProfileStyles.accordionContent}>
+              <div className={CustomerProfileStyles.accordionLeft}>
+                <div className={localStylea.frequentFlyerNumberInputArea}>
+                  <input
+                    type="text"
+                    placeholder="Frequent Flyer Number"
+                    className={globalStyles.commonTextInput}
+                    value={frequentFlyerNumber?.FFN}
+                    onChange={(e) => handleOnInputChange(e.target.value)}
+                  />
+                  <ButtonPanel OnSave={onSave} />
+                </div>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 300 }} aria-label="FFN list">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Frequent Flyer Number</TableCell>
+                        <TableCell>Edit / Delete</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {fFNList.map((FFN) => (
+                        <TableRow
+                          key={FFN.FFNId}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                          }}
+                        >
+                          <TableCell width={400} component="th" scope="row">
+                            {FFN.FFN}
+                          </TableCell>
+                          <TableCell
+                            sx={{ minWidth: 120 }}
+                            width={100}
+                            scope="row"
+                          >
+                            {
+                              //visas.expireDate && visas.expireDate > today &&
+                              <>
+                                <button
+                                  className={globalStyles.customButtonEdit}
+                                  onClick={() =>
+                                    handleEdit(FFN.FFNId as number)
+                                  }
+                                >
+                                  <ModeEditIcon />
+                                </button>
+                                &nbsp;
+                                <button
+                                  className={globalStyles.customButtonDanger}
+                                  onClick={() => handleFFNDelete(FFN.FFNId)}
+                                >
+                                  <DeleteIcon />
+                                </button>
+                              </>
+                            }
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </div>
             </div>
-          </div>
-        </AccordionDetails>
+          </AccordionDetails>
+        ) : (
+          <AccordionDetails>
+            <Typography className={CustomerProfileStyles.accordionContent}>
+              Primary passport must be saved first
+            </Typography>
+          </AccordionDetails>
+        )}
       </Accordion>
     </>
   );

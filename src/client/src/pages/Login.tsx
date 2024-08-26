@@ -9,15 +9,14 @@ import {
 } from "@azure/msal-browser";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store";
 import axios from "axios";
+import { baseURL } from "../features/Helpers/helper";
+import { AuthenticatedResponse } from "../features/Types/Login/authenticatedResponse";
+import { notifyError } from "../components/CommonComponents/Toasters";
 
 const Login = () => {
   const { instance, accounts } = useMsal();
   const navigate = useNavigate();
-  const dispatch: AppDispatch = useDispatch();
-  const baseURL = import.meta.env.VITE_API_BASE_URL as string;
   const adScopes = import.meta.env.VITE_AD_SCOPE as string;
 
   const [isHealthy, setIsHealthy] = useState(false);
@@ -32,28 +31,51 @@ const Login = () => {
             navigate("/");
           }
         } else {
+          notifyError(
+            "Something went wrong. Please try again later or contact system administrator"
+          );
           console.error("API is not healthy");
         }
       })
-      .catch(() => {
-        console.error("API is not healthy");
+      .catch((e) => {
+        console.error("API is not healthy", e);
+        notifyError(
+          "Something went wrong. Please try again later or contact system administrator"
+        );
       });
   }, [accounts]);
 
-  const handleAPIAuthentication = (upn: string, accessToken: string) => {
+  const handleAPIAuthentication = (
+    upn: string,
+    userRole: string,
+    accessToken: string
+  ) => {
     const body = {
       upn: upn,
+      userRole: userRole,
     };
 
     axios
-      .post(`${baseURL}/auth/user`, body, {
+      .post<AuthenticatedResponse>(`${baseURL}/auth/user`, body, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           ContentType: "application/json",
         },
+        withCredentials: true,
       })
-      .then((res) => console.log(res.data))
-      .catch((err) => console.error(err));
+      .then((res) => {
+        if (res.status !== 200) {
+          notifyError("Failed to authenticate user");
+          navigate("/login");
+          return;
+        }
+
+        //res.data.accessToken = accessToken;
+        //dispatch(setUser(res.data));
+      })
+      .catch(() => {
+        notifyError("Failed to authenticate user");
+      });
   };
 
   const loginToApp = async () => {
@@ -63,12 +85,14 @@ const Login = () => {
         account: accounts[0],
       })
       .then((response) => {
-        handleAPIAuthentication(
-          response.account.username,
-          response.accessToken
-        );
+        const upn = (response.idTokenClaims as any).preferred_username;
+        const userRole = (response.idTokenClaims as any).roles[0];
+        const accessToken = response.accessToken;
+
+        handleAPIAuthentication(upn, userRole, accessToken);
       })
       .catch((error) => {
+        notifyError("System Error: Failed to login");
         if (error instanceof InteractionRequiredAuthError) {
           console.error("Interaction required:", error.message);
         } else if (

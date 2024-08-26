@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace SkyVault.Exceptions;
 
 public static class SkyExceptionExtension
@@ -13,6 +15,7 @@ public static class SkyExceptionExtension
     public static void LogException(this Exception exception, string? correlationId)
     {
         //Need to implement connectivity to Azure Application Insights for central log management
-        Console.WriteLine(exception.Message + " " + correlationId);
+        //Console.WriteLine(exception.Message + " " + correlationId);
+        Log.Error(exception, "An exception occured with correlationId: {correlationId}", correlationId);
     }
 }

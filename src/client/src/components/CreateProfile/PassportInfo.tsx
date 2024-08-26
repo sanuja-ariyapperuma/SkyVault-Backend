@@ -5,7 +5,6 @@ import localStyles from "../CreateProfile/CustomerProfile.module.css";
 import globalStyles from "../CommonComponents/Common.module.css";
 import CustomSelect from "../CommonComponents/CustomSelect";
 import { ChangeEvent } from "react";
-import { Dayjs } from "dayjs";
 import { PassportType } from "../../features/Types/CustomerProfile/PassportType";
 
 type PassportInfoProps = {
@@ -39,10 +38,10 @@ const PassportInfo = (props: PassportInfoProps) => {
   const handleOnCountrySelect = (value: string) => {
     handleFieldChange("countryId", value);
   };
-  const handleOnDateOfBirthChange = (newValue: Dayjs | null) => {
+  const handleOnDateOfBirthChange = (newValue: string) => {
     handleFieldChange("dateOfBirth", newValue);
   };
-  const handleOnPassportExpiryChange = (newValue: Dayjs | null) => {
+  const handleOnPassportExpiryChange = (newValue: string) => {
     handleFieldChange("passportExpiryDate", newValue);
   };
   const handleOnPassportNumberChange = (

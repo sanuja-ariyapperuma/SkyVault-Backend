@@ -22,9 +22,6 @@ const CustomSelect = (props: CustomSelectProps) => {
       if (selectedOption) {
         setVal(selectedOption);
       } else {
-        console.log("Initial Value", initialValue);
-        console.log("Options length", options.length);
-        console.log("Selected Option", selectedOption);
         console.log("Selected Option not found");
       }
     } else {

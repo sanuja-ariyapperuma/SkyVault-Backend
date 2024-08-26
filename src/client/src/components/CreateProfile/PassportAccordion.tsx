@@ -19,15 +19,16 @@ import {
 } from "../../features/Types/CustomerProfile/PassportType";
 
 import {
+  baseURL,
   convertPassportTypeToSavePassportRequestType,
   validatePassport,
   validatePassportFields,
 } from "../../features/Helpers/helper";
 import axios from "axios";
-import { baseURL } from "../../features/services/apiCalls";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import { ProfileDefinitionResponse } from "../../features/Types/CustomerProfile/CommonDefinitions";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
+import { Dayjs } from "dayjs";
 
 type PassportAccordionProps = {
   setCustomerProfileId: (id: string) => void;
@@ -51,12 +52,6 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   const [gender, setGender] = useState<OptionsType[]>([]);
   const [nationality, setNationality] = useState<OptionsType[]>([]);
 
-  useEffect(() => {
-    if (customerProfileId) {
-      getPassportData();
-    }
-  }, [customerProfileId]);
-
   const initialPassportData = {
     id: "",
     salutationId: "",
@@ -66,10 +61,19 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     genderId: "",
     placeOfBirth: "",
     passportNumber: "",
-    dateOfBirth: null,
-    passportExpiryDate: null,
+    dateOfBirth: "",
+    passportExpiryDate: "",
     countryId: "",
   };
+
+  useEffect(() => {
+    if (customerProfileId) {
+      getPassportData();
+    } else {
+      setPrimaryPassport({ ...initialPassportData, isPrimary: "1" });
+      setSecondaryPassport({ ...initialPassportData, isPrimary: "0" });
+    }
+  }, [customerProfileId]);
 
   const [primaryPassport, setPrimaryPassport] = useState<PassportType>({
     ...initialPassportData,
@@ -95,12 +99,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
           if (passport.isPrimary === "1") {
             setPrimaryPassport({
               ...passport,
-              passportExpiryDate: passport.passportExpiryDate
-                ? new Date(passport.passportExpiryDate)
-                : null,
-              dateOfBirth: passport.dateOfBirth
-                ? new Date(passport.dateOfBirth)
-                : null,
+              passportExpiryDate: passport.passportExpiryDate,
+              dateOfBirth: passport.dateOfBirth,
             });
             setPrimaryPassportSavedId(passport.id);
           }
@@ -108,12 +108,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
           if (passport.isPrimary === "0") {
             setSecondaryPassport({
               ...passport,
-              passportExpiryDate: passport.passportExpiryDate
-                ? new Date(passport.passportExpiryDate)
-                : null,
-              dateOfBirth: passport.dateOfBirth
-                ? new Date(passport.dateOfBirth)
-                : null,
+              passportExpiryDate: passport.passportExpiryDate,
+              dateOfBirth: passport.dateOfBirth,
             });
             setSecondaryPassportSavedId(passport.id);
           }
@@ -131,7 +127,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
         isPrimary: "0",
         id: "",
         passportNumber: "",
-        passportExpiryDate: null,
+        passportExpiryDate: "",
+        countryId: "",
       });
       setSecondaryPassportEnabled(!secondaryPassportEnabled);
     }
@@ -165,19 +162,19 @@ const PassportAccordion = (props: PassportAccordionProps) => {
 
         if (passport.IsPrimary === "1") {
           setCustomerProfileId(responseData.customerProfileId);
+          setPrimaryPassportSavedId(responseData.passportId);
           setPrimaryPassport((prevState) => ({
             ...prevState,
             id: responseData.passportId,
           }));
-          setPrimaryPassportSavedId(responseData.passportId);
         }
 
         if (passport.IsPrimary === "0") {
+          setSecondaryPassportSavedId(responseData.passportId);
           setSecondaryPassport((prevState) => ({
             ...prevState,
             id: responseData.passportId,
           }));
-          setSecondaryPassportSavedId(responseData.passportId);
         }
 
         notifySuccess("Passport added successfully");
@@ -189,24 +186,40 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   };
 
   const handleFieldChangeSecondaryPassport = (field: string, value: any) => {
+    if (field === "countryId" && value === primaryPassport.countryId) {
+      notifyError(
+        "Primary and Secondary passport countries cannot be the same"
+      );
+      return;
+    }
     setSecondaryPassport({
       ...secondaryPassport,
       [field]: value,
     });
   };
 
-  const handleFieldChange = (field: string, value: string) => {
+  const handleFieldChange = (field: string, value: string | Dayjs) => {
     if (!validatePassportFields(field, value)) return;
+
+    console.log("field", field, " | ", "value", value);
+    console.log("primaryPassport", primaryPassport.countryId);
+
+    if (field === "countryId" && value === primaryPassport.countryId) {
+      notifyError(
+        "Primary and Secondary passport countries cannot be the same"
+      );
+      return;
+    }
 
     setPrimaryPassport({
       ...primaryPassport,
-      [field]: value.toString().trim(),
+      [field]: value.toString(),
     });
   };
 
   const handleOnSaveSecondaryPassport = (): void => {
     if (!customerProfileId) {
-      notifyError("Primary passport must be saved first");
+      notifyError("Primary passport must be saved before adding VISAs");
       return;
     }
 

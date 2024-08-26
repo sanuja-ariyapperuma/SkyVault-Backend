@@ -15,7 +15,6 @@ import {
   SaveVISAResponseType,
   VISAType,
 } from "../../features/Types/CustomerProfile/VISAType";
-import { baseURL } from "../../features/services/apiCalls";
 import {
   addSingleVISA,
   removeSingleVISA,
@@ -24,6 +23,7 @@ import {
 } from "../../features/reducers/VISAListReducer";
 import { useEffect, useState } from "react";
 import {
+  baseURL,
   convertVisaTypeToSaveVisaType,
   validateVISA,
 } from "../../features/Helpers/helper";
@@ -54,17 +54,19 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     visaNumber: "",
     countryId: "",
     issuedPlace: "",
-    issuedDate: null,
-    expireDate: null,
+    issuedDate: "",
+    expireDate: "",
     assignedToPrimaryPassport: true,
     countryName: "",
     passportNumber: "",
   };
 
   useEffect(() => {
-    console.log("Customer Profile ID VISA ", customerProfileId);
     if (customerProfileId) {
       fetchVISAs();
+    } else {
+      dispatch(replaceVISAList([]));
+      setVisa(initialVisa);
     }
   }, [customerProfileId]);
   const [visa, setVisa] = useState<VISAType>(initialVisa);
@@ -159,7 +161,15 @@ const VISAAccordion = (props: VISAAccordionProps) => {
         console.log("Error", error.response);
       });
   };
-  const handleFieldChangeVISA = (field: string, value: any) => {
+  const handleFieldChangeVISA = (field: string, value: string) => {
+    if (
+      field === "assignedToPrimaryPassport" &&
+      !value &&
+      secondaryPassportId === ""
+    ) {
+      notifyError("Secondary passport must be saved first");
+      return;
+    }
     setVisa({
       ...visa,
       [field]: value,
@@ -221,7 +231,9 @@ const VISAAccordion = (props: VISAAccordionProps) => {
         id="panel2-header"
       >
         <Typography className={customerProfileStyles.accordionHeader}>
-          VISA Information (Optional)
+          <span className={customerProfileStyles.accordionHeader}>
+            VISA Information (Optional)
+          </span>
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -239,7 +251,7 @@ const VISAAccordion = (props: VISAAccordionProps) => {
             />
           </>
         ) : (
-          "Primary passport must be saved first"
+          "Primary passport must be saved before adding VISA"
         )}
       </AccordionDetails>
     </Accordion>

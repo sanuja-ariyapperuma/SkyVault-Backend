@@ -1,6 +1,5 @@
 import globalStyles from "./Common.module.css";
 import SaveIcon from "@mui/icons-material/Save";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 type ButtonPanelProps = {
   OnSave: () => void;

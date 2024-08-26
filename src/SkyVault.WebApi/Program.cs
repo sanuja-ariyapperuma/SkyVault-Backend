@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using Serilog;
+using Serilog.Events;
 using SkyVault.WebApi.Authentication;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
@@ -10,7 +12,7 @@ using SkyVault.WebApi.Middlewares;
 
 namespace SkyVault.WebApi;
 
-public class Program
+public static class Program
 {
     public static void Main(string[] args)
     {
@@ -24,6 +26,7 @@ public class Program
             options.UseMySql(builder.Configuration.GetConnectionString("Localconnection"), new MySqlServerVersion(new Version(8, 0)));
         });
         builder.Services.AddAutoMapper(typeof(Program).Assembly,typeof(MappingProfile).Assembly);
+
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options =>
@@ -39,6 +42,9 @@ public class Program
             options.AddPolicy("RequireAppRole", policy => policy.RequireClaim("roles", "YourAppRole"));
         });
 
+        //builder.Services.AddMicrosoftGraph(options => {
+        //    options.Scopes = ["User.Read"];
+        //});
 
 
         builder.Services.AddCors(options =>
@@ -54,6 +60,16 @@ public class Program
         });
 
         builder.Services.AddAuthorization();
+
+        Log.Logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.File(builder.Configuration["Logging:FilePath"]!, rollingInterval: RollingInterval.Day)
+        .CreateLogger();
+
+        builder.Host.UseSerilog();
 
         var app = builder.Build();
         app.UseMiddleware<CorrelationIdMiddleware>();

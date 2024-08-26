@@ -1,6 +1,7 @@
 ﻿//https://www.fileformat.info/tool/hash.htm
 
 using SkyVault.Exceptions;
+using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 
@@ -8,21 +9,21 @@ namespace SkyVault.WebApi.Backend
 {
     public sealed class SystemUserData(SkyvaultContext db)
     {
-        public SkyResult<SystemUser> CreateOrGetUser(string[] requestUser, string? correlationId)
+        public SkyResult<SystemUser> CreateOrGetUser(SystemUserCreateOrUpdateDto requestUser, string? correlationId)
         {
             try
             {
-                var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser[0]);
+                var sysUser = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == requestUser.Upn);
 
                 if (sysUser != null)
                     return new SkyResult<SystemUser>().SucceededWithValue(sysUser);
 
                 sysUser = new SystemUser
                 {
-                    FirstName = requestUser[2],
-                    LastName = requestUser[1],
-                    SamProfileId = requestUser[0],
-                    UserRole = requestUser[3]
+                    FirstName = requestUser.FirstName,
+                    LastName = requestUser.LastName,
+                    SamProfileId = requestUser.Upn,
+                    UserRole = requestUser.UserRole.ToString()
                 };
                 
                 db.SystemUsers.Add(sysUser);

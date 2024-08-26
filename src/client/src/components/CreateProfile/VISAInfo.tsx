@@ -1,7 +1,6 @@
 import FormControl from "@mui/joy/FormControl";
 import FormHelperText from "@mui/joy/FormHelperText";
 import { Checkbox } from "@mui/joy";
-import { Dayjs } from "dayjs";
 
 import localStyles from "./CustomerProfile.module.css";
 import globalStyles from "../CommonComponents/Common.module.css";
@@ -9,7 +8,7 @@ import CustomDatePicker from "../CommonComponents/CustomDatePicker";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
 import VISAList from "./VISAList";
 import CustomSelect from "../CommonComponents/CustomSelect";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { VISAType } from "../../features/Types/CustomerProfile/VISAType";
 
 type VISAInfoProps = {
@@ -29,11 +28,11 @@ const VISAInfo = (props: VISAInfoProps) => {
     onVISADeleteClick,
   } = props;
 
-  const handleOnVISAExpiryChange = (newValue: Dayjs | null) => {
-    handleFieldChange("expireDate", newValue?.format("DD/MM/YYYY"));
+  const handleOnVISAExpiryChange = (newValue: string) => {
+    handleFieldChange("expireDate", newValue);
   };
-  const handleOnVISAIssuedDateChange = (newValue: Dayjs | null) => {
-    handleFieldChange("issuedDate", newValue?.format("DD/MM/YYYY"));
+  const handleOnVISAIssuedDateChange = (newValue: string) => {
+    handleFieldChange("issuedDate", newValue);
   };
   const handleOnCountrySelect = (value: string) => {
     handleFieldChange("countryId", value);
@@ -46,7 +45,7 @@ const VISAInfo = (props: VISAInfoProps) => {
   ) => {
     handleFieldChange("issuedPlace", event.target.value);
   };
-  const handleOnAssignChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleOnAssignChange = () => {
     handleFieldChange(
       "assignedToPrimaryPassport",
       !initialVisa.assignedToPrimaryPassport

@@ -4,6 +4,7 @@ import {
   SavePassportRequestType,
 } from "../Types/CustomerProfile/PassportType";
 import { SaveVISAType, VISAType } from "../Types/CustomerProfile/VISAType";
+import { AuthenticatedUser } from "../Types/User/userType";
 
 export const validatePassport = (
   passport: SavePassportRequestType
@@ -122,7 +123,10 @@ export const validateVISA = (visa: SaveVISAType): boolean => {
     valid = false;
   }
 
-  if (visa.ExpiryDate! < visa.IssuedDate!) {
+  const expirydate = new Date(visa.ExpiryDate);
+  const issuedDate = new Date(visa.IssuedDate);
+
+  if (expirydate < issuedDate) {
     notifyError("VISA expiry date cannot be less than issued date");
     valid = false;
   }
@@ -133,9 +137,9 @@ export const validateVISA = (visa: SaveVISAType): boolean => {
 export const convertVisaTypeToSaveVisaType = (visa: VISAType): SaveVISAType => {
   return {
     Id: visa.id,
-    VisaNumber: visa.visaNumber,
+    VisaNumber: visa.visaNumber.trim(),
     CountryId: visa.countryId,
-    IssuedPlace: visa.issuedPlace,
+    IssuedPlace: visa.issuedPlace.trim(),
     IssuedDate: visa.issuedDate,
     ExpiryDate: visa.expireDate,
     CustomerProfileId: "",
@@ -152,16 +156,34 @@ export const convertPassportTypeToSavePassportRequestType = (
     CustomerProfileId: "",
     SystemUserId: "9",
     ParentId: "",
-    LastName: passport.lastName,
-    OtherNames: passport.otherNames,
-    PassportNumber: passport.passportNumber,
+    LastName: passport.lastName.trim(),
+    OtherNames: passport.otherNames.trim(),
+    PassportNumber: passport.passportNumber.trim(),
     Gender: passport.genderId,
-    DateOfBirth: passport.dateOfBirth?.toLocaleDateString("en-gb") ?? "",
-    PlaceOfBirth: passport.placeOfBirth,
-    ExpiryDate: passport.passportExpiryDate?.toLocaleDateString("en-gb") ?? "",
+    DateOfBirth: passport.dateOfBirth?.toString() ?? "",
+    PlaceOfBirth: passport.placeOfBirth.trim(),
+    ExpiryDate: passport.passportExpiryDate?.toString() ?? "",
     NationalityId: passport.nationalityId,
     CountryId: passport.countryId,
     IsPrimary: passport.isPrimary,
     SalutationId: passport.salutationId,
   };
 };
+
+const decodeCookie = (cookieValue: any): AuthenticatedUser => {
+  const decodedValue = atob(cookieValue.TravelChannel);
+  return JSON.parse(decodedValue) as AuthenticatedUser;
+};
+
+export const getDisplayName = (cookieValue: any): string => {
+  const decodedValue = decodeCookie(cookieValue);
+  return decodedValue.DisplayName;
+};
+
+export const getUserRole = (cookieValue: any): string => {
+  const decodedValue = decodeCookie(cookieValue);
+  return decodedValue.UserRole;
+};
+
+export const baseURL = import.meta.env.VITE_API_BASE_URL as string;
+export const authRedirectURL = import.meta.env.VITE_AUTH_REDIRECT_URL as string;

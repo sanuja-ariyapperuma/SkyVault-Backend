@@ -9,3 +9,11 @@ export type CustomerProfileType = {
   FrequentFlyerNumber: string[];
   PreferredCommunicationMethod: CommunicationMethod;
 };
+
+export type FamilyMembersType = {
+  customerId: string;
+  lastName: string;
+  otherNames: string;
+  passportNumber: string;
+  isParent: boolean;
+};

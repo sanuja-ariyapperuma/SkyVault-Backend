@@ -8,8 +8,6 @@ namespace SkyVault.WebApi.Backend
     {
         public SkyResult<string> AddVisa(VisaReqeust visaRequest, string correlationId)
         {
-            try
-            {
                 var newvisa = new Visa
                 {
                     VisaNumber = visaRequest.VisaNumber!,
@@ -24,12 +22,7 @@ namespace SkyVault.WebApi.Backend
                 db.SaveChanges();
 
                 return new SkyResult<string>().SucceededWithValue(newvisa.Id.ToString());
-            }
-            catch (Exception ex)
-            {
-
-                return new SkyResult<string>().Fail(ex.Message, "0daa030e-0004", correlationId);
-            }
+            
         }
 
         public SkyResult<string> UpdateVisa(string visaId, VisaReqeust visaRequest, string correlationId)

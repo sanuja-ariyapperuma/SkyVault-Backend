@@ -1,8 +1,4 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-
-export const baseURL = "https://localhost:7199";
 
 const axiosInstance = axios.create({
   baseURL: "https://localhost:7199", // Replace with your base URL
@@ -11,14 +7,14 @@ const axiosInstance = axios.create({
   },
 });
 
-const setAuthToken = () => {
-  const accessToken = useSelector(
-    (store: RootState) => store.tokenR.accessToken
-  );
-  axiosInstance.defaults.headers.common[
-    "Authorization"
-  ] = `Bearer ${accessToken}`;
-};
+// const setAuthToken = () => {
+//   // const accessToken = useSelector(
+//   //   (store: RootState) => store.tokenR.accessToken
+//   // );
+//   axiosInstance.defaults.headers.common[
+//     "Authorization"
+//   ] = `Bearer ${accessToken}`;
+// };
 
 export interface RequestParams {
   url: string;
@@ -33,7 +29,7 @@ const axiosRequest = async ({ url, method, body }: RequestParams) => {
     data: body,
   };
 
-  setAuthToken();
+  // setAuthToken();
 
   try {
     const response = await axiosInstance(config);

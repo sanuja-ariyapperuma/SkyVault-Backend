@@ -9,8 +9,7 @@ namespace SkyVault.WebApi.Backend
     {
         public SkyResult<string> AddFFN(int customerId, string ffn, string correlationId)
         {
-            try
-            {
+
 
                 var newFFN = new FrequentFlyerNumber
                 {
@@ -22,11 +21,7 @@ namespace SkyVault.WebApi.Backend
                 db.SaveChanges();
 
                 return new SkyResult<string>().SucceededWithValue(newFFN.Id.ToString());
-            }
-            catch (Exception ex)
-            {
-                return new SkyResult<string>().Fail(ex.Message, "0daa030e-0004", correlationId);
-            }
+
         }
 
         public SkyResult<string> UpdateFFN(int ffnId, string ffn, string correlationId)

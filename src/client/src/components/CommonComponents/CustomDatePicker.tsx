@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 
 type CustomDatePickerProps = {
   label: string;
-  onDateChange: (newValue: Dayjs | null) => void;
-  initialValue?: Date | null;
+  onDateChange: (newValue: string) => void;
+  initialValue?: string;
 };
 
 const CustomDatePicker = (props: CustomDatePickerProps) => {
@@ -26,7 +26,7 @@ const CustomDatePicker = (props: CustomDatePickerProps) => {
 
   const handleOnDateChange = (newValue: Dayjs | null) => {
     setVal(newValue);
-    onDateChange(newValue);
+    onDateChange(newValue?.format("DD/MM/YYYY") ?? "");
   };
 
   return (

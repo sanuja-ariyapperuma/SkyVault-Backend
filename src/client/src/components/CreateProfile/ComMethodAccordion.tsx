@@ -12,8 +12,8 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CustomerProfileStyles from "./CustomerProfile.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { baseURL } from "../../features/services/apiCalls";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
+import { baseURL } from "../../features/Helpers/helper";
 
 enum CommunicationMethod {
   None = 1,
@@ -57,7 +57,7 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
         SystemUserId: SystemUser,
         PrefCommId: comMethod.toString(),
       })
-      .then((response) => {
+      .then(() => {
         notifySuccess("Communication method updated successfully");
         setComMethod(comMethod);
       })
@@ -68,20 +68,22 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
   };
 
   const getComMethodOnCustomerProfile = () => {
-    if (!CustomerProfileId) return;
-
-    axios
-      .post(`${baseURL}/getCommMethod`, {
-        SystemUserId: SystemUser,
-        CustomerProfileId: CustomerProfileId,
-      })
-      .then((response) => {
-        setComMethod(parseInt(response.data));
-      })
-      .catch((error) => {
-        console.log(error);
-        notifyError("Failed to get communication method");
-      });
+    if (CustomerProfileId) {
+      axios
+        .post(`${baseURL}/getCommMethod`, {
+          SystemUserId: SystemUser,
+          CustomerProfileId: CustomerProfileId,
+        })
+        .then((response) => {
+          setComMethod(parseInt(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+          notifyError("Failed to get communication method");
+        });
+    } else {
+      setComMethod(CommunicationMethod.None);
+    }
   };
 
   return (
@@ -92,37 +94,47 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
         id="panel2-header"
       >
         <Typography className={CustomerProfileStyles.accordionHeader}>
-          Preferred Communication Method
+          <span className={CustomerProfileStyles.accordionHeader}>
+            Preferred Communication Method
+          </span>
         </Typography>
       </AccordionSummary>
-      <AccordionDetails>
-        <div className={CustomerProfileStyles.accordionContent}>
-          <RadioGroup
-            defaultValue={CommunicationMethod.None}
-            name="radio-buttons-group"
-            sx={{ display: "flex", flexDirection: "row" }}
-            value={comMethod}
-            onChange={onComMethodChange}
-          >
-            <FormControlLabel
-              value={CommunicationMethod.None}
-              control={<Radio />}
-              label="None"
-            />
+      {CustomerProfileId ? (
+        <AccordionDetails>
+          <div className={CustomerProfileStyles.accordionContent}>
+            <RadioGroup
+              defaultValue={CommunicationMethod.None}
+              name="radio-buttons-group"
+              sx={{ display: "flex", flexDirection: "row" }}
+              value={comMethod}
+              onChange={onComMethodChange}
+            >
+              <FormControlLabel
+                value={CommunicationMethod.None}
+                control={<Radio />}
+                label="None"
+              />
 
-            <FormControlLabel
-              value={CommunicationMethod.WhatsApp}
-              control={<Radio />}
-              label="WhatsApp"
-            />
-            <FormControlLabel
-              value={CommunicationMethod.Email}
-              control={<Radio />}
-              label="Email"
-            />
-          </RadioGroup>
-        </div>
-      </AccordionDetails>
+              <FormControlLabel
+                value={CommunicationMethod.WhatsApp}
+                control={<Radio />}
+                label="WhatsApp"
+              />
+              <FormControlLabel
+                value={CommunicationMethod.Email}
+                control={<Radio />}
+                label="Email"
+              />
+            </RadioGroup>
+          </div>
+        </AccordionDetails>
+      ) : (
+        <AccordionDetails>
+          <Typography className={CustomerProfileStyles.accordionContent}>
+            Primary passport must be saved first
+          </Typography>
+        </AccordionDetails>
+      )}
     </Accordion>
   );
 };

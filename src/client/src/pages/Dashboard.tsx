@@ -4,7 +4,6 @@ import axios from "axios";
 
 import localStyles from "../components/Dashboard/Dashboard.module.css";
 import NavItem from "../components/NavBar/NavItem";
-import { baseURL } from "../features/services/apiCalls";
 import { useMsal } from "@azure/msal-react";
 import { debounce } from "lodash";
 
@@ -13,6 +12,7 @@ import {
   SearchResponse,
 } from "../features/Types/Dashboard/dashboardTypes";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "../features/Helpers/helper";
 
 const Dashboard = () => {
   const { instance, accounts } = useMsal();
@@ -21,7 +21,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const request = {
-    scopes: ["api://e401d532-a867-4131-82c6-fe18242da055/access_as_user"],
+    scopes: [import.meta.env.VITE_AD_SCOPE as string],
     account: accounts[0],
   };
 
