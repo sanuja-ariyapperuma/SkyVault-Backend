@@ -10,14 +10,14 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { baseURL } from "../features/Helpers/helper";
+import { baseURL, scopes } from "../features/Helpers/helper";
 import { AuthenticatedResponse } from "../features/Types/Login/authenticatedResponse";
 import { notifyError } from "../components/CommonComponents/Toasters";
 
 const Login = () => {
   const { instance, accounts } = useMsal();
   const navigate = useNavigate();
-  const adScopes = import.meta.env.VITE_AD_SCOPE as string;
+  const adScopes = scopes;
 
   const [isHealthy, setIsHealthy] = useState(false);
 
@@ -69,9 +69,6 @@ const Login = () => {
           navigate("/login");
           return;
         }
-
-        //res.data.accessToken = accessToken;
-        //dispatch(setUser(res.data));
       })
       .catch(() => {
         notifyError("Failed to authenticate user");

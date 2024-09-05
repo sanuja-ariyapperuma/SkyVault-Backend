@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace SkyVault.Payloads.RequestPayloads
 {
-    public record GetFamilyMembersRequest(string SystemUserId, string CustomerProfileId);
+    public record GetFamilyMembersRequest(string CustomerProfileId);
 }

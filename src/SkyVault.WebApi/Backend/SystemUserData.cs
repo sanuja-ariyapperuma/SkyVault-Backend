@@ -66,5 +66,31 @@ namespace SkyVault.WebApi.Backend
                     correlationId: correlationId);
             }
         }
+
+        public SkyResult<int> GetUserIdByUpn(string upn, string? correlationId) 
+        {
+            try
+            {
+                var user = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == upn);
+
+                if (user == null)
+                    return new SkyResult<int>().Fail(
+                        message: "User not found.",
+                        errorCode: "2ac5059f-0003",
+                        correlationId: correlationId);
+
+                return new SkyResult<int>().SucceededWithValue(user.Id);
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
+
+                return new SkyResult<int>().Fail(
+                    message: "An unexpected error occurred while fetching user. Please try again.",
+                    errorCode: "2ac5059f-0002",
+                    correlationId: correlationId);
+            }
+
+        }
     }
 }

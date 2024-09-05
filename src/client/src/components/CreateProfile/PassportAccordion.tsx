@@ -15,7 +15,6 @@ import globalStyles from "./../CommonComponents/Common.module.css";
 import {
   PassportType,
   SavePassportRequestType,
-  SavePassportResponseType,
 } from "../../features/Types/CustomerProfile/PassportType";
 
 import {
@@ -26,9 +25,14 @@ import {
 } from "../../features/Helpers/helper";
 import axios from "axios";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
-import { ProfileDefinitionResponse } from "../../features/Types/CustomerProfile/CommonDefinitions";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
 import { Dayjs } from "dayjs";
+import { useAccessToken } from "../../hooks/useAccessToken";
+import { fetchCommonDataAPI } from "../../features/services/CustomerProfile/CommonData/apiMethods";
+import {
+  getPassportDataAPI,
+  saveUpdateCustomerProfileAPI,
+} from "../../features/services/CustomerProfile/apiMethods";
 
 type PassportAccordionProps = {
   setCustomerProfileId: (id: string) => void;
@@ -40,6 +44,8 @@ type PassportAccordionProps = {
 };
 
 const PassportAccordion = (props: PassportAccordionProps) => {
+  const accessToken = useAccessToken();
+
   const {
     setCustomerProfileId,
     customerProfileId,
@@ -75,6 +81,10 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     }
   }, [customerProfileId]);
 
+  useEffect(() => {
+    fetchCommonData();
+  }, [accessToken]);
+
   const [primaryPassport, setPrimaryPassport] = useState<PassportType>({
     ...initialPassportData,
     isPrimary: "1",
@@ -89,13 +99,9 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     useState<boolean>(true);
 
   const getPassportData = () => {
-    axios
-      .post<PassportType[] | null>(`${baseURL}/getPassportsByCustomerId`, {
-        CustomerProfileId: customerProfileId,
-        SystemUserId: "9",
-      })
+    getPassportDataAPI(customerProfileId)
       .then((response) => {
-        response.data?.map((passport) => {
+        response?.map((passport) => {
           if (passport.isPrimary === "1") {
             setPrimaryPassport({
               ...passport,
@@ -146,19 +152,16 @@ const PassportAccordion = (props: PassportAccordionProps) => {
 
     if (!isValid) return;
 
-    const url = passport.Id
-      ? `${baseURL}/UpdatePassport`
-      : `${baseURL}/AddPassport`;
-
-    axios
-      .post<SavePassportResponseType>(url, passport)
+    saveUpdateCustomerProfileAPI(!!passport.Id, passport)
       .then((response) => {
         if (passport.Id) {
           notifySuccess("Passport updated successfully");
           return;
         }
 
-        const responseData = response.data;
+        notifySuccess("Passport added successfully");
+
+        const responseData = response;
 
         if (passport.IsPrimary === "1") {
           setCustomerProfileId(responseData.customerProfileId);
@@ -176,8 +179,6 @@ const PassportAccordion = (props: PassportAccordionProps) => {
             id: responseData.passportId,
           }));
         }
-
-        notifySuccess("Passport added successfully");
       })
       .catch((error) => {
         notifyError(`Sorry! ${error.message}`);
@@ -231,41 +232,30 @@ const PassportAccordion = (props: PassportAccordionProps) => {
 
   const fetchCommonData = async () => {
     try {
-      const definitionData = await axios.post<ProfileDefinitionResponse>(
-        `${baseURL}/profilepage-commondata`,
-        {
-          headers: {
-            ContentType: "application/json",
-          },
-        }
-      );
+      const definitionData = await fetchCommonDataAPI();
 
-      const sal = definitionData.data.salutations.map(
-        (salutation): OptionsType => {
-          return {
-            value: salutation.id,
-            label: salutation.name,
-          };
-        }
-      );
+      const sal = definitionData.salutations.map((salutation): OptionsType => {
+        return {
+          value: salutation.id,
+          label: salutation.name,
+        };
+      });
 
-      const gend = definitionData.data.genders.map((gender): OptionsType => {
+      const gend = definitionData.genders.map((gender): OptionsType => {
         return {
           value: gender.id,
           label: gender.name,
         };
       });
 
-      const nat = definitionData.data.nationalities.map(
-        (natio): OptionsType => {
-          return {
-            value: natio.id,
-            label: natio.name,
-          };
-        }
-      );
+      const nat = definitionData.nationalities.map((natio): OptionsType => {
+        return {
+          value: natio.id,
+          label: natio.name,
+        };
+      });
 
-      const cntry = definitionData.data.countries.map((cnty): OptionsType => {
+      const cntry = definitionData.countries.map((cnty): OptionsType => {
         return {
           value: cnty.id,
           label: cnty.name,
@@ -277,13 +267,9 @@ const PassportAccordion = (props: PassportAccordionProps) => {
       setSalutations(sal);
       setGender(gend);
     } catch (error) {
-      console.log("Error", error);
+      console.log("Error retrieving common data : ", error);
     }
   };
-
-  useEffect(() => {
-    fetchCommonData();
-  }, []);
 
   return (
     <Accordion>

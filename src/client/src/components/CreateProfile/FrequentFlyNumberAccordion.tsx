@@ -26,6 +26,11 @@ import axios from "axios";
 import ConfirmBox from "../CommonComponents/ConfirmBox";
 import { useConfirmDialog } from "../../hooks/useConfirmDialog";
 import { baseURL } from "../../features/Helpers/helper";
+import {
+  deleteFFNAPI,
+  getFFNByCustomerAPI,
+  updateFFNAPI,
+} from "../../features/services/CustomerProfile/apiMethods";
 
 type FFNListType = {
   FFN: string;
@@ -67,13 +72,11 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
 
   const update = () => {
     if (!validate()) return;
-
-    axios
-      .put(`${baseURL}/updateFFN/${frequentFlyerNumber?.FFNId}`, {
-        CustomerProfileId: CustomerProfileId,
-        FFN: frequentFlyerNumber?.FFN,
-        SystemUser: SystemUser,
-      })
+    updateFFNAPI(
+      CustomerProfileId,
+      frequentFlyerNumber?.FFN,
+      frequentFlyerNumber?.FFNId ?? 0
+    )
       .then(() => {
         let updatingItem = fFNList.find(
           (ffn) => ffn.FFNId === frequentFlyerNumber?.FFNId
@@ -120,18 +123,12 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
   };
 
   const deleteFFN = (id: number) => {
-    axios
-      .delete(`${baseURL}/deleteFFN/${id}`, {
-        data: {
-          CustomerProfileId: CustomerProfileId,
-          SystemUser: SystemUser,
-        },
-      })
+    deleteFFNAPI(id, CustomerProfileId)
       .then(() => {
+        notifySuccess("Frequent Flyer Number deleted successfully");
+
         const newFFNList = fFNList.filter((ffn) => ffn.FFNId !== id);
         setFFNList(newFFNList);
-
-        notifySuccess("Frequent Flyer Number deleted successfully");
       })
       .catch((error) => {
         console.log("Error : ", error);
@@ -151,14 +148,10 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
   const getAllFFN = (CustomerProfileId: string) => {
     if (!CustomerProfileId) return;
 
-    axios
-      .post(`${baseURL}/getFFNByCustomer`, {
-        SystemUser: SystemUser,
-        CustomerProfileId: CustomerProfileId,
-      })
+    getFFNByCustomerAPI(CustomerProfileId)
       .then((response) => {
         setFFNList(
-          response.data.map(
+          response.map(
             (ffn: any) =>
               ({
                 FFN: ffn.ffn,

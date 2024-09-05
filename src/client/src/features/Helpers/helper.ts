@@ -143,7 +143,6 @@ export const convertVisaTypeToSaveVisaType = (visa: VISAType): SaveVISAType => {
     IssuedDate: visa.issuedDate,
     ExpiryDate: visa.expireDate,
     CustomerProfileId: "",
-    SystemUserId: "9",
     PassportId: "",
   };
 };
@@ -154,7 +153,6 @@ export const convertPassportTypeToSavePassportRequestType = (
   return {
     Id: passport.id,
     CustomerProfileId: "",
-    SystemUserId: "9",
     ParentId: "",
     LastName: passport.lastName.trim(),
     OtherNames: passport.otherNames.trim(),
@@ -187,3 +185,6 @@ export const getUserRole = (cookieValue: any): string => {
 
 export const baseURL = import.meta.env.VITE_API_BASE_URL as string;
 export const authRedirectURL = import.meta.env.VITE_AUTH_REDIRECT_URL as string;
+export const clientId = import.meta.env.VITE_AUTH_CLIENT_ID as string;
+export const authority = import.meta.env.VITE_AUTH_Authority as string;
+export const scopes = import.meta.env.VITE_AD_SCOPE as string;

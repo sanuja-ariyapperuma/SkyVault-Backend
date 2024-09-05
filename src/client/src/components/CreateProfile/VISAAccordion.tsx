@@ -10,11 +10,7 @@ import VISAInfo from "./VISAInfo";
 
 import customerProfileStyles from "./CustomerProfile.module.css";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
-import axios from "axios";
-import {
-  SaveVISAResponseType,
-  VISAType,
-} from "../../features/Types/CustomerProfile/VISAType";
+import { VISAType } from "../../features/Types/CustomerProfile/VISAType";
 import {
   addSingleVISA,
   removeSingleVISA,
@@ -23,12 +19,17 @@ import {
 } from "../../features/reducers/VISAListReducer";
 import { useEffect, useState } from "react";
 import {
-  baseURL,
   convertVisaTypeToSaveVisaType,
   validateVISA,
 } from "../../features/Helpers/helper";
 import { useDispatch } from "react-redux";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
+import {
+  deleteVisaAPI,
+  getVisaByCustomerAPI,
+  saveVisaAPI,
+  updateVisaAPI,
+} from "../../features/services/CustomerProfile/apiMethods";
 
 type VISAAccordionProps = {
   customerProfileId: string;
@@ -95,12 +96,10 @@ const VISAAccordion = (props: VISAAccordionProps) => {
       return;
     }
 
-    axios
-      .post<SaveVISAResponseType>(`${baseURL}/AddVISA`, savingVisa)
+    saveVisaAPI(savingVisa)
       .then((response) => {
         notifySuccess("VISA added successfully");
-
-        visa.id = response.data.VisaId;
+        visa.id = response.VisaId;
         visa.countryName =
           country.find((c: OptionsType) => c.value === visa.countryId)?.label ??
           "";
@@ -131,30 +130,18 @@ const VISAAccordion = (props: VISAAccordionProps) => {
       return;
     }
 
-    axios
-      .put<SaveVISAResponseType>(
-        `${baseURL}/updatevisa/${visa.id}`,
-        updatingVisa
-      )
-      .then((response) => {
-        if (response.status == 200) {
-          visa.countryName =
-            country.find((c: OptionsType) => c.value === visa.countryId)
-              ?.label ?? "";
-          visa.passportNumber = visa.assignedToPrimaryPassport
-            ? primaryPassportId ?? ""
-            : secondaryPassportId ?? "";
+    updateVisaAPI(visa.id, updatingVisa)
+      .then(() => {
+        visa.countryName =
+          country.find((c: OptionsType) => c.value === visa.countryId)?.label ??
+          "";
+        visa.passportNumber = visa.assignedToPrimaryPassport
+          ? primaryPassportId ?? ""
+          : secondaryPassportId ?? "";
 
-          dispatch(updateSingle(visa));
-
-          setVisa(initialVisa);
-
-          notifySuccess("VISA updated successfully");
-        } else {
-          notifyError(
-            "Something went wrong. VISA did not updated successfully"
-          );
-        }
+        dispatch(updateSingle(visa));
+        setVisa(initialVisa);
+        notifySuccess("VISA updated successfully");
       })
       .catch((error) => {
         notifyError(`Sorry! ${error.message}`);
@@ -187,17 +174,10 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     );
   };
   const deleteVISA = (id: string) => {
-    axios
-      .delete(`${baseURL}/deletevisa/${id}`, {
-        data: { SystemUserId: "9", CustomerProfileId: customerProfileId },
-      })
-      .then((response) => {
-        if (response.status == 200) {
-          dispatch(removeSingleVISA(id));
-          notifySuccess("VISA deleted successfully");
-        } else {
-          notifyError("Something went wrong. VISA did not delete successfully");
-        }
+    deleteVisaAPI(id)
+      .then(() => {
+        dispatch(removeSingleVISA(id));
+        notifySuccess("VISA deleted successfully");
       })
       .catch((error) => {
         notifyError(`Sorry! ${error.message}`);
@@ -205,22 +185,10 @@ const VISAAccordion = (props: VISAAccordionProps) => {
       });
   };
   const fetchVISAs = async () => {
-    if (!customerProfileId) {
-      return;
-    }
-
-    try {
-      const visaData = await axios.post<VISAType[]>(
-        `${baseURL}/getVISAByCustomer`,
-        {
-          CustomerProfileId: customerProfileId,
-          SystemUserId: "9",
-        }
-      );
-
-      dispatch(replaceVISAList(visaData.data));
-    } catch (error) {
-      console.log("Error", error);
+    if (customerProfileId) {
+      getVisaByCustomerAPI(customerProfileId).then((visaData) => {
+        dispatch(replaceVISAList(visaData));
+      });
     }
   };
   return (

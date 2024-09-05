@@ -8,7 +8,6 @@ namespace SkyVault.Payloads.RequestPayloads;
     public record VisaReqeust(
         string? Id,
         string? CustomerProfileId,
-        string? SystemUserId,
         string? PassportId,
         string? VisaNumber,
         string? IssuedPlace,

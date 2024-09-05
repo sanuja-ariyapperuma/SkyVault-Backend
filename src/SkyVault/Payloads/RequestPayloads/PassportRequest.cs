@@ -8,7 +8,6 @@ namespace SkyVault.Payloads.RequestPayloads;
     public record PassportRequest(
             string? Id,
             string? CustomerProfileId,
-            string? SystemUserId,
             string? ParentId,
             string? LastName,
             string? OtherNames,

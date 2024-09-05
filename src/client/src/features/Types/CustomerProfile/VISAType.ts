@@ -18,7 +18,6 @@ export type SaveVISAType = {
   IssuedDate: string;
   ExpiryDate: string;
   CustomerProfileId: string | null;
-  SystemUserId: string;
   PassportId: string;
 };
 

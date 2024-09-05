@@ -6,6 +6,8 @@ internal static class LoginEndpointExtension
     {
         app.MapGet("/l-check", () => Task.FromResult("Health Check!"));
         app.MapPost("/auth/user", Workloads.AuthenticationWorkload.AuthenticateUser)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
     }
 }

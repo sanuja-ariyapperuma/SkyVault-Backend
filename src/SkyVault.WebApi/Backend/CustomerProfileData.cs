@@ -14,14 +14,18 @@ namespace SkyVault.WebApi.Backend
             db.CustomerProfiles.Include(p => p.Passports)
                 .ThenInclude(o => o.Visas)
                 .FirstOrDefault(p => p.Id == profileId);
-        public List<SearchProfileItem>? Search(string searchQuery, int systemUserId)
+        public List<SearchProfileItem>? Search(string searchQuery, string systemUserUniqueIdentifier)
         {
-            string systemUserRoles = db.SystemUsers.Find(systemUserId)!.UserRole!;
+            var systemUser = db.SystemUsers.FirstOrDefault(e => e.SamProfileId == systemUserUniqueIdentifier);
+
+            var systemUserRole = systemUser!.UserRole;
 
             var query = db.Passports.Where(p =>
-                (systemUserRoles == "admin" ||
-                systemUserRoles == "su.admin" ||
-                p.CustomerProfile.SystemUserId == systemUserId) &&
+                (
+                    systemUserRole!.ToLower() == "superadmin" ||
+                    systemUserRole!.ToLower() == "admin" ||
+                    p.CustomerProfile.SystemUserId == systemUser.Id
+                ) &&
                 (
                     p.PassportNumber.Contains(searchQuery) ||
                     p.LastName.Contains(searchQuery) ||
@@ -47,7 +51,7 @@ namespace SkyVault.WebApi.Backend
 
             return savedprofile.Entity;
         }
-        public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, string correlationId)
+        public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, int systemUserId, string correlationId)
         {
                 var passport = new Passport
                 {
@@ -65,7 +69,7 @@ namespace SkyVault.WebApi.Backend
 
                 var newProfile = new CustomerProfile
                 {
-                    SystemUserId = Convert.ToInt32(passportRequest.SystemUserId),
+                    SystemUserId = Convert.ToInt32(systemUserId),
                     SalutationId = Convert.ToInt32(passportRequest.SalutationId),
                     PreferredCommId = (int)PreferedCommiunicationMethod.None,
                     ParentId = string.IsNullOrWhiteSpace(passportRequest.ParentId) ? null : Convert.ToInt32(passportRequest.ParentId),

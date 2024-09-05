@@ -1,36 +1,23 @@
 import { useState } from "react";
 import Select, { SingleValue } from "react-select";
-import axios from "axios";
 
 import localStyles from "../components/Dashboard/Dashboard.module.css";
 import NavItem from "../components/NavBar/NavItem";
-import { useMsal } from "@azure/msal-react";
 import { debounce } from "lodash";
 
-import {
-  OptionsType,
-  SearchResponse,
-} from "../features/Types/Dashboard/dashboardTypes";
+import { OptionsType } from "../features/Types/Dashboard/dashboardTypes";
 import { useNavigate } from "react-router-dom";
-import { baseURL } from "../features/Helpers/helper";
+import { notifyError } from "../components/CommonComponents/Toasters";
+import { searchProfiles } from "../features/services/Dashboard.ts/apiMethods";
 
 const Dashboard = () => {
-  const { instance, accounts } = useMsal();
   const [options, setOptions] = useState<OptionsType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const request = {
-    scopes: [import.meta.env.VITE_AD_SCOPE as string],
-    account: accounts[0],
-  };
-
-  const handleSearch = debounce((newValue: string) => {
+  const handleSearch = debounce(async (newValue: string) => {
+    setOptions([]);
     setIsLoading(true);
-    const body = {
-      SysUserId: "9",
-      SearchQuery: newValue,
-    };
 
     if (newValue.length == 0) {
       setOptions([]);
@@ -38,33 +25,31 @@ const Dashboard = () => {
       return;
     }
 
-    instance.acquireTokenSilent(request).then(async (response) => {
-      const accessToken = response.accessToken;
+    try {
+      const searchResponse = await searchProfiles(newValue);
+      const profiles = searchResponse.profiles;
 
-      try {
-        const response_1 = await axios.post<SearchResponse>(
-          `${baseURL}/searchprofile`,
-          body,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              ContentType: "application/json",
-            },
-          }
-        );
-        const options = response_1.data.profiles.map((profile): OptionsType => {
+      if (profiles.length === 0) {
+        const option: OptionsType = {
+          value: "",
+          label: "No profile found",
+        };
+        setOptions([option]);
+      } else {
+        const optionsFromDb = profiles.map((profile): OptionsType => {
           return {
             value: profile.profileId,
             label: `${profile.salutation} ${profile.lastName} ${profile.otherNames} | ${profile.passportNumber}`,
           };
         });
-        setOptions(options);
-      } catch (err) {
-        return console.error(err);
-      } finally {
-        setIsLoading(false);
+        setOptions(optionsFromDb);
       }
-    });
+    } catch (err) {
+      notifyError("Something went wrong. Failed to search");
+      return console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   }, 500);
 
   const handleSelect = (newValue: SingleValue<OptionsType>) => {

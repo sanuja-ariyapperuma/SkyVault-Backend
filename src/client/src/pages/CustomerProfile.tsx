@@ -117,9 +117,6 @@ const CustomerProfile = () => {
         CustomerProfileId={customerProfileId ?? ""}
         SystemUser="9"
       />
-      {/* <div className={localStyles.footerButtonArea}>
-        <ButtonPanel OnSave={handleOnSavePrimaryPassport} />
-      </div> */}
     </div>
   );
 };

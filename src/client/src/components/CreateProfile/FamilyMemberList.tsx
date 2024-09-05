@@ -1,9 +1,8 @@
-import axios from "axios";
 import FamilyMember from "./FamilyMember";
 import localStyles from "./FamilyMemberList.module.css";
-import { baseURL } from "../../features/Helpers/helper";
 import { useEffect, useState } from "react";
 import { FamilyMembersType } from "../../features/Types/CustomerProfile/CustomerProfileType";
+import { getFamilyMembersAPI } from "../../features/services/CustomerProfile/apiMethods";
 
 type FamilyMemberListProps = {
   CustomerProfile: string;
@@ -13,8 +12,7 @@ type FamilyMemberListProps = {
 };
 
 const FamilyMemberList = (props: FamilyMemberListProps) => {
-  const { CustomerProfile, ParentId, SystemUserId, handleOnClickMember } =
-    props;
+  const { CustomerProfile, ParentId, handleOnClickMember } = props;
 
   const [familyMembers, setFamilyMembers] = useState<FamilyMembersType[]>([]);
 
@@ -24,14 +22,10 @@ const FamilyMemberList = (props: FamilyMemberListProps) => {
   }, [CustomerProfile]);
 
   const getFamilyMembers = () => {
-    axios
-      .post<FamilyMembersType[]>(`${baseURL}/getFamilyMembers`, {
-        SystemUserId: SystemUserId,
-        CustomerProfileId: CustomerProfile,
-      })
+    getFamilyMembersAPI(CustomerProfile)
       .then((response) => {
-        if (response.data.length > 0) {
-          setFamilyMembers(response.data);
+        if (response.length > 0) {
+          setFamilyMembers(response);
         }
       })
       .catch((error) => {

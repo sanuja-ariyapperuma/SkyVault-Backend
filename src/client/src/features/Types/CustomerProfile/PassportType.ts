@@ -16,7 +16,6 @@ export type PassportType = {
 export type SavePassportRequestType = {
   Id: string | null;
   CustomerProfileId: string | null;
-  SystemUserId: string;
   ParentId: string;
   LastName: string;
   OtherNames: string;
