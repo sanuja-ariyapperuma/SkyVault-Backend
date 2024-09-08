@@ -11,6 +11,7 @@ export type PassportType = {
   passportExpiryDate: string;
   countryId: string;
   isPrimary: string;
+  parentId?: string;
 };
 
 export type SavePassportRequestType = {
@@ -28,6 +29,7 @@ export type SavePassportRequestType = {
   CountryId: string;
   IsPrimary: string;
   SalutationId: string;
+  parentId?: string;
 };
 
 export type SavePassportResponseType = {

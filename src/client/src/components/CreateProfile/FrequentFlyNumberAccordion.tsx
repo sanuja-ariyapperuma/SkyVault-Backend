@@ -27,6 +27,7 @@ import ConfirmBox from "../CommonComponents/ConfirmBox";
 import { useConfirmDialog } from "../../hooks/useConfirmDialog";
 import { baseURL } from "../../features/Helpers/helper";
 import {
+  addFFNAPI,
   deleteFFNAPI,
   getFFNByCustomerAPI,
   updateFFNAPI,
@@ -99,17 +100,12 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
   const saveFFN = () => {
     if (!validate()) return;
 
-    axios
-      .post(`${baseURL}/addFFN`, {
-        CustomerProfileId: CustomerProfileId,
-        FFN: frequentFlyerNumber.FFN,
-        SystemUser: SystemUser,
-      })
+    addFFNAPI(frequentFlyerNumber.FFN, CustomerProfileId)
       .then((response) => {
         const newFFNList = [...fFNList];
         newFFNList.push({
           FFN: frequentFlyerNumber?.FFN,
-          FFNId: parseInt(response.data),
+          FFNId: response,
         });
         setFFNList(newFFNList);
         setFrequentFlyerNumber({ FFN: "" });

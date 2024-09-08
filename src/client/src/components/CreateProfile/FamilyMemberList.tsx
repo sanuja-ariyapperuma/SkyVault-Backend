@@ -24,7 +24,7 @@ const FamilyMemberList = (props: FamilyMemberListProps) => {
   const getFamilyMembers = () => {
     getFamilyMembersAPI(CustomerProfile)
       .then((response) => {
-        if (response.length > 0) {
+        if (response.length > 1) {
           setFamilyMembers(response);
         }
       })

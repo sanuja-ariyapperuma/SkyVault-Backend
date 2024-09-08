@@ -15,7 +15,6 @@ import FamilyMemberList from "../components/CreateProfile/FamilyMemberList";
 
 const CustomerProfile = () => {
   let { profileId } = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -46,14 +45,10 @@ const CustomerProfile = () => {
   };
 
   const handleOnAddingFamilyMember = () => {
-    navigate("/customer-profile", {
-      state: {
-        parentId: customerProfileId,
-        customerProfileId: "",
-        primaryPassportId: "",
-        secondaryPassportId: "",
-      },
-    });
+    setParentId(parentId ? parentId : customerProfileId);
+    setCustomerProfileId("");
+    setPrimaryPassportId("");
+    setSecondaryPassportId("");
   };
 
   const handleOnClickMember = (customerId: string) => {
@@ -65,7 +60,11 @@ const CustomerProfile = () => {
       <ConfirmBox {...dialogProps} />
       <div className={localStyles.topHeading}>
         <h2 className={localStyles.pageHeader}>
-          {profileId ? "Update Profile" : "Create Profile"}
+          {profileId && parentId
+            ? "Add Family Member"
+            : profileId
+            ? "Update Profile"
+            : "Create Profile"}
         </h2>
       </div>
       <div className={localStyles.buttonContainer}>
@@ -101,6 +100,7 @@ const CustomerProfile = () => {
         country={country}
         setPrimaryPassportSavedId={setPrimaryPassportSavedId}
         setSecondaryPassportSavedId={setSecondaryPassportSavedId}
+        parentId={parentId ?? ""}
       />
       <VISAAccordion
         customerProfileId={customerProfileId ?? ""}

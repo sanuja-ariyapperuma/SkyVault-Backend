@@ -83,17 +83,9 @@ namespace SkyVault.WebApi.Backend
 
             
         }
-        public bool CheckPassportExists(string passportNumber, string correlationId)
-        {
-            try
-            {
-                return db.Passports.Any(p => p.PassportNumber == passportNumber);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
+        public bool CheckPassportExists(string passportNumber)
+            => db.Passports.Any(p => p.PassportNumber == passportNumber);
+
         public SkyResult<string> UpdateComMethod(ComMethodUpdateRequest comMethodRequest, string correlationId)
         {
             var isCommMethodExists = db.CommunicationMethods.Any(s => s.Id == Convert.ToInt32(comMethodRequest.PrefCommId));
@@ -102,8 +94,7 @@ namespace SkyVault.WebApi.Backend
                 return new SkyResult<string>().Fail("Communication Method does not exist", "4cf0079e-0009", correlationId);
 
             var result = db.CustomerProfiles.Where(c =>
-                c.Id == Convert.ToInt32(comMethodRequest.CustomerProfileId) &&
-                c.SystemUserId == Convert.ToInt32(comMethodRequest.SystemUserId)
+                c.Id == Convert.ToInt32(comMethodRequest.CustomerProfileId)
                 ).ExecuteUpdate(update =>
                     update.SetProperty(cp => cp.PreferredCommId, Convert.ToInt32(comMethodRequest.PrefCommId))
             );
@@ -131,6 +122,7 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<string>().SucceededWithValue("Authorized");
         }
+
         public SkyResult<string> CheckAccessToTheProfileWithVisaId(int visaId, int systemUserId, string correlationId)
         {
             FormattableString query = $@"
@@ -174,20 +166,74 @@ namespace SkyVault.WebApi.Backend
         }
         public SkyResult<List<FamilyMembersResponse>> GetFamilyMembers(int customerId, string correlationId) 
         {
-            var result = db.Passports
-                    .Include(p => p.CustomerProfile)
-                    .Where(p => p.CustomerProfile.ParentId == customerId && p.IsPrimary == "1")
-                    .Select(p => new FamilyMembersResponse
-                    (
-                        p.CustomerProfile.Id,
-                        p.LastName,
-                        p.OtherNames,
-                        p.PassportNumber,
-                        p.CustomerProfile.ParentId == null
-                    )).ToList();
+            
+            var isCustomerParent = db.CustomerProfiles.Where(cp => cp.Id == customerId && cp.ParentId == null).Any();
+            var familyMembers = new List<FamilyMembersResponse>();
 
+            if (isCustomerParent) // Parent
+            {
+                var customerQuery = db.CustomerProfiles
+                    .Include(cp => cp.Passports)
+                    .Include(cp => cp.InverseParent) // children profiles
+                        .ThenInclude(child => child.Passports) // include children's passports
+                    .Where(cp => cp.Id == customerId);
 
-            return new SkyResult<List<FamilyMembersResponse>>().SucceededWithValue(result);
+                var parent = customerQuery.FirstOrDefault();
+
+                //Add Parent
+                familyMembers.Add(new FamilyMembersResponse
+                (
+                    parent!.Id,
+                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
+                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
+                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    true
+                ));
+
+                //Add Children
+                familyMembers.AddRange(parent.InverseParent.Select(child => new FamilyMembersResponse
+                (
+                    child.Id,
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    false
+                )).OrderBy(a => a.OtherNames));
+            }
+            else // Child
+            {
+                var customerQuery = db.CustomerProfiles
+                    .Include(cp => cp.Parent)
+                        .ThenInclude(p => p.Passports)
+                    .Include(p => p.Parent)
+                        .ThenInclude(parent => parent.InverseParent)
+                        .ThenInclude(child => child.Passports)
+                    .Where(cp => cp.Id == customerId);
+
+                var result = customerQuery.ToList();
+
+                //Add Parent
+                familyMembers.Add(new FamilyMembersResponse
+                (
+                    result[0].Parent!.Id,
+                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
+                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
+                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    true
+                ));
+
+                //Add Children
+                familyMembers.AddRange(result[0].Parent!.InverseParent.Select(child => new FamilyMembersResponse
+                (
+                    child.Id,
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    false
+                )).OrderBy(a => a.OtherNames));
+            }
+
+            return new SkyResult<List<FamilyMembersResponse>>().SucceededWithValue(familyMembers);
 
         }
     }

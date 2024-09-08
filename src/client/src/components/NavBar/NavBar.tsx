@@ -31,12 +31,20 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    if (cookie.TravelChannel) {
-      setFullName(getDisplayName(cookie));
-      setUserRole(getUserRole(cookie));
-    } else {
-      console.error("Cookie not found");
-    }
+    // console.log("Cookie Value :", cookie);
+    // if (cookie.TravelChannel) {
+    //   setFullName(getDisplayName(cookie));
+    //   setUserRole(getUserRole(cookie));
+    // } else {
+    const activeAccount = accounts[0];
+    setFullName(activeAccount.name ?? "");
+    setUserRole(
+      activeAccount.idTokenClaims?.roles?.length ?? 0 > 0
+        ? activeAccount.idTokenClaims?.roles?.[0] ?? ""
+        : ""
+    );
+    //   console.log("Active Account :", activeAccount);
+    // }
   }, [cookie]);
 
   return (

@@ -26,7 +26,7 @@ namespace SkyVault.WebApi.Workloads
             try
             {
 
-                var uniqueUserIdentifyer = context.User.Identity!.Name;
+                var userIdentifyer = context.User.Identity!.Name;
 
                 _correlationId = CorrelationHandler.Get(context);
 
@@ -34,7 +34,7 @@ namespace SkyVault.WebApi.Workloads
 
                 var customerProfiles = customerProfileData.Search(
                     searchProfileRequest.SearchQuery!,
-                    uniqueUserIdentifyer!);
+                    userIdentifyer!);
 
                 return Results.Ok(new SearchProfileResponse(searchProfileRequest.SearchQuery!, 
                     customerProfiles!));
@@ -64,27 +64,22 @@ namespace SkyVault.WebApi.Workloads
         {
             try
             {
+                SaveUpdateCustomerProfileResponse savedCustomerProfile;
                 var customerProfileData = new CustomerProfileData(dbContext);
                 var systemUserData = new SystemUserData(dbContext);
 
-                SaveUpdateCustomerProfileResponse savedCustomerProfile;
-
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-
                 if (String.IsNullOrEmpty(passportRequest.CustomerProfileId?.Trim())) 
                 {
+
+
+                    var userId = (String.IsNullOrEmpty(passportRequest.ParentId?.Trim())) ? 
+                        GetUserId(context, systemUserData) : 
+                        GetUserIdForCustomerProfile(context, systemUserData, customerProfileData, passportRequest.ParentId);
+
                     if (!IsPassportDataValid(passportRequest))
                         return Results.BadRequest("Invalid data found");  
 
-                    var checkPassportExists = customerProfileData.CheckPassportExists(passportRequest.PassportNumber ?? "", _correlationId);
+                    var checkPassportExists = customerProfileData.CheckPassportExists(passportRequest.PassportNumber ?? "");
 
                     if (checkPassportExists)
                         return Results.BadRequest("A passport from the provided passport number is already existing");
@@ -99,17 +94,14 @@ namespace SkyVault.WebApi.Workloads
                 }
                 else 
                 {
+                    var customer_profile_data = new CustomerProfileData(dbContext);
 
-                    var authorized = customerProfileData.CheckAccessToTheProfile(
-                        Convert.ToInt32(passportRequest.CustomerProfileId),
-                        Convert.ToInt32(userId),
-                        _correlationId
+                    GetUserIdForCustomerProfile(
+                        context,
+                        systemUserData,
+                        customer_profile_data,
+                        passportRequest.CustomerProfileId
                     );
-
-                    if (!authorized.Succeeded)
-                        return Results.Problem(
-                                            new ValidationProblemDetails().ToValidationProblemDetails(
-                                                authorized.Message, authorized.ErrorCode, _correlationId));
 
                     var passportData = new PassportData(dbContext);
                     var savepassport = passportData.AddNewPassport(passportRequest, _correlationId);
@@ -124,7 +116,7 @@ namespace SkyVault.WebApi.Workloads
 
                 
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 e.LogException(_correlationId);
 
@@ -134,55 +126,42 @@ namespace SkyVault.WebApi.Workloads
             }
         }
 
-        public static IResult GetPassports(
+        public static IResult GetPassportsByCustomerProfileId(
             [FromRoute] string profileId,
             SkyvaultContext dbContext,
             HttpContext context
-            )
+        )
         {
             try
             {
-            _correlationId = CorrelationHandler.Get(context);
+            
+                _correlationId = CorrelationHandler.Get(context);
 
-            var passportData = new PassportData(dbContext);
-            var customer_profile_data = new CustomerProfileData(dbContext);
-            var systemUserData = new SystemUserData(dbContext);
+                var passportData = new PassportData(dbContext);
+                var customer_profile_data = new CustomerProfileData(dbContext);
+                var systemUserData = new SystemUserData(dbContext);
 
-            var userUpn = context.User.Identity!.Name;
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customer_profile_data,
+                    profileId);
 
-            if (String.IsNullOrEmpty(userUpn))
-                 return Results.Problem(
-                     new ProblemDetails().ToProblemDetails(
-                         "System user not found", "30550615-0003", _correlationId));
+                var passport = passportData.GetPassportByCustomerProfileId(Convert.ToInt32(profileId), _correlationId);
 
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorization = customer_profile_data.CheckAccessToTheProfile(
-                Convert.ToInt32(profileId),
-                userId,
-                _correlationId
-                );
-
-            if (!authorization.Succeeded)
-                return Results.Problem(
-                                   new ValidationProblemDetails().ToValidationProblemDetails(
-                                        authorization.Message, "30550615-0004", _correlationId));
-
-            var passport = passportData.GetPassportByCustomerProfileId(Convert.ToInt32(profileId), _correlationId);
-
-            return Results.Ok(passport.Value?.Select(p => new PassportResponse(
-                    p.Id.ToString(),
-                    p.LastName,
-                    p.OtherNames,
-                    p.PassportNumber,
-                    p.Gender,
-                    p.DateOfBirth.ToString(),
-                    p.PlaceOfBirth,
-                    p.ExpiryDate.ToString(),
-                    p.NationalityId.ToString(),
-                    p.CountryId.ToString(),
-                    p.IsPrimary.ToString(),
-                    p.CustomerProfile.SalutationId.ToString()
+                return Results.Ok(passport.Value?.Select(p => new PassportResponse(
+                        p.Id.ToString(),
+                        p.LastName,
+                        p.OtherNames,
+                        p.PassportNumber,
+                        p.Gender,
+                        p.DateOfBirth.ToString(),
+                        p.PlaceOfBirth,
+                        p.ExpiryDate.ToString(),
+                        p.NationalityId.ToString(),
+                        p.CountryId.ToString(),
+                        p.IsPrimary.ToString(),
+                        p.CustomerProfile.SalutationId.ToString()
             )));
 
             }
@@ -212,34 +191,21 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    passportRequest.CustomerProfileId!);
 
-                if (String.IsNullOrEmpty(userUpn))
+                var result = passportData.UpdatePassport(passportRequest, _correlationId);
+
+                if (!result.Succeeded)
                     return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
+                        new ValidationProblemDetails().ToValidationProblemDetails(
+                        result.Message, result.ErrorCode, _correlationId)
+                    );
 
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                Convert.ToInt32(passportRequest.CustomerProfileId),
-                Convert.ToInt32(userId),
-                _correlationId
-            );
-
-            if (!authorized.Succeeded)
-                return Results.Problem(
-                                    new ValidationProblemDetails().ToValidationProblemDetails(
-                                        authorized.Message, authorized.ErrorCode, _correlationId));
-
-            var result = passportData.UpdatePassport(passportRequest, _correlationId);
-
-            if (!result.Succeeded)
-                return Results.Problem(
-                    new ValidationProblemDetails().ToValidationProblemDetails(
-                    result.Message, result.ErrorCode, _correlationId));
-
-            return Results.Ok(new SaveUpdateCustomerProfileResponse(passportRequest.CustomerProfileId));
+                return Results.Ok(new SaveUpdateCustomerProfileResponse(passportRequest.CustomerProfileId));
 
             }
             catch (System.Exception e)
@@ -265,26 +231,11 @@ namespace SkyVault.WebApi.Workloads
                 var customer_profile_data = new CustomerProfileData(dbContext);
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-
-                var authorization = customer_profile_data.CheckAccessToTheProfile(
-                        Convert.ToInt32(profileId),
-                        Convert.ToInt32(userId),
-                        _correlationId
-                    );
-
-                if (!authorization.Succeeded)
-                    return Results.Problem(
-                                       new ValidationProblemDetails().ToValidationProblemDetails(
-                                            "Unauthorized", "30550615-0007", _correlationId));
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customer_profile_data,
+                    profileId);
 
                 var result = visaData.GetVisaByCustomerProfileId(
                     Convert.ToInt32(profileId),
@@ -327,26 +278,11 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                    Convert.ToInt32(visaReqeust.CustomerProfileId),
-                    Convert.ToInt32(userId),
-                    _correlationId
-                );
-
-                if(!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
-
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    visaReqeust.CustomerProfileId!);
 
                 var result = visaData.AddVisa(visaReqeust, _correlationId);
 
@@ -355,7 +291,7 @@ namespace SkyVault.WebApi.Workloads
                                         new ValidationProblemDetails().ToValidationProblemDetails(
                                             result.Message, result.ErrorCode, _correlationId));
 
-                return Results.Ok(new AddVISAResponse(result.Value));    
+                return Results.Ok(new AddVISAResponse(result.Value!));    
             }
             catch (Exception e)
             {
@@ -380,25 +316,12 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                    Convert.ToInt32(visaReqeust.CustomerProfileId),
-                    userId,
-                    _correlationId
-                );
-
-                if(!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
+                int userId = GetUserIdForCustomerProfile(
+                                context,
+                                systemUserData,
+                                customerProfileData,
+                                visaReqeust.CustomerProfileId!
+                             );
                     
                 var result = visaData.UpdateVisa(visaId, visaReqeust, userId, _correlationId);
 
@@ -432,25 +355,12 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                        Convert.ToInt32(comMethodRequest.CustomerProfileId),
-                        userId,
-                        _correlationId
-                    );
-
-                    if(!authorized.Succeeded)
-                        return Results.Problem(
-                                            new ValidationProblemDetails().ToValidationProblemDetails(
-                                                authorized.Message, authorized.ErrorCode, _correlationId));
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    comMethodRequest.CustomerProfileId!
+                );
 
                 var result = customerProfileData.UpdateComMethod(comMethodRequest, _correlationId);
 
@@ -472,28 +382,26 @@ namespace SkyVault.WebApi.Workloads
             
         }
 
-        public static IResult GetComMethod([FromBody] GetComMethodRequest comMethodRequest,
-                       SkyvaultContext dbContext,
-                                  HttpContext context) 
+        public static IResult GetCommMethod(
+                        [FromBody] GetComMethodRequest comReqeust,
+                        SkyvaultContext dbContext,
+                        HttpContext context) 
         {
             try
             {
                 _correlationId = CorrelationHandler.Get(context);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
+                var systemUserData = new SystemUserData(dbContext);
 
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                    Convert.ToInt32(comMethodRequest.CustomerProfileId),
-                    Convert.ToInt32(comMethodRequest.SystemUserId),
-                    _correlationId
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    comReqeust.CustomerProfileId
                 );
 
-                if (!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
-
-                var result = customerProfileData.GetComMethod(Convert.ToInt32(comMethodRequest.CustomerProfileId), _correlationId);
+                var result = customerProfileData.GetComMethod(Convert.ToInt32(comReqeust.CustomerProfileId), _correlationId);
 
                 if (!result.Succeeded)
                     return Results.Problem(
@@ -524,6 +432,7 @@ namespace SkyVault.WebApi.Workloads
                 _correlationId = CorrelationHandler.Get(context);
 
                 var visaData = new VisaData(dbContext);
+
 
                 if (int.TryParse(visaId, out int deletingVisa))
                 {
@@ -565,31 +474,16 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                       Convert.ToInt32(ffnRequest.CustomerProfileId),
-                       userId,
-                       _correlationId
-                   );
-
-                if (!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
-
-
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    ffnRequest.CustomerProfileId!
+                );
 
                 if (int.TryParse(ffnRequest.CustomerProfileId, out int cutomerId))
                 {
-                    var result = ffnData.AddFFN(cutomerId, ffnRequest.FFN, _correlationId);
+                    var result = ffnData.AddFFN(cutomerId, ffnRequest.FFN!, _correlationId);
 
                     if (!result.Succeeded)
                         return Results.Problem(
@@ -625,31 +519,18 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                       Convert.ToInt32(ffnRequest.CustomerProfileId),
-                       userId,
-                       _correlationId
-                   );
-
-                if (!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    ffnRequest.CustomerProfileId!
+                );
 
                 var ffnData = new FFNData(dbContext);
 
                 if (int.TryParse(ffId, out int ffnId))
                 {
-                    var result = ffnData.UpdateFFN(ffnId, ffnRequest.FFN, _correlationId);
+                    var result = ffnData.UpdateFFN(ffnId, ffnRequest.FFN!, _correlationId);
 
                     if (!result.Succeeded)
                         return Results.Problem(
@@ -684,26 +565,12 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                       Convert.ToInt32(ffnRequest.CustomerProfileId),
-                       userId,
-                       _correlationId
-                   );
-
-                if (!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    ffnRequest.CustomerProfileId!
+                );
 
                 var ffnData = new FFNData(dbContext);
 
@@ -744,28 +611,14 @@ namespace SkyVault.WebApi.Workloads
                 var ffnData = new FFNData(dbContext);
 
                 var customerProfileData = new CustomerProfileData(dbContext);
-
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                       Convert.ToInt32(profileId),
-                       userId,
-                       _correlationId
-                   );
-
-                if (!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    profileId
+                );
 
                 if (int.TryParse(profileId, out int custId))
                 {
@@ -800,32 +653,16 @@ namespace SkyVault.WebApi.Workloads
             _correlationId = CorrelationHandler.Get(context);
             var customerProfileData = new CustomerProfileData(dbContext);
 
-            
-
             if (int.TryParse(profileId, out int custId)) 
             {
                 var systemUserData = new SystemUserData(dbContext);
 
-                var userUpn = context.User.Identity!.Name;
-
-                if (String.IsNullOrEmpty(userUpn))
-                    return Results.Problem(
-                        new ProblemDetails().ToProblemDetails(
-                            "System user not found", "30550615-0003", _correlationId));
-
-                var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
-
-                var authorized = customerProfileData.CheckAccessToTheProfile(
-                       custId,
-                       userId,
-                       _correlationId
+                GetUserIdForCustomerProfile(
+                    context,
+                    systemUserData,
+                    customerProfileData,
+                    profileId
                 );
-
-                if (!authorized.Succeeded)
-                    return Results.Problem(
-                                        new ValidationProblemDetails().ToValidationProblemDetails(
-                                            authorized.Message, authorized.ErrorCode, _correlationId));
-
 
                 var result = customerProfileData.GetFamilyMembers(custId, _correlationId);
 
@@ -861,6 +698,51 @@ namespace SkyVault.WebApi.Workloads
 
             return true;
         }
+
+        private static int GetUserIdForCustomerProfile(
+            HttpContext context, 
+            SystemUserData systemUserData, 
+            CustomerProfileData customerProfileData,
+            string customerProfileId
+            )
+        {
+            var userUpn = context.User.Identity!.Name;
+
+            if (String.IsNullOrEmpty(userUpn))
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId);
+
+            if (!userId.Succeeded)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            var authorized = customerProfileData.CheckAccessToTheProfile(
+                        Convert.ToInt32(customerProfileId),
+                        Convert.ToInt32(userId.Value),
+                        _correlationId
+                    );
+
+            if (!authorized.Succeeded)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            return systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
+        }
+
+        private static int GetUserId(
+            HttpContext context,
+            SystemUserData systemUserData
+            ) 
+        {
+            var userUpn = context.User.Identity!.Name;
+
+            if (String.IsNullOrEmpty(userUpn))
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId);
+
+            return userId.Value;
+        }
+
         #endregion
 
     }

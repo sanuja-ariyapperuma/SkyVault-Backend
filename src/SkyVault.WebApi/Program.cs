@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using SkyVault.WebApi.Authentication;
@@ -32,15 +33,24 @@ public static class Program
     .AddMicrosoftIdentityWebApi(options =>
     {
         builder.Configuration.Bind("AzureAd", options);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
     }, options =>
     {
         builder.Configuration.Bind("AzureAd", options);
     });
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("RequireAppRole", policy => policy.RequireClaim("roles", "YourAppRole"));
-        });
+        //builder.Services.AddAuthorization();
+
+        //builder.Services.AddAuthorization(options =>
+        //{
+        //    options.AddPolicy("RequireAppRole", policy => policy.RequireClaim("roles", "YourAppRole"));
+        //});
 
         //builder.Services.AddMicrosoftGraph(options => {
         //    options.Scopes = ["User.Read"];
@@ -59,7 +69,7 @@ public static class Program
                 });
         });
 
-        builder.Services.AddAuthorization();
+       
 
         Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)

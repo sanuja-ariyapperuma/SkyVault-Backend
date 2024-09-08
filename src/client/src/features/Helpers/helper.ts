@@ -165,6 +165,7 @@ export const convertPassportTypeToSavePassportRequestType = (
     CountryId: passport.countryId,
     IsPrimary: passport.isPrimary,
     SalutationId: passport.salutationId,
+    parentId: passport.parentId,
   };
 };
 
@@ -174,6 +175,7 @@ const decodeCookie = (cookieValue: any): AuthenticatedUser => {
 };
 
 export const getDisplayName = (cookieValue: any): string => {
+  console.log("called");
   const decodedValue = decodeCookie(cookieValue);
   return decodedValue.DisplayName;
 };

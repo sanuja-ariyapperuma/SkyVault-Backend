@@ -102,3 +102,33 @@ export const deleteFFNAPI = async (
     },
   });
 };
+
+export const addFFNAPI = async (
+  FFN: string,
+  CustomerProfileId: string
+): Promise<number> => {
+  const response = await api.post("/addFFN", {
+    FFN: FFN,
+    CustomerProfileId: CustomerProfileId,
+  });
+  return response.data;
+};
+
+export const updateComMethodAPI = async (
+  CustomerProfileId: string,
+  PrefCommId: string
+): Promise<void> => {
+  await api.post(`/updateCommMethod`, {
+    CustomerProfileId: CustomerProfileId,
+    PrefCommId: PrefCommId,
+  });
+};
+
+export const getComMethodAPI = async (
+  CustomerProfileId: string
+): Promise<number> => {
+  const response = await api.post(`/getComMethod`, {
+    CustomerProfileId: CustomerProfileId,
+  });
+  return response.data;
+};

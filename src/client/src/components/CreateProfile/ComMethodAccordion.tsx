@@ -14,6 +14,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import { baseURL } from "../../features/Helpers/helper";
+import {
+  getComMethodAPI,
+  updateComMethodAPI,
+} from "../../features/services/CustomerProfile/apiMethods";
 
 enum CommunicationMethod {
   None = 1,
@@ -51,12 +55,7 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
   };
 
   const updateComMethod = (comMethod: number) => {
-    axios
-      .post(`${baseURL}/updateCommMethod`, {
-        CustomerProfileId: CustomerProfileId,
-        SystemUserId: SystemUser,
-        PrefCommId: comMethod.toString(),
-      })
+    updateComMethodAPI(CustomerProfileId, comMethod.toString())
       .then(() => {
         notifySuccess("Communication method updated successfully");
         setComMethod(comMethod);
@@ -69,13 +68,9 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
 
   const getComMethodOnCustomerProfile = () => {
     if (CustomerProfileId) {
-      axios
-        .post(`${baseURL}/getCommMethod`, {
-          SystemUserId: SystemUser,
-          CustomerProfileId: CustomerProfileId,
-        })
+      getComMethodAPI(CustomerProfileId)
         .then((response) => {
-          setComMethod(parseInt(response.data));
+          setComMethod(response);
         })
         .catch((error) => {
           console.log(error);

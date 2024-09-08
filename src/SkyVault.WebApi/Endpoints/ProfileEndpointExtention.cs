@@ -60,14 +60,16 @@
                 .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapPost("/updateCommMethod", Workloads.ProfileWorkload.UpdateComMethod)
+                .RequireAuthorization()
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
-            app.MapPost("/getCommMethod", Workloads.ProfileWorkload.GetComMethod)
+            app.MapPost("/getComMethod", Workloads.ProfileWorkload.GetCommMethod)
+                .RequireAuthorization()
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
-            app.MapGet("/getPassportsByCustomerProfileId/{profileId}", Workloads.ProfileWorkload.GetPassports)
+            app.MapGet("/getPassportsByCustomerProfileId/{profileId}", Workloads.ProfileWorkload.GetPassportsByCustomerProfileId)
                 .RequireAuthorization()
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);

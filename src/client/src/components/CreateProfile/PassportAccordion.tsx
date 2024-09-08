@@ -41,6 +41,7 @@ type PassportAccordionProps = {
   country: OptionsType[];
   setPrimaryPassportSavedId: (id: string) => void;
   setSecondaryPassportSavedId: (id: string) => void;
+  parentId?: string;
 };
 
 const PassportAccordion = (props: PassportAccordionProps) => {
@@ -53,6 +54,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     setCountry,
     setPrimaryPassportSavedId,
     setSecondaryPassportSavedId,
+    parentId,
   } = props;
   const [salutations, setSalutations] = useState<OptionsType[]>([]);
   const [gender, setGender] = useState<OptionsType[]>([]);
@@ -141,9 +143,12 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   };
 
   const handleOnSavePrimaryPassport = (): void => {
+    primaryPassport.parentId = parentId ?? "";
+
     const passport: SavePassportRequestType =
       convertPassportTypeToSavePassportRequestType(primaryPassport);
     passport.CustomerProfileId = customerProfileId;
+
     savePassport(passport);
   };
 
