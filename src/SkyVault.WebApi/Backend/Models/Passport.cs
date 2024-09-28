@@ -19,7 +19,7 @@ public partial class Passport
 
     public DateOnly DateOfBirth { get; set; }
 
-    public DateOnly? ExpiryDate { get; set; }
+    public DateOnly ExpiryDate { get; set; }
 
     public string? PlaceOfBirth { get; set; }
 

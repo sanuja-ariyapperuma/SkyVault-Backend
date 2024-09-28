@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -26,6 +27,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+builder.Services.AddAuthentication(sharedOptions =>
+{
+    sharedOptions.DefaultScheme = AzureADDefaults.AuthenticationScheme;
 });
 /*builder.Services.AddAuthentication(azureOptions =>
     {

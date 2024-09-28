@@ -1,7 +1,4 @@
-import {
-  CustomerProfileType,
-  FamilyMembersType,
-} from "../../Types/CustomerProfile/CustomerProfileType";
+import { FamilyMembersType } from "../../Types/CustomerProfile/CustomerProfileType";
 import {
   PassportType,
   SavePassportRequestType,

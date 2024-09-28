@@ -1,6 +1,5 @@
 import { Button } from "@mui/material";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { useNavigate } from "react-router-dom";
 
 type FamilyMemberProps = {
   MemberName: string;
@@ -13,13 +12,11 @@ type FamilyMemberProps = {
 };
 
 const FamilyMember = (prop: FamilyMemberProps) => {
-  const navigate = useNavigate();
   const {
     MemberName,
     IsCurrent,
     IsPrimary,
     PassportNumber,
-    ParentId,
     MemberId,
     handleOnClickMember,
   } = prop;

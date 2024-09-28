@@ -9,7 +9,6 @@ const initialState: UserState = {
   user: {
     fullName: "",
     userRole: "",
-    accessToken: "",
   },
 };
 
@@ -24,7 +23,6 @@ export const userContextSlice = createSlice({
       state.user = {
         fullName: "",
         userRole: "",
-        accessToken: "",
       };
     },
   },

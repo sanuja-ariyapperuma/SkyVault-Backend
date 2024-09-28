@@ -9,12 +9,11 @@ import NavItem from "./NavItem";
 import { ToastContainer } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
-import { getDisplayName, getUserRole } from "../../features/Helpers/helper";
 
 const NavBar = () => {
   const { instance, accounts } = useMsal();
 
-  const [cookie, setCookie, removeCookie] = useCookies(["TravelChannel"]);
+  const [cookie, _, removeCookie] = useCookies(["TravelChannel"]);
   const [fullName, setFullName] = useState<string>("");
   const [userRole, setUserRole] = useState<string>("");
 
@@ -31,11 +30,6 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    // console.log("Cookie Value :", cookie);
-    // if (cookie.TravelChannel) {
-    //   setFullName(getDisplayName(cookie));
-    //   setUserRole(getUserRole(cookie));
-    // } else {
     const activeAccount = accounts[0];
     setFullName(activeAccount.name ?? "");
     setUserRole(
@@ -43,8 +37,6 @@ const NavBar = () => {
         ? activeAccount.idTokenClaims?.roles?.[0] ?? ""
         : ""
     );
-    //   console.log("Active Account :", activeAccount);
-    // }
   }, [cookie]);
 
   return (

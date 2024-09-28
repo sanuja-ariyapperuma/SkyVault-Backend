@@ -7,10 +7,17 @@ type CustomSelectProps = {
   onChange: (selectedValue: string) => void;
   placeholder: string;
   initialValue?: string;
+  isDisabled?: boolean;
 };
 
 const CustomSelect = (props: CustomSelectProps) => {
-  const { options, onChange, placeholder, initialValue } = props;
+  const {
+    options,
+    onChange,
+    placeholder,
+    initialValue,
+    isDisabled = false,
+  } = props;
 
   const [val, setVal] = useState<OptionsType | null>(null);
 
@@ -51,6 +58,7 @@ const CustomSelect = (props: CustomSelectProps) => {
         <TextField {...params} label={placeholder} variant="standard" />
       )}
       onChange={handleChange}
+      disabled={isDisabled}
     />
   );
 };

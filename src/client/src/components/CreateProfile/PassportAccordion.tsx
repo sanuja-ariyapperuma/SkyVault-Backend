@@ -18,15 +18,14 @@ import {
 } from "../../features/Types/CustomerProfile/PassportType";
 
 import {
-  baseURL,
   convertPassportTypeToSavePassportRequestType,
+  isPreviousDate,
   validatePassport,
   validatePassportFields,
 } from "../../features/Helpers/helper";
-import axios from "axios";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useAccessToken } from "../../hooks/useAccessToken";
 import { fetchCommonDataAPI } from "../../features/services/CustomerProfile/CommonData/apiMethods";
 import {
@@ -198,6 +197,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
       );
       return;
     }
+
     setSecondaryPassport({
       ...secondaryPassport,
       [field]: value,
@@ -207,14 +207,15 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   const handleFieldChange = (field: string, value: string | Dayjs) => {
     if (!validatePassportFields(field, value)) return;
 
-    console.log("field", field, " | ", "value", value);
-    console.log("primaryPassport", primaryPassport.countryId);
-
     if (field === "countryId" && value === primaryPassport.countryId) {
       notifyError(
         "Primary and Secondary passport countries cannot be the same"
       );
       return;
+    }
+
+    if (field == "dateOfBirth" && isPreviousDate(value as string)) {
+      notifyError("Date of birth cannot be a future date");
     }
 
     setPrimaryPassport({
@@ -324,6 +325,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
                 country={country}
                 customerPassport={secondaryPassport}
                 handleFieldChange={handleFieldChangeSecondaryPassport}
+                isSecondary={true}
               />
             </div>
           )}

@@ -12,5 +12,6 @@ public sealed record PassportResponse(
     string? NationalityId,
     string? CountryId,
     string? IsPrimary,
-    string? SalutationId
+    string? SalutationId,
+    string? PassportCode
     );

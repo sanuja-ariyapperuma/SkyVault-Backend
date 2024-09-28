@@ -65,6 +65,11 @@ export const validatePassport = (
     valid = false;
   }
 
+  if (!isPreviousDate(passport.DateOfBirth)) {
+    notifyError("Date of birth cannot be a future date");
+    valid = false;
+  }
+
   return valid;
 };
 
@@ -183,6 +188,15 @@ export const getDisplayName = (cookieValue: any): string => {
 export const getUserRole = (cookieValue: any): string => {
   const decodedValue = decodeCookie(cookieValue);
   return decodedValue.UserRole;
+};
+
+export const isPreviousDate = (date: string): boolean => {
+  const [day, month, year] = date.split("/").map(Number);
+
+  const selectedDate = new Date(year, month - 1, day);
+  const today = new Date();
+
+  return selectedDate < today ? false : true;
 };
 
 export const baseURL = import.meta.env.VITE_API_BASE_URL as string;

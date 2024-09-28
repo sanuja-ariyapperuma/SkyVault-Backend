@@ -6,6 +6,7 @@ import globalStyles from "../CommonComponents/Common.module.css";
 import CustomSelect from "../CommonComponents/CustomSelect";
 import { ChangeEvent } from "react";
 import { PassportType } from "../../features/Types/CustomerProfile/PassportType";
+import { Typography } from "@mui/material";
 
 type PassportInfoProps = {
   salutations: OptionsType[];
@@ -14,6 +15,7 @@ type PassportInfoProps = {
   country: OptionsType[];
   customerPassport: PassportType;
   handleFieldChange: (field: string, value: any) => void;
+  isSecondary?: boolean;
 };
 
 const PassportInfo = (props: PassportInfoProps) => {
@@ -24,6 +26,7 @@ const PassportInfo = (props: PassportInfoProps) => {
     country,
     customerPassport,
     handleFieldChange,
+    isSecondary = false,
   } = props;
 
   const handleSalutationSelect = (value: string) => {
@@ -62,74 +65,88 @@ const PassportInfo = (props: PassportInfoProps) => {
   };
 
   return (
-    <div className={localStyles.accordionContent}>
-      <div className={localStyles.accordionLeft}>
-        <CustomSelect
-          options={salutations}
-          onChange={handleSalutationSelect}
-          placeholder="Salutation"
-          initialValue={customerPassport.salutationId}
-        />
-        <input
-          type="text"
-          placeholder="Other names"
-          className={globalStyles.commonTextInput}
-          value={customerPassport.otherNames}
-          onChange={handleOtherNameChange}
-        />
-        <CustomSelect
-          options={gender}
-          onChange={handleGenderSelect}
-          placeholder="Gender"
-          initialValue={customerPassport.genderId}
-        />
-        <input
-          type="text"
-          placeholder="Passport Number"
-          className={globalStyles.commonTextInput}
-          value={customerPassport.passportNumber}
-          onChange={handleOnPassportNumberChange}
-        />
-        <CustomDatePicker
-          label="Passport Expiry Date"
-          onDateChange={handleOnPassportExpiryChange}
-          initialValue={customerPassport.passportExpiryDate}
-        />
+    <div>
+      <div>
+        <Typography variant="h6" style={{ marginLeft: "5px" }}>
+          {" "}
+          {customerPassport.passportCode}
+        </Typography>
       </div>
-      <div className={localStyles.accordionRight}>
-        <input
-          type="text"
-          placeholder="Last Name"
-          className={globalStyles.commonTextInput}
-          value={customerPassport.lastName}
-          onChange={handleLastNameChange}
-        />
-        <CustomSelect
-          options={nationality}
-          onChange={handleNationalityOnSelect}
-          placeholder="Nationality"
-          initialValue={customerPassport.nationalityId}
-        />
-        <input
-          type="text"
-          placeholder="Place of Birth"
-          className={globalStyles.commonTextInput}
-          value={customerPassport.placeOfBirth}
-          onChange={handleOnPleaceOfBirthChange}
-        />
-        <CustomDatePicker
-          label="Date of Birth"
-          onDateChange={handleOnDateOfBirthChange}
-          initialValue={customerPassport.dateOfBirth}
-        />
-        <CustomSelect
-          options={country}
-          onChange={handleOnCountrySelect}
-          placeholder="Country"
-          initialValue={customerPassport.countryId}
-        />
+      <div className={localStyles.accordionContent}>
+        <div className={localStyles.accordionLeft}>
+          <CustomSelect
+            options={salutations}
+            onChange={handleSalutationSelect}
+            placeholder="Salutation"
+            initialValue={customerPassport.salutationId}
+            isDisabled={isSecondary}
+          />
+          <input
+            type="text"
+            placeholder="Other names"
+            className={globalStyles.commonTextInput}
+            value={customerPassport.otherNames}
+            onChange={handleOtherNameChange}
+            disabled={isSecondary}
+          />
+          <CustomSelect
+            options={gender}
+            onChange={handleGenderSelect}
+            placeholder="Gender"
+            initialValue={customerPassport.genderId}
+            isDisabled={isSecondary}
+          />
+          <input
+            type="text"
+            placeholder="Passport Number"
+            className={globalStyles.commonTextInput}
+            value={customerPassport.passportNumber}
+            onChange={handleOnPassportNumberChange}
+          />
+          <CustomDatePicker
+            label="Passport Expiry Date"
+            onDateChange={handleOnPassportExpiryChange}
+            initialValue={customerPassport.passportExpiryDate}
+          />
+        </div>
+        <div className={localStyles.accordionRight}>
+          <input
+            type="text"
+            placeholder="Last Name"
+            className={globalStyles.commonTextInput}
+            value={customerPassport.lastName}
+            onChange={handleLastNameChange}
+            disabled={isSecondary}
+          />
+          <CustomSelect
+            options={nationality}
+            onChange={handleNationalityOnSelect}
+            placeholder="Nationality"
+            initialValue={customerPassport.nationalityId}
+          />
+          <input
+            type="text"
+            placeholder="Place of Birth"
+            className={globalStyles.commonTextInput}
+            value={customerPassport.placeOfBirth}
+            onChange={handleOnPleaceOfBirthChange}
+            disabled={isSecondary}
+          />
+          <CustomDatePicker
+            label="Date of Birth"
+            onDateChange={handleOnDateOfBirthChange}
+            initialValue={customerPassport.dateOfBirth}
+            disableFuture={true}
+            isDisabled={isSecondary}
+          />
+          <CustomSelect
+            options={country}
+            onChange={handleOnCountrySelect}
+            placeholder="Country"
+            initialValue={customerPassport.countryId}
+          />
+        </div>
       </div>
-      <div></div>
     </div>
   );
 };

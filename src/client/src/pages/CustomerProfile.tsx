@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import localStyles from "../components/CreateProfile/CustomerProfile.module.css";
 import { OptionsType } from "../features/Types/Dashboard/dashboardTypes";
 import { useConfirmDialog } from "../hooks/useConfirmDialog";

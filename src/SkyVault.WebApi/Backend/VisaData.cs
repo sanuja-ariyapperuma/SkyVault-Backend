@@ -65,6 +65,8 @@ namespace SkyVault.WebApi.Backend
                 .Include(v => v.Country)
                 .Include(v => v.Passport)
                 .ThenInclude(p => p.CustomerProfile)
+                .Include(v => v.Passport)
+                .ThenInclude(p => p.Country)
                 .Where(v => v.Passport.CustomerProfileId == customerProfileId)
                 .OrderByDescending(v => v.IssuedDate)
                 .ToList();

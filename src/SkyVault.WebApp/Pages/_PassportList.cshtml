@@ -12,7 +12,7 @@
     <tbody>
     @if (TempData["CustomerProfile.PassportList"] != null)
     {
-        @foreach (var passport in (TempData["CustomerProfile.PassportList"] as Passport[])!)
+        @foreach (var passport in (TempData["CustomerProfile.PassportList"] as PassportModal[])!)
         {
             <tr>
                 <td>

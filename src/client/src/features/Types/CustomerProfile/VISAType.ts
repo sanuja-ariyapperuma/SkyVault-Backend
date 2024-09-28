@@ -8,6 +8,7 @@ export type VISAType = {
   expireDate: string;
   assignedToPrimaryPassport: boolean;
   passportNumber: string;
+  visaCode: string;
 };
 
 export type SaveVISAType = {

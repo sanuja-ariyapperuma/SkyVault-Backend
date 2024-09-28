@@ -10,6 +10,7 @@ import VISAList from "./VISAList";
 import CustomSelect from "../CommonComponents/CustomSelect";
 import { ChangeEvent } from "react";
 import { VISAType } from "../../features/Types/CustomerProfile/VISAType";
+import { Typography } from "@mui/material";
 
 type VISAInfoProps = {
   country: OptionsType[];
@@ -62,6 +63,11 @@ const VISAInfo = (props: VISAInfoProps) => {
 
   return (
     <div className={localStyles.visaContainer}>
+      <div>
+        {initialVisa.visaNumber && (
+          <Typography variant="h6">{initialVisa.visaCode}</Typography>
+        )}
+      </div>
       <div className={localStyles.accordionContent}>
         <div className={localStyles.accordionLeft}>
           <input

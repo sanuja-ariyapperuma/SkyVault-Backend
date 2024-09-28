@@ -9,6 +9,7 @@ public sealed record Visa(
     string? ExpireDate,
     string? AssignedToPrimaryPassport,
     string? PassportNumber,
-    string? CountryName
+    string? CountryName,
+    string? VisaCode
     );
 

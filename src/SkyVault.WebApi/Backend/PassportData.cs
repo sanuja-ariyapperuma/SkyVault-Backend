@@ -63,6 +63,7 @@ namespace SkyVault.WebApi.Backend
         {
                 var result = db.Passports
                     .Include(c => c.CustomerProfile)
+                    .Include(c => c.Country)
                     .Where(p => p.CustomerProfileId == customerProfileId).ToList();
 
                 return new SkyResult<List<Passport>>().SucceededWithValue(result);

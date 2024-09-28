@@ -22,10 +22,8 @@ import ButtonPanel from "../CommonComponents/ButtonPanel";
 
 import localStylea from "./FrequentFlyerNumberAccordion.module.css";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
-import axios from "axios";
 import ConfirmBox from "../CommonComponents/ConfirmBox";
 import { useConfirmDialog } from "../../hooks/useConfirmDialog";
-import { baseURL } from "../../features/Helpers/helper";
 import {
   addFFNAPI,
   deleteFFNAPI,
@@ -44,7 +42,7 @@ type FrequentFlyNumberAccordionProps = {
 };
 
 const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
-  const { CustomerProfileId, SystemUser } = props;
+  const { CustomerProfileId } = props;
 
   const { dialogProps, openDialog } = useConfirmDialog();
 

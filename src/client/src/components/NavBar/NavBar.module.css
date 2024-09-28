@@ -2,10 +2,10 @@
   @apply w-screen h-screen flex flex-row space-x-5;
 }
 .navContainer {
-  @apply h-screen w-1/6 min-w-fit  flex flex-col p-5 rounded-r-3xl border-2 shadow-2xl;
+  @apply fixed h-screen w-1/6 min-w-fit  flex flex-col p-5 rounded-r-3xl border-2 shadow-2xl;
 }
 .pagesContainer {
-  @apply w-5/6;
+  @apply !ml-96 w-5/6;
 }
 .brandContainer {
   @apply flex flex-row space-x-2;

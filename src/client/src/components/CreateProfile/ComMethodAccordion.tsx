@@ -11,9 +11,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import CustomerProfileStyles from "./CustomerProfile.module.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
-import { baseURL } from "../../features/Helpers/helper";
 import {
   getComMethodAPI,
   updateComMethodAPI,

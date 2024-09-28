@@ -60,6 +60,7 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     assignedToPrimaryPassport: true,
     countryName: "",
     passportNumber: "",
+    visaCode: "",
   };
 
   useEffect(() => {

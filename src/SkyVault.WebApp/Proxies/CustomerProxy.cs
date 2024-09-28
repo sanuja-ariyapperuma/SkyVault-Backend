@@ -29,10 +29,10 @@ public sealed class CustomerProxy(HttpClient httpClient)
         }
     }
 
-    public SkyResult<Passport> GetPassport(GetPassportRequest passportRequest)
+    public SkyResult<PassportModal> GetPassport(GetPassportRequest passportRequest)
     {
         var postResponse = httpClient.PostAsJsonAsync("/getpassport", passportRequest).Result;
-        return HandleResponse<Passport>(postResponse);
+        return HandleResponse<PassportModal>(postResponse);
     }
     
     public SkyResult<Visa> GetVisa(GetVisaRequest visaRequest)

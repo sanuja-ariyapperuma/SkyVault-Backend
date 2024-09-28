@@ -12,6 +12,7 @@ export type PassportType = {
   countryId: string;
   isPrimary: string;
   parentId?: string;
+  passportCode?: string;
 };
 
 export type SavePassportRequestType = {

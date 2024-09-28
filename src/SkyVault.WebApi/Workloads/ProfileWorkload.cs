@@ -149,7 +149,7 @@ namespace SkyVault.WebApi.Workloads
 
                 var passport = passportData.GetPassportByCustomerProfileId(Convert.ToInt32(profileId), _correlationId);
 
-                return Results.Ok(passport.Value?.Select(p => new PassportResponse(
+                var passportResult = passport.Value?.Select(p => new PassportResponse(
                         p.Id.ToString(),
                         p.LastName,
                         p.OtherNames,
@@ -161,8 +161,11 @@ namespace SkyVault.WebApi.Workloads
                         p.NationalityId.ToString(),
                         p.CountryId.ToString(),
                         p.IsPrimary.ToString(),
-                        p.CustomerProfile.SalutationId.ToString()
-            )));
+                        p.CustomerProfile.SalutationId.ToString(),
+                        getPassportCode(p)
+                ));
+
+                return Results.Ok(passportResult);
 
             }
             catch (Exception e)
@@ -176,6 +179,38 @@ namespace SkyVault.WebApi.Workloads
             
 
         }
+
+        private static string getPassportCode(Passport p) 
+        {
+            return String.Concat(
+                            "SR DOCS YY HK1-P-",
+                            p.Country.CountryCode.ToUpper(), "-",
+                            p.PassportNumber, "-",
+                            p.PlaceOfBirth, "-",
+                            convertDateToCustomFormat(p.DateOfBirth), "-",
+                            p.Gender, "-",
+                            convertDateToCustomFormat(p.ExpiryDate), "-",
+                            p.LastName.ToUpper(), "-",
+                            p.OtherNames.ToUpper().Replace(" ", "-"), "-", "H/P1"
+                        );
+        }
+
+        private static string getVisaCode(Backend.Models.Visa visa) 
+        {
+            return String.Concat(
+                        "SR DOCO YY HK1", "-",
+                        visa.Passport.Country.CountryCode, "-",
+                        "V", "-",
+                        visa.VisaNumber, "-",
+                        visa.IssuedPlace, "-",
+                        convertDateToCustomFormat(visa.IssuedDate), "-",
+                        visa.Country.CountryCode, "-",
+                        convertDateToCustomFormat(visa.ExpireDate)
+                    );
+        }
+
+        private static string convertDateToCustomFormat(DateOnly date) => date.ToString("ddMMMyy").ToUpper();
+        
 
         public static IResult UpdatePassport(
                 [FromBody] PassportRequest passportRequest,
@@ -241,7 +276,7 @@ namespace SkyVault.WebApi.Workloads
                     Convert.ToInt32(profileId),
                     _correlationId);
 
-                return Results.Ok(result.Value?.Select(visa => new Payloads.CommonPayloads.Visa(
+                var response = result.Value?.Select(visa => new Payloads.CommonPayloads.Visa(
                     visa.Id.ToString(),
                     visa.VisaNumber,
                     visa.CountryId.ToString(),
@@ -250,9 +285,11 @@ namespace SkyVault.WebApi.Workloads
                     visa.ExpireDate.ToString(),
                     visa.Passport.IsPrimary.ToString(),
                     visa.Passport.PassportNumber,
-                    visa.Country.CountryName
-                )).ToArray()
-                );
+                    visa.Country.CountryName,
+                    getVisaCode(visa)
+                )).ToArray();
+
+                return Results.Ok(response);
              
             }
             catch (Exception e)
