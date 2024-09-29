@@ -1,0 +1,28 @@
+name: skyvault-app
+services:
+  # Backend (.NET Core Web API)
+  - name: web-api
+    github:
+      repo: SkyLanceSolutions/skyvault
+      branch: main
+      deploy_on_push: true
+    build_command: "dotnet build"
+    run_command: "dotnet run"
+    source_dir: src/SkyVault.WebApi
+    environment_slug: dotnet
+
+  # Frontend (React)
+  - name: frontend
+    github:
+      repo: SkyLanceSolutions/skyvault
+      branch: main
+      deploy_on_push: true
+    build_command: "npm install && npm run build"
+    run_command: "npm start"
+    source_dir: src/client
+    environment_slug: nodejs
+    routes:
+      - path: /
+        preserve_path: true
+        service: frontend
+        redirect: false
