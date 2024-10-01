@@ -17,16 +17,15 @@ const CustomerProfile = () => {
   let { profileId } = useParams();
   const location = useLocation();
 
-  useEffect(() => {
-    if (location.state) {
-      setParentId(location.state.parentId || "");
-      setCustomerProfileId(location.state.customerProfileId || "");
-      setPrimaryPassportId(location.state.primaryPassportId || "");
-      setSecondaryPassportId(location.state.secondaryPassportId || "");
-    } else if (profileId) {
-      setCustomerProfileId(profileId);
-    }
-  }, [location.state]);
+  // useEffect(() => {
+  //   if (location.state) {
+  //     setCustomerProfileId(location.state.customerProfileId || "");
+  //     setPrimaryPassportId(location.state.primaryPassportId || "");
+  //     setSecondaryPassportId(location.state.secondaryPassportId || "");
+  //   } else if (profileId) {
+  //     setCustomerProfileId(profileId);
+  //   }
+  // }, [location.state]);
 
   const [country, setCountry] = useState<OptionsType[]>([]);
   const { dialogProps, openDialog } = useConfirmDialog();
