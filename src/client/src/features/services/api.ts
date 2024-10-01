@@ -22,7 +22,6 @@ api.interceptors.request.use(
     const accessToken = response.accessToken;
 
     if (accessToken) config.headers["Authorization"] = `Bearer ${accessToken}`;
-    console.log("Bearer ", accessToken);
     return config;
   },
   (error) => {
@@ -41,9 +40,7 @@ api.interceptors.response.use(
       notifyError("Unauthorized action");
       window.location.href = "/login";
     } else {
-      notifyError(
-        "Something went wrong. Please try again later or contact system administrator"
-      );
+      console.log(`Error ${error}`);
     }
 
     return Promise.reject(error);

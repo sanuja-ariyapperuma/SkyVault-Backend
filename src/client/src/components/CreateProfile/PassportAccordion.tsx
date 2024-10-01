@@ -25,7 +25,7 @@ import {
 } from "../../features/Helpers/helper";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import { OptionsType } from "../../features/Types/Dashboard/dashboardTypes";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import { useAccessToken } from "../../hooks/useAccessToken";
 import { fetchCommonDataAPI } from "../../features/services/CustomerProfile/CommonData/apiMethods";
 import {
@@ -185,8 +185,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
         }
       })
       .catch((error) => {
-        notifyError(`Sorry! ${error.message}`);
-        console.log("Error", error.response);
+        notifyError(error.response.data);
+        console.log("Error", error.response.data);
       });
   };
 

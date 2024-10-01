@@ -45,7 +45,7 @@ const Dashboard = () => {
         setOptions(optionsFromDb);
       }
     } catch (err) {
-      notifyError("Something went wrong. Failed to search");
+      notifyError("Something went wrong. Search is failing");
       return console.error(err);
     } finally {
       setIsLoading(false);

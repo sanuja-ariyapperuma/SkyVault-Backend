@@ -82,7 +82,7 @@ namespace SkyVault.WebApi.Workloads
                     var checkPassportExists = customerProfileData.CheckPassportExists(passportRequest.PassportNumber ?? "");
 
                     if (checkPassportExists)
-                        return Results.BadRequest("A passport from the provided passport number is already existing");
+                        return Results.BadRequest("Passport number is already existing");
 
                     var savedprofile = customerProfileData.SaveProfile(passportRequest, userId, _correlationId);
                     
