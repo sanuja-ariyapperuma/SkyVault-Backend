@@ -67,6 +67,7 @@ const Dashboard = () => {
           onInputChange={handleSearch}
           isLoading={isLoading}
           onChange={handleSelect}
+          noOptionsMessage={() => "No Profiles Found"}
         />
       </div>
     </div>
