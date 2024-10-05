@@ -76,8 +76,10 @@ namespace SkyVault.WebApi.Workloads
                         GetUserId(context, systemUserData) : 
                         GetUserIdForCustomerProfile(context, systemUserData, customerProfileData, passportRequest.ParentId);
 
-                    if (!IsPassportDataValid(passportRequest))
-                        return Results.BadRequest("Invalid data found");  
+                    var validatePassportRequest = IsPassportDataValid(passportRequest);
+
+                    if (!validatePassportRequest.Succeeded)
+                        return Results.BadRequest(validatePassportRequest.Message);  
 
                     var checkPassportExists = customerProfileData.CheckPassportExists(passportRequest.PassportNumber ?? "");
 
@@ -717,23 +719,45 @@ namespace SkyVault.WebApi.Workloads
 
         #region Private Methods
 
-        private static bool IsPassportDataValid(PassportRequest passportRequest)
+        private static SkyResult<bool> IsPassportDataValid(PassportRequest passportRequest)
         {
-            if (
-                String.IsNullOrEmpty(passportRequest.CountryId) &&
-                String.IsNullOrEmpty(passportRequest.DateOfBirth) &&
-                String.IsNullOrEmpty(passportRequest.ExpiryDate) &&
-                String.IsNullOrEmpty(passportRequest.PassportNumber) &&
-                passportRequest.PassportNumber?.Length < 6 &&
-                String.IsNullOrEmpty(passportRequest.OtherNames) &&
-                passportRequest.OtherNames?.Length < 3 &&
-                String.IsNullOrEmpty(passportRequest.LastName) &&
-                passportRequest.LastName?.Length < 3 &&
-                String.IsNullOrEmpty(passportRequest.Gender) &&
-                String.IsNullOrEmpty(passportRequest.SalutationId)
-                ) return false;
+            if (String.IsNullOrEmpty(passportRequest.CountryId)) 
+            {
+                return new SkyResult<bool>().Fail("Country Id is required", "", "");
+            } else if(String.IsNullOrEmpty(passportRequest.DateOfBirth))
+            {
+                return new SkyResult<bool>().Fail("Date of Birth is required", "", "");
+            }
+            else if (String.IsNullOrEmpty(passportRequest.ExpiryDate))
+            {
+                return new SkyResult<bool>().Fail("Expiry Date is required", "", "");
+            }
+            else if (String.IsNullOrEmpty(passportRequest.PassportNumber))
+            {
+                return new SkyResult<bool>().Fail("Passport Number is required", "", "");
+            }
+            else if (passportRequest.PassportNumber?.Length < 8)
+            {
+                return new SkyResult<bool>().Fail("Passport Number should be atleast 8 characters", "", "");
+            }
+            else if (String.IsNullOrEmpty(passportRequest.OtherNames))
+            {
+                return new SkyResult<bool>().Fail("Other Names is required", "", "");
+            }
+            else if (passportRequest.OtherNames?.Length < 3)
+            {
+                return new SkyResult<bool>().Fail("Other Names should be atleast 3 characters", "", "");
+            }
+            else if (String.IsNullOrEmpty(passportRequest.LastName))
+            {
+                return new SkyResult<bool>().Fail("Last Name is required", "", "");
+            }
+            else if (passportRequest.LastName?.Length < 3)
+            {
+                return new SkyResult<bool>().Fail("Last Name should be atleast 3 characters", "", "");
+            }
 
-            return true;
+            return new SkyResult<bool>().SucceededWithValue(true);
         }
 
         private static int GetUserIdForCustomerProfile(
