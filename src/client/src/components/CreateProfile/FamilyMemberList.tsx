@@ -7,19 +7,22 @@ import { getFamilyMembersAPI } from "../../features/services/CustomerProfile/api
 type FamilyMemberListProps = {
   CustomerProfile: string;
   ParentId: string;
-  SystemUserId: string;
   handleOnClickMember: (customerId: string) => void;
+  setParentId: (parentId: string) => void;
 };
 
 const FamilyMemberList = (props: FamilyMemberListProps) => {
-  const { CustomerProfile, ParentId, handleOnClickMember } = props;
+  const { CustomerProfile, ParentId, handleOnClickMember, setParentId } = props;
 
   const [familyMembers, setFamilyMembers] = useState<FamilyMembersType[]>([]);
 
   useEffect(() => {
-    console.log(ParentId);
     getFamilyMembers();
   }, [CustomerProfile]);
+
+  useEffect(() => {
+    updateParentId();
+  }, [familyMembers]);
 
   const getFamilyMembers = () => {
     getFamilyMembersAPI(CustomerProfile)
@@ -31,6 +34,12 @@ const FamilyMemberList = (props: FamilyMemberListProps) => {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const updateParentId = () => {
+    const parentId = familyMembers.find((member) => member.isParent)
+      ?.customerId!;
+    setParentId(parentId);
   };
 
   return (

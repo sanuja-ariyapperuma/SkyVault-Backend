@@ -62,6 +62,14 @@ const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {
   });
 
   const onSave = () => {
+    //Check frequent flyer number is in ffnList
+    const exists = fFNList.find((a) => a.FFN === frequentFlyerNumber.FFN);
+
+    if (exists) {
+      notifyError("Frequent flyer number is already exists");
+      return;
+    }
+
     if (frequentFlyerNumber?.FFNId) {
       update();
     } else {

@@ -1,6 +1,7 @@
 import localStyles from "../components/Login/Login.module.css";
 import logo from "../assets/login_logo.png";
 import LoginButton from "../components/Login/LoginButton";
+import background from "../assets/travel-channel3.jpg";
 import { useMsal } from "@azure/msal-react";
 import {
   AuthError,
@@ -112,11 +113,13 @@ const Login = () => {
   return (
     <div className={localStyles.mainContainer}>
       <img className={localStyles.logo} src={logo} alt="logo" />
+      <img src={background} className={localStyles.backgroundImage} />
       <div className={localStyles.loginDescription}>
         <p>
-          Access your account securely with Microsoft 365 credentials. Simply
-          provide your <br /> organization credentials to gain instant access to
-          this portal
+          Access your account securely with ease using your Microsoft 365
+          credentials. Simply enter your <br /> username and password associated
+          with your Microsoft 365 account to gain instant access to our <br />
+          platform's features and services.
         </p>
       </div>
 

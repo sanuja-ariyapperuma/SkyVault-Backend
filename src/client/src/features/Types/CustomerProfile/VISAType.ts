@@ -23,5 +23,5 @@ export type SaveVISAType = {
 };
 
 export type SaveVISAResponseType = {
-  VisaId: string;
+  visaId: string;
 };

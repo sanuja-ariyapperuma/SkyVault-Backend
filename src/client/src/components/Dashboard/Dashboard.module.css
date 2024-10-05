@@ -7,3 +7,9 @@
 .searchArea {
   @apply px-5 pt-3;
 }
+.backgroundImage {
+  @apply w-1/2 flex;
+}
+.backgroundImageContainer {
+  @apply flex mt-20 justify-center;
+}

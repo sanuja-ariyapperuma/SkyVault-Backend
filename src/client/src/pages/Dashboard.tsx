@@ -2,13 +2,16 @@ import { useState } from "react";
 import Select, { SingleValue } from "react-select";
 
 import localStyles from "../components/Dashboard/Dashboard.module.css";
-import NavItem from "../components/NavBar/NavItem";
 import { debounce } from "lodash";
 
 import { OptionsType } from "../features/Types/Dashboard/dashboardTypes";
 import { useNavigate } from "react-router-dom";
 import { notifyError } from "../components/CommonComponents/Toasters";
 import { searchProfiles } from "../features/services/Dashboard.ts/apiMethods";
+
+import backgroud from "../assets/traveling-rafiki.png";
+import AddIcon from "@mui/icons-material/Add";
+import globalStyles from "../components/CommonComponents/Common.module.css";
 
 const Dashboard = () => {
   const [options, setOptions] = useState<OptionsType[]>([]);
@@ -59,7 +62,19 @@ const Dashboard = () => {
   return (
     <div className={localStyles.myClass}>
       <div className={localStyles.buttonArea}>
-        <NavItem iconPath="" navName="Create Profile" />
+        {/* <NavItem
+          iconPath=""
+          navName="Create Profile"
+          isActive={false}
+          path=""
+        /> */}
+        <button
+          className={globalStyles.customButton}
+          onClick={() => navigate("/customer-profile")}
+        >
+          <AddIcon />
+          Create Profile &nbsp;
+        </button>
       </div>
       <div className={localStyles.searchArea}>
         <Select
@@ -68,6 +83,13 @@ const Dashboard = () => {
           isLoading={isLoading}
           onChange={handleSelect}
           noOptionsMessage={() => "No Profiles Found"}
+        />
+      </div>
+      <div className={localStyles.backgroundImageContainer}>
+        <img
+          src={backgroud}
+          alt="Background Logo"
+          className={localStyles.backgroundImage}
         />
       </div>
     </div>

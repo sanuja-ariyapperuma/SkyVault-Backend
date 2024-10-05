@@ -10,6 +10,10 @@ import { ToastContainer } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
 
+import profileNavIcon from "../../assets/icons/pm_active.png";
+import notificationIcon from "../../assets/icons/notification.png";
+import transferProfileIcon from "../../assets/icons/switch-1.png";
+
 const NavBar = () => {
   const { instance, accounts } = useMsal();
 
@@ -62,7 +66,24 @@ const NavBar = () => {
           </div>
         </div>
         <div className={localStyles.menuContainer}>
-          <NavItem iconPath={""} navName={"Profile Management"} />
+          <NavItem
+            iconPath={profileNavIcon}
+            navName={"Profile Management"}
+            isActive={true}
+            path="/customer-profile"
+          />
+          <NavItem
+            iconPath={notificationIcon}
+            navName={"Notifications"}
+            isActive={false}
+            path=""
+          />
+          <NavItem
+            iconPath={transferProfileIcon}
+            navName={"Transfer Profiles"}
+            isActive={false}
+            path=""
+          />
         </div>
         <div className={localStyles.footerContainer}>
           {/* Footer Area */}

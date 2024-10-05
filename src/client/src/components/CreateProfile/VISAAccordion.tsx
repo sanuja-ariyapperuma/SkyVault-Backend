@@ -100,7 +100,7 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     saveVisaAPI(savingVisa)
       .then((response) => {
         notifySuccess("VISA added successfully");
-        visa.id = response.VisaId;
+        visa.id = response.visaId;
         visa.countryName =
           country.find((c: OptionsType) => c.value === visa.countryId)?.label ??
           "";
@@ -164,7 +164,6 @@ const VISAAccordion = (props: VISAAccordionProps) => {
     });
   };
   const handleOnVISAEditClick = (editingVisa: VISAType) => {
-    console.log("Editing VISA", editingVisa);
     if (editingVisa) {
       setVisa(editingVisa);
     }

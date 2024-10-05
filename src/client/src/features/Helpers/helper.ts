@@ -65,10 +65,10 @@ export const validatePassport = (
     valid = false;
   }
 
-  if (!isPreviousDate(passport.DateOfBirth)) {
-    notifyError("Date of birth cannot be a future date");
-    valid = false;
-  }
+  // if (!isPreviousDate(passport.DateOfBirth)) {
+  //   notifyError("Date of birth cannot be a future date");
+  //   valid = false;
+  // }
 
   return valid;
 };
@@ -180,7 +180,6 @@ const decodeCookie = (cookieValue: any): AuthenticatedUser => {
 };
 
 export const getDisplayName = (cookieValue: any): string => {
-  console.log("called");
   const decodedValue = decodeCookie(cookieValue);
   return decodedValue.DisplayName;
 };

@@ -17,15 +17,15 @@ const CustomerProfile = () => {
   let { profileId } = useParams();
   const location = useLocation();
 
-  // useEffect(() => {
-  //   if (location.state) {
-  //     setCustomerProfileId(location.state.customerProfileId || "");
-  //     setPrimaryPassportId(location.state.primaryPassportId || "");
-  //     setSecondaryPassportId(location.state.secondaryPassportId || "");
-  //   } else if (profileId) {
-  //     setCustomerProfileId(profileId);
-  //   }
-  // }, [location.state]);
+  useEffect(() => {
+    if (location.state) {
+      setCustomerProfileId(location.state.customerProfileId || "");
+      setPrimaryPassportId(location.state.primaryPassportId || "");
+      setSecondaryPassportId(location.state.secondaryPassportId || "");
+    } else if (profileId) {
+      setCustomerProfileId(profileId);
+    }
+  }, [location.state]);
 
   const [country, setCountry] = useState<OptionsType[]>([]);
   const { dialogProps, openDialog } = useConfirmDialog();
@@ -38,13 +38,16 @@ const CustomerProfile = () => {
 
   const setPrimaryPassportSavedId = (id: string) => {
     setPrimaryPassportId(id);
+    setSecondaryPassportId("");
   };
   const setSecondaryPassportSavedId = (id: string) => {
     setSecondaryPassportId(id);
   };
 
   const handleOnAddingFamilyMember = () => {
-    setParentId(parentId ? parentId : customerProfileId);
+    setParentId(
+      parentId ? parentId.toString() : customerProfileId?.toString() ?? "" // parentId.toString() to fix a bug
+    );
     setCustomerProfileId("");
     setPrimaryPassportId("");
     setSecondaryPassportId("");
@@ -83,8 +86,8 @@ const CustomerProfile = () => {
           <FamilyMemberList
             CustomerProfile={customerProfileId ?? ""}
             ParentId={parentId ?? ""}
-            SystemUserId="9"
             handleOnClickMember={handleOnClickMember}
+            setParentId={setParentId}
           />
           <br />
         </>

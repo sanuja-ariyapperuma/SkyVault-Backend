@@ -1,5 +1,5 @@
 .mainContainer {
-  @apply w-screen h-screen justify-center items-center flex flex-col;
+  @apply w-screen h-screen justify-center items-center flex flex-col -mt-28;
 }
 .logo {
   @apply w-72;
@@ -21,4 +21,7 @@
 }
 .loginDescription {
   @apply flex text-center text-sm text-gray-500 mt-10;
+}
+.backgroundImage {
+  @apply w-1/6;
 }

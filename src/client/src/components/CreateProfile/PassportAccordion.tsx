@@ -32,6 +32,7 @@ import {
   getPassportDataAPI,
   saveUpdateCustomerProfileAPI,
 } from "../../features/services/CustomerProfile/apiMethods";
+import AddIcon from "@mui/icons-material/Add";
 
 type PassportAccordionProps = {
   setCustomerProfileId: (id: string) => void;
@@ -74,11 +75,10 @@ const PassportAccordion = (props: PassportAccordionProps) => {
   };
 
   useEffect(() => {
+    setPrimaryPassport({ ...initialPassportData, isPrimary: "1" });
+    setSecondaryPassport({ ...initialPassportData, isPrimary: "0" });
     if (customerProfileId) {
       getPassportData();
-    } else {
-      setPrimaryPassport({ ...initialPassportData, isPrimary: "1" });
-      setSecondaryPassport({ ...initialPassportData, isPrimary: "0" });
     }
   }, [customerProfileId]);
 
@@ -297,6 +297,7 @@ const PassportAccordion = (props: PassportAccordionProps) => {
               className={globalStyles.customButton}
               onClick={handleOnSecondaryPassportAddRemove}
             >
+              <AddIcon />
               Add Secondary
             </button>
           )}
