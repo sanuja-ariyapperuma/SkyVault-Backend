@@ -35,6 +35,8 @@ const CustomerProfile = () => {
   const [secondaryPassportId, setSecondaryPassportId] = useState<string | null>(
     ""
   );
+  const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
+    useState<boolean>(true);
 
   const setPrimaryPassportSavedId = (id: string) => {
     setPrimaryPassportId(id);
@@ -51,6 +53,7 @@ const CustomerProfile = () => {
     setCustomerProfileId("");
     setPrimaryPassportId("");
     setSecondaryPassportId("");
+    setSecondaryPassportEnabled(true);
   };
 
   const handleOnClickMember = (customerId: string) => {
@@ -103,6 +106,8 @@ const CustomerProfile = () => {
         setPrimaryPassportSavedId={setPrimaryPassportSavedId}
         setSecondaryPassportSavedId={setSecondaryPassportSavedId}
         parentId={parentId ?? ""}
+        secondaryPassportEnabled={secondaryPassportEnabled}
+        setSecondaryPassportEnabled={setSecondaryPassportEnabled}
       />
       <VISAAccordion
         customerProfileId={customerProfileId ?? ""}

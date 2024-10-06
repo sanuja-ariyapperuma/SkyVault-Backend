@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -42,6 +42,8 @@ type PassportAccordionProps = {
   setPrimaryPassportSavedId: (id: string) => void;
   setSecondaryPassportSavedId: (id: string) => void;
   parentId?: string;
+  secondaryPassportEnabled: boolean;
+  setSecondaryPassportEnabled: Dispatch<SetStateAction<boolean>>;
 };
 
 const PassportAccordion = (props: PassportAccordionProps) => {
@@ -55,6 +57,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     setPrimaryPassportSavedId,
     setSecondaryPassportSavedId,
     parentId,
+    secondaryPassportEnabled,
+    setSecondaryPassportEnabled,
   } = props;
   const [salutations, setSalutations] = useState<OptionsType[]>([]);
   const [gender, setGender] = useState<OptionsType[]>([]);
@@ -96,8 +100,8 @@ const PassportAccordion = (props: PassportAccordionProps) => {
     isPrimary: "0",
   });
 
-  const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
-    useState<boolean>(true);
+  // const [secondaryPassportEnabled, setSecondaryPassportEnabled] =
+  //   useState<boolean>(true);
 
   const getPassportData = () => {
     getPassportDataAPI(customerProfileId)
