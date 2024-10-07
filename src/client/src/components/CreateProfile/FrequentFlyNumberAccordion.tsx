@@ -38,7 +38,6 @@ type FFNListType = {
 
 type FrequentFlyNumberAccordionProps = {
   CustomerProfileId: string;
-  SystemUser: string;
 };
 
 const FrequentFlyNumberAccordion = (props: FrequentFlyNumberAccordionProps) => {

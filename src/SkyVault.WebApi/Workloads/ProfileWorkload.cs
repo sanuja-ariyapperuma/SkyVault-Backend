@@ -1,4 +1,5 @@
 ﻿using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -393,6 +394,19 @@ namespace SkyVault.WebApi.Workloads
                 var customerProfileData = new CustomerProfileData(dbContext);
 
                 var systemUserData = new SystemUserData(dbContext);
+
+                if (comMethodRequest.PrefCommId == "3" && !Regex.IsMatch(comMethodRequest.WhatsAppNumber, @"^\+?\d+$")) 
+                {
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                                                "WhatsAppNumber can only contain numbers", "", _correlationId));
+                }
+
+                if (comMethodRequest.PrefCommId == "2" && !Regex.IsMatch(comMethodRequest.EmailAddress, @"^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")) {
+                    return Results.Problem(
+                                        new ValidationProblemDetails().ToValidationProblemDetails(
+                                                                "Invalid Email Address", "", _correlationId));
+                }
 
                 GetUserIdForCustomerProfile(
                     context,

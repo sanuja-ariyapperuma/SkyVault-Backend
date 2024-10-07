@@ -1,3 +1,4 @@
+import { ComMethodType } from "../../../components/CreateProfile/ComMethodAccordion";
 import { FamilyMembersType } from "../../Types/CustomerProfile/CustomerProfileType";
 import {
   PassportType,
@@ -113,17 +114,21 @@ export const addFFNAPI = async (
 
 export const updateComMethodAPI = async (
   CustomerProfileId: string,
-  PrefCommId: string
+  PrefCommId: string,
+  WhatsAppNumber: string,
+  EmailAddress: string
 ): Promise<void> => {
   await api.post(`/updateCommMethod`, {
     CustomerProfileId: CustomerProfileId,
     PrefCommId: PrefCommId,
+    WhatsAppNumber: WhatsAppNumber,
+    EmailAddress: EmailAddress,
   });
 };
 
 export const getComMethodAPI = async (
   CustomerProfileId: string
-): Promise<number> => {
+): Promise<ComMethodType> => {
   const response = await api.post(`/getComMethod`, {
     CustomerProfileId: CustomerProfileId,
   });

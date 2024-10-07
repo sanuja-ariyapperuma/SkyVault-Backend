@@ -116,14 +116,8 @@ const CustomerProfile = () => {
         country={country}
         openDialog={openDialog}
       />
-      <FrequentFlyNumberAccordion
-        CustomerProfileId={customerProfileId ?? ""}
-        SystemUser={"9"}
-      />
-      <ComMethodAccordion
-        CustomerProfileId={customerProfileId ?? ""}
-        SystemUser="9"
-      />
+      <FrequentFlyNumberAccordion CustomerProfileId={customerProfileId ?? ""} />
+      <ComMethodAccordion CustomerProfileId={customerProfileId ?? ""} />
     </div>
   );
 };

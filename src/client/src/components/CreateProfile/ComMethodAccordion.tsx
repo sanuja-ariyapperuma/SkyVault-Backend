@@ -10,53 +10,101 @@ import {
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import CustomerProfileStyles from "./CustomerProfile.module.css";
-import { useEffect, useState } from "react";
+import { ChangeEvent, HtmlHTMLAttributes, useEffect, useState } from "react";
 import { notifyError, notifySuccess } from "../CommonComponents/Toasters";
 import {
   getComMethodAPI,
   updateComMethodAPI,
 } from "../../features/services/CustomerProfile/apiMethods";
 
+import globalStyles from "../CommonComponents/Common.module.css";
+import ButtonPanel from "../CommonComponents/ButtonPanel";
+
 enum CommunicationMethod {
   None = 1,
-  WhatsApp = 2,
-  Email = 3,
+  WhatsApp = 3,
+  Email = 2,
 }
+
+export type ComMethodType = {
+  communicationMethod: number;
+  whatsAppNumber: string;
+  email: string;
+};
 
 type ComMethodAccordionProps = {
   CustomerProfileId: string;
-  SystemUser: string;
 };
 
 const ComMethodAccordion = (props: ComMethodAccordionProps) => {
-  const { CustomerProfileId, SystemUser } = props;
+  const { CustomerProfileId } = props;
 
   const [comMethod, setComMethod] = useState<CommunicationMethod>(
     CommunicationMethod.None
   );
+
+  const [whatsAppNumber, setWhatsAppNumber] = useState<string>("");
+  const [emailAddress, setEmailAddress] = useState<string>("");
 
   useEffect(() => {
     getComMethodOnCustomerProfile();
   }, [CustomerProfileId]);
 
   const onComMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const chosenMethod = parseInt(e.target.value);
+    switch (chosenMethod) {
+      case CommunicationMethod.WhatsApp:
+        setComMethod(CommunicationMethod.WhatsApp);
+        break;
+      case CommunicationMethod.Email:
+        setComMethod(CommunicationMethod.Email);
+        break;
+      default:
+        setComMethod(CommunicationMethod.None);
+        break;
+    }
+  };
+
+  const isNumeric = (str: string) => /^\d+$/.test(str);
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const updateComMethod = () => {
     if (CustomerProfileId === "") {
       notifyError("Create a passport first to update communication method");
       return;
     }
-    if (SystemUser === "") {
-      notifyError("Something went wrong. Please try again");
-      return;
+
+    if (comMethod === CommunicationMethod.Email) {
+      if (emailAddress === null || emailAddress.trim() === "") {
+        notifyError("Communication method email address cannot be empty");
+        return;
+      }
+      if (!isValidEmail(emailAddress)) {
+        notifyError("Invalid Email Address");
+        return;
+      }
+    } else if (comMethod === CommunicationMethod.WhatsApp) {
+      if (whatsAppNumber === null || whatsAppNumber.trim() === "") {
+        notifyError("Communication method WhatsApp number cannot be empty");
+        return;
+      }
+      if (!isNumeric(whatsAppNumber)) {
+        notifyError("WhatsApp Number can only contain numbers");
+        return;
+      }
     }
 
-    updateComMethod(parseInt(e.target.value));
-  };
-
-  const updateComMethod = (comMethod: number) => {
-    updateComMethodAPI(CustomerProfileId, comMethod.toString())
+    updateComMethodAPI(
+      CustomerProfileId,
+      comMethod.toString(),
+      whatsAppNumber,
+      emailAddress
+    )
       .then(() => {
         notifySuccess("Communication method updated successfully");
-        setComMethod(comMethod);
       })
       .catch((error) => {
         console.log(error);
@@ -68,7 +116,9 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
     if (CustomerProfileId) {
       getComMethodAPI(CustomerProfileId)
         .then((response) => {
-          setComMethod(response);
+          setComMethod(response.communicationMethod);
+          setEmailAddress(response.email);
+          setWhatsAppNumber(response.whatsAppNumber);
         })
         .catch((error) => {
           console.log(error);
@@ -119,6 +169,30 @@ const ComMethodAccordion = (props: ComMethodAccordionProps) => {
                 label="Email"
               />
             </RadioGroup>
+            {comMethod !== CommunicationMethod.None && (
+              <>
+                {comMethod === CommunicationMethod.Email ? (
+                  // Input for Email
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    className={globalStyles.commonTextInput}
+                    value={emailAddress}
+                    onChange={(event) => setEmailAddress(event.target.value)}
+                  />
+                ) : (
+                  // Input for WhatsApp (or any other method)
+                  <input
+                    type="telephone"
+                    placeholder="WhatsApp Number"
+                    className={globalStyles.commonTextInput}
+                    value={whatsAppNumber}
+                    onChange={(event) => setWhatsAppNumber(event.target.value)}
+                  />
+                )}
+              </>
+            )}
+            <ButtonPanel OnSave={updateComMethod} />
           </div>
         </AccordionDetails>
       ) : (

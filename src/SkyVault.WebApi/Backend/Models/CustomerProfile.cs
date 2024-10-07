@@ -15,6 +15,10 @@ public partial class CustomerProfile
 
     public int? ParentId { get; set; }
 
+    public string WhatsAppNumber { get; set; } = String.Empty;
+
+    public string EmailAddress { get; set; } = String.Empty;
+
     public virtual ICollection<FrequentFlyerNumber> FrequentFlyerNumbers { get; set; } = new List<FrequentFlyerNumber>();
 
     public virtual ICollection<CustomerProfile> InverseParent { get; set; } = new List<CustomerProfile>();

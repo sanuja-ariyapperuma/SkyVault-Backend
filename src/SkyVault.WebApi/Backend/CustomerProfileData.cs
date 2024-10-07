@@ -96,7 +96,10 @@ namespace SkyVault.WebApi.Backend
             var result = db.CustomerProfiles.Where(c =>
                 c.Id == Convert.ToInt32(comMethodRequest.CustomerProfileId)
                 ).ExecuteUpdate(update =>
-                    update.SetProperty(cp => cp.PreferredCommId, Convert.ToInt32(comMethodRequest.PrefCommId))
+                    update
+                    .SetProperty(cp => cp.PreferredCommId, Convert.ToInt32(comMethodRequest.PrefCommId))
+                    .SetProperty(cp => cp.WhatsAppNumber, comMethodRequest.WhatsAppNumber)
+                    .SetProperty(cp => cp.EmailAddress, comMethodRequest.EmailAddress)
             );
 
             if (result == 0)
@@ -139,16 +142,24 @@ namespace SkyVault.WebApi.Backend
 
             return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
         }
-        public SkyResult<PreferedCommiunicationMethod> GetComMethod(int customerProfileId, string correlationId)
+        public SkyResult<ComMethod> GetComMethod(int customerProfileId, string correlationId)
         {
             var result = db.CustomerProfiles.Where(c =>
                 c.Id == Convert.ToInt32(customerProfileId)
-                ).Select(cp => cp.PreferredCommId).FirstOrDefault();
+                ).FirstOrDefault();
 
-            if (result == 0)
-                return new SkyResult<PreferedCommiunicationMethod>().Fail("No Profile Found or Unauthorize Update", "4cf0079e-0012", correlationId);
+            if (result == null)
+                return new SkyResult<ComMethod>().Fail("No Profile Found or Unauthorize Access", "4cf0079e-0012", correlationId);
 
-            return new SkyResult<PreferedCommiunicationMethod>().SucceededWithValue((PreferedCommiunicationMethod)result);
+            var response = new ComMethod()
+            {
+                CommunicationMethod = result.PreferredCommId,
+                Email = result.EmailAddress,
+                WhatsAppNumber = result.WhatsAppNumber
+
+            };
+
+            return new SkyResult<ComMethod>().SucceededWithValue(response);
         }
         public SkyResult<string> CheckAccessToTheProfileWithPassportId(int passportId, int systemUserId, string correlationId)
         {

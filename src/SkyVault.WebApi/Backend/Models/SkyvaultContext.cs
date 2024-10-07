@@ -100,6 +100,8 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.PreferredCommId).HasColumnName("preferred_comm_id");
             entity.Property(e => e.SalutationId).HasColumnName("salutation_id");
             entity.Property(e => e.SystemUserId).HasColumnName("system_user_id");
+            entity.Property(e => e.WhatsAppNumber).HasColumnName("whatsapp_number");
+            entity.Property(e => e.EmailAddress).HasColumnName("email");
 
             entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
                 .HasForeignKey(d => d.ParentId)

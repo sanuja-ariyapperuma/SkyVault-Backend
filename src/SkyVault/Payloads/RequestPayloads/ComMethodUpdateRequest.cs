@@ -8,6 +8,7 @@ namespace SkyVault.Payloads.RequestPayloads;
 
 public record ComMethodUpdateRequest(
     string? CustomerProfileId,
-    string? SystemUserId,
-    string? PrefCommId
+    string? EmailAddress,
+    string? PrefCommId,
+    string? WhatsAppNumber
     );
