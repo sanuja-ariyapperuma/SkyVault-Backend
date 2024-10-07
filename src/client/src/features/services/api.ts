@@ -41,6 +41,7 @@ api.interceptors.response.use(
       window.location.href = "/login";
     } else {
       console.log(`Error ${error}`);
+      msalInstance.logoutRedirect();
     }
 
     return Promise.reject(error);
