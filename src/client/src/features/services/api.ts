@@ -2,6 +2,7 @@ import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { baseURL, scopes } from "../Helpers/helper";
 import { notifyError } from "../../components/CommonComponents/Toasters";
 import { msalInstance } from "../../main";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 const api = axios.create({
   baseURL: baseURL,
@@ -38,10 +39,11 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       notifyError("Unauthorized action");
-      window.location.href = "/login";
+      msalInstance.logoutRedirect();
+    } else if (error instanceof InteractionRequiredAuthError) {
+      msalInstance.logoutRedirect();
     } else {
-      console.log(`Error ${error}`);
-      //msalInstance.logoutRedirect();
+      console.log(error);
     }
 
     return Promise.reject(error);
