@@ -1,5 +1,6 @@
 ﻿//https://www.fileformat.info/tool/hash.htm
 
+using Microsoft.EntityFrameworkCore;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
@@ -71,7 +72,7 @@ namespace SkyVault.WebApi.Backend
         {
             try
             {
-                var user = db.SystemUsers.FirstOrDefault(c => c.SamProfileId == upn);
+                var user = db.SystemUsers.AsNoTracking().FirstOrDefault(c => c.SamProfileId == upn);
 
                 if (user == null)
                     return new SkyResult<int>().Fail(

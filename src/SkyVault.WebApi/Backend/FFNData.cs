@@ -55,7 +55,7 @@ namespace SkyVault.WebApi.Backend
 
         public SkyResult<List<FFNResponse>> GetFFNByCustomerId(int customerId, string correlationId)
         {
-            var ffnList = db.FrequentFlyerNumbers
+            var ffnList = db.FrequentFlyerNumbers.AsNoTracking()
                 .Where(ffn => ffn.CustomerProfileId == customerId)
                 .Select(ffn => new FFNResponse
                 {

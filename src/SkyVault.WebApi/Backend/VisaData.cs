@@ -52,7 +52,7 @@ namespace SkyVault.WebApi.Backend
         public SkyResult<Visa> GetVisaById(int visaId, string correlationId)
         {
 
-            var result = db.Visas.Where(p => p.Id == visaId).FirstOrDefault();
+            var result = db.Visas.AsNoTracking().FirstOrDefault(p => p.Id == visaId);
 
             if (result == null)
                 return new SkyResult<Visa>().Fail("No passport found", "1f7504d7-0005", correlationId);
@@ -62,6 +62,7 @@ namespace SkyVault.WebApi.Backend
         public SkyResult<List<Visa>> GetVisaByCustomerProfileId(int customerProfileId, string correlationId)
         {
             var result = db.Visas
+                .AsNoTracking()
                 .Include(v => v.Country)
                 .Include(v => v.Passport)
                 .ThenInclude(p => p.CustomerProfile)

@@ -28,7 +28,7 @@ public static class Program
         
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
-            options.UseMySql(builder.Configuration.GetConnectionString("Localconnection"), new MySqlServerVersion(new Version(8, 0)));
+            options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0)));
         });
 
         builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database");
@@ -100,7 +100,7 @@ public static class Program
             .WriteTo.Console()
             .CreateLogger();
 
-        Log.Information("API is starting up");
+        Log.Information($"{builder.Environment.EnvironmentName} : API is starting up");
 
         builder.Host.UseSerilog();
 

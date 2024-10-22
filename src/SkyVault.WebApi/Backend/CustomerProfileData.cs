@@ -10,13 +10,9 @@ namespace SkyVault.WebApi.Backend
 {
     public sealed class CustomerProfileData(SkyvaultContext db)
     {
-        public CustomerProfile? Get(int profileId, int systemUserId) =>
-            db.CustomerProfiles.Include(p => p.Passports)
-                .ThenInclude(o => o.Visas)
-                .FirstOrDefault(p => p.Id == profileId);
         public List<SearchProfileItem>? Search(string searchQuery, string systemUserUniqueIdentifier)
         {
-            var systemUser = db.SystemUsers.FirstOrDefault(e => e.SamProfileId == systemUserUniqueIdentifier);
+            var systemUser = db.SystemUsers.AsNoTracking().FirstOrDefault(e => e.SamProfileId == systemUserUniqueIdentifier);
 
             var systemUserRole = systemUser!.UserRole;
 
@@ -44,13 +40,7 @@ namespace SkyVault.WebApi.Backend
                 p.CustomerProfile.Salutation.SalutationName
             )).ToList();
         }
-        public CustomerProfile Create(CustomerProfile newProfile)
-        {
-            var savedprofile = db.CustomerProfiles.Add(newProfile);
-            db.SaveChanges();
-
-            return savedprofile.Entity;
-        }
+        
         public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, int systemUserId, string correlationId)
         {
                 var passport = new Passport
@@ -107,6 +97,7 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<string>().SucceededWithValue("Preffered Commiunication Method Updated");
         }
+        
         public SkyResult<string> CheckAccessToTheProfile(int customerProfileId, int systemUserId, string correlationId)
         {
             var systemUserRole = db.SystemUsers.Find(systemUserId)?.UserRole;
@@ -126,27 +117,11 @@ namespace SkyVault.WebApi.Backend
             return new SkyResult<string>().SucceededWithValue("Authorized");
         }
 
-        public SkyResult<string> CheckAccessToTheProfileWithVisaId(int visaId, int systemUserId, string correlationId)
-        {
-            FormattableString query = $@"
-                SELECT cp.Id 
-                FROM customer_profiles cp
-                INNER JOIN passports p 
-                ON p.customer_profile_id = cp.id
-                INNER JOIN visas v 
-                ON v.passport_id = p.id
-                WHERE v.id = {visaId}
-                ";
-
-            var customerProfileId = db.CustomerProfiles.FromSql(query).Select(p => p.Id).FirstOrDefault();
-
-            return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
-        }
         public SkyResult<ComMethod> GetComMethod(int customerProfileId, string correlationId)
         {
             var result = db.CustomerProfiles.Where(c =>
                 c.Id == Convert.ToInt32(customerProfileId)
-                ).FirstOrDefault();
+                ).AsNoTracking().FirstOrDefault();
 
             if (result == null)
                 return new SkyResult<ComMethod>().Fail("No Profile Found or Unauthorize Access", "4cf0079e-0012", correlationId);
@@ -161,24 +136,11 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<ComMethod>().SucceededWithValue(response);
         }
-        public SkyResult<string> CheckAccessToTheProfileWithPassportId(int passportId, int systemUserId, string correlationId)
-        {
-            FormattableString query = $@"
-                SELECT cp.Id 
-                FROM customer_profiles cp
-                INNER JOIN passports p 
-                ON p.customer_profile_id = cp.id
-                WHERE p.id = {passportId}
-                ";
-
-            var customerProfileId = db.CustomerProfiles.FromSql(query).Select(p => p.Id).FirstOrDefault();
-
-            return CheckAccessToTheProfile(customerProfileId, systemUserId, correlationId);
-        }
+        
         public SkyResult<List<FamilyMembersResponse>> GetFamilyMembers(int customerId, string correlationId) 
         {
             
-            var isCustomerParent = db.CustomerProfiles.Where(cp => cp.Id == customerId && cp.ParentId == null).Any();
+            var isCustomerParent = db.CustomerProfiles.AsNoTracking().Where(cp => cp.Id == customerId && cp.ParentId == null).Any();
             var familyMembers = new List<FamilyMembersResponse>();
 
             if (isCustomerParent) // Parent

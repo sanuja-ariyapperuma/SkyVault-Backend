@@ -25,17 +25,17 @@ public static class CustomWorkload
             {
                     Task.Run(() =>
                     {
-                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("Localconnection")!));
+                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("DefaultConnection")!));
                         salutations = commonData.Salutations();
                     }),
                     Task.Run(() =>
                     {
-                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("Localconnection")!));
+                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("DefaultConnection")!));
                         nationalities = commonData.GetNationalities();
                     }),
                     Task.Run(() =>
                     {
-                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("Localconnection")!));
+                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("DefaultConnection")!));
                         countries = commonData.GetCountries();
                     })
             };

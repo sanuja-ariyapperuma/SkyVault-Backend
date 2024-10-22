@@ -62,21 +62,12 @@ namespace SkyVault.WebApi.Backend
         public SkyResult<List<Passport>> GetPassportByCustomerProfileId(int customerProfileId, string correlationId)
         {
                 var result = db.Passports
+                    .AsNoTracking()
                     .Include(c => c.CustomerProfile)
                     .Include(c => c.Country)
                     .Where(p => p.CustomerProfileId == customerProfileId).ToList();
 
                 return new SkyResult<List<Passport>>().SucceededWithValue(result);
-        }
-
-        public SkyResult<string> CheckPassportExists(string passportNumber, string correlationId)
-        {
-            var isPassportExists = db.Passports.Any(p => p.PassportNumber == passportNumber);
-
-            if (isPassportExists)
-                return new SkyResult<string>().Fail("Passport Number Already Exists", "1f7504d7-0006", correlationId);
-
-            return new SkyResult<string>().SucceededWithValue("Passport Number can be use");
         }
     }
 }
