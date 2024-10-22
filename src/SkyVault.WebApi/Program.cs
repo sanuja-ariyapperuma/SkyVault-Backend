@@ -77,6 +77,9 @@ public static class Program
                 });
         });
 
+        builder.Services.AddMemoryCache();
+
+
 
 
         //Log.Logger = new LoggerConfiguration()

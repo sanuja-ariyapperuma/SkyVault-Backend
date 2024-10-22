@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
@@ -11,44 +12,31 @@ namespace SkyVault.WebApi.Workloads;
 public static class CustomWorkload
 {
     public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
-        IMapper mapper, IConfiguration configuration, HttpContext context)
+        IMapper mapper,IMemoryCache cache, IConfiguration configuration, HttpContext context)
     {
         var correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
         List<Salutation> salutations = [];
         List<Nationality> nationalities = [];
         List<Country> countries = [];
+        List<Gender> gender = [];
 
         try
         {
-            var tasks = new Task[]
-            {
-                    Task.Run(() =>
-                    {
-                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("DefaultConnection")!));
-                        salutations = commonData.Salutations();
-                    }),
-                    Task.Run(() =>
-                    {
-                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("DefaultConnection")!));
-                        nationalities = commonData.GetNationalities();
-                    }),
-                    Task.Run(() =>
-                    {
-                        var commonData = new CommonData(dbContext.CreateDbContext(configuration.GetConnectionString("DefaultConnection")!));
-                        countries = commonData.GetCountries();
-                    })
-            };
 
-            Task.WaitAll(tasks);
+            throw new Exception("Custom Exception");
 
-            var commonData = new CommonData(dbContext);
-            var genders = commonData.GetGender();
+            var cacheService = new CacheService(cache,dbContext);
+
+            salutations = cacheService.GetSalutations();
+            countries = cacheService.GetCountries();
+            nationalities = cacheService.GetNationalities();
+            gender = cacheService.GetGender();
 
             var profileDefinition = new ProfileDefinitionResponse(
                 mapper.Map<List<Payloads.CommonPayloads.Salutation>>(salutations),
                 mapper.Map<List<Payloads.CommonPayloads.Nationality>>(nationalities),
-                mapper.Map<List<Payloads.CommonPayloads.Gender>>(genders),
+                mapper.Map<List<Payloads.CommonPayloads.Gender>>(gender),
                 mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
 
             return Results.Ok(profileDefinition);
