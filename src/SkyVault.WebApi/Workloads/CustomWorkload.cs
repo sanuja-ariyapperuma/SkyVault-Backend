@@ -24,8 +24,6 @@ public static class CustomWorkload
         try
         {
 
-            throw new Exception("Custom Exception");
-
             var cacheService = new CacheService(cache,dbContext);
 
             salutations = cacheService.GetSalutations();
