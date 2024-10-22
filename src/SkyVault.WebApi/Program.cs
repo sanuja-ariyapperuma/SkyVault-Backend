@@ -3,6 +3,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,7 @@ using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
 using SkyVault.WebApi.MappingProfiles;
 using SkyVault.WebApi.Middlewares;
+using System.Globalization;
 using System.Text.Json;
 
 namespace SkyVault.WebApi;
@@ -79,18 +81,6 @@ public static class Program
 
         builder.Services.AddMemoryCache();
 
-
-
-
-        //Log.Logger = new LoggerConfiguration()
-        //.ReadFrom.Configuration(builder.Configuration)
-        //.MinimumLevel.Information()
-        //.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-        //.Enrich.FromLogContext()
-        //.WriteTo.File(builder.Configuration["Logging:FilePath"]!, rollingInterval: RollingInterval.Day)
-        //.WriteTo.Console()
-        //.CreateLogger();
-
         Log.Logger = new LoggerConfiguration()
             .WriteTo.ApplicationInsights(
             new TelemetryConfiguration { InstrumentationKey = builder.Configuration["AzureAppInsight:InstrumentKey"] },
@@ -117,6 +107,15 @@ public static class Program
         app.UseAuthentication();
         app.UseAuthorization();
         //app.UseMiddleware<ExceptionMiddleware>();
+
+        var supportedCultures = new[] { new CultureInfo("en-GB") };
+
+        app.UseRequestLocalization(new RequestLocalizationOptions
+        {
+            DefaultRequestCulture = new RequestCulture("en-GB"),
+            SupportedCultures = supportedCultures,
+            SupportedUICultures = supportedCultures
+        });
 
         app.MapHealthChecks("/api/health", new HealthCheckOptions
         {

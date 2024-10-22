@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
+using System.Globalization;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -12,8 +13,8 @@ namespace SkyVault.WebApi.Backend
                 {
                     VisaNumber = visaRequest.VisaNumber!,
                     IssuedPlace = visaRequest.IssuedPlace!,
-                    IssuedDate = DateOnly.FromDateTime(DateTime.Parse(visaRequest.IssuedDate)),
-                    ExpireDate = DateOnly.FromDateTime(DateTime.Parse(visaRequest.ExpiryDate)),
+                    IssuedDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.IssuedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                    ExpireDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     CountryId = Convert.ToInt32(visaRequest.CountryId),
                     PassportId = Convert.ToInt32(visaRequest.PassportId)
                 };
@@ -36,9 +37,9 @@ namespace SkyVault.WebApi.Backend
                     updates.SetProperty(visa => visa.VisaNumber, visaRequest.VisaNumber)
                         .SetProperty(visa => visa.IssuedPlace, visaRequest.IssuedPlace)
                         .SetProperty(visa => visa.IssuedDate, DateOnly.FromDateTime(
-                            DateTime.Parse(visaRequest.IssuedDate)))
+                            DateTime.ParseExact(visaRequest.IssuedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
                         .SetProperty(visa => visa.ExpireDate, DateOnly.FromDateTime(
-                            DateTime.Parse(visaRequest.ExpiryDate)))
+                            DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
                         .SetProperty(visa => visa.CountryId, Convert.ToInt32(visaRequest.CountryId))
                         .SetProperty(visa => visa.PassportId, Convert.ToInt32(visaRequest.PassportId))
                         );

@@ -5,6 +5,7 @@ using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.Payloads.CommonPayloads;
+using System.Globalization;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -49,8 +50,8 @@ namespace SkyVault.WebApi.Backend
                     LastName = passportRequest.LastName!,
                     OtherNames = passportRequest.OtherNames,
                     CountryId = Convert.ToInt32(passportRequest.CountryId),
-                    DateOfBirth = DateOnly.FromDateTime(DateTime.Parse(passportRequest.DateOfBirth)),
-                    ExpiryDate = DateOnly.FromDateTime(DateTime.Parse(passportRequest.ExpiryDate)),
+                    DateOfBirth = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                    ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     Gender = passportRequest.Gender!,
                     IsPrimary = passportRequest.IsPrimary!,
                     NationalityId = Convert.ToInt32(passportRequest.NationalityId),

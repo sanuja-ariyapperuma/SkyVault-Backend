@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
+using System.Globalization;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -15,8 +16,8 @@ namespace SkyVault.WebApi.Backend
                     LastName = newPassport.LastName!,
                     OtherNames = newPassport.OtherNames,
                     CountryId = Convert.ToInt32(newPassport.CountryId),
-                    DateOfBirth = DateOnly.FromDateTime(DateTime.Parse(newPassport.DateOfBirth)),
-                    ExpiryDate = DateOnly.FromDateTime(DateTime.Parse(newPassport.ExpiryDate)),
+                    DateOfBirth = DateOnly.FromDateTime(DateTime.ParseExact(newPassport.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                    ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(newPassport.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     CustomerProfileId = Convert.ToInt32(newPassport.CustomerProfileId),
                     Gender = newPassport.Gender!,
                     IsPrimary = newPassport.IsPrimary!,
@@ -43,9 +44,9 @@ namespace SkyVault.WebApi.Backend
                         .SetProperty(passport => passport.OtherNames, passportRequest.OtherNames)
                         .SetProperty(passport => passport.Gender, passportRequest.Gender)
                         .SetProperty(passport => passport.DateOfBirth,
-                            DateOnly.FromDateTime(DateTime.Parse(passportRequest.DateOfBirth)))
+                            DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
                         .SetProperty(passport => passport.ExpiryDate,
-                            DateOnly.FromDateTime(DateTime.Parse(passportRequest.ExpiryDate)))
+                            DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
                         .SetProperty(passport => passport.PlaceOfBirth, passportRequest.PlaceOfBirth)
                         .SetProperty(passport => passport.NationalityId,
                             Convert.ToInt32(passportRequest.NationalityId))
