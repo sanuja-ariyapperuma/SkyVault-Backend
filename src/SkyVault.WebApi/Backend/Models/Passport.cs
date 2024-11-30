@@ -21,8 +21,6 @@ public partial class Passport
 
     public DateOnly ExpiryDate { get; set; }
 
-    public string? PlaceOfBirth { get; set; }
-
     public int NationalityId { get; set; }
 
     public string IsPrimary { get; set; } = null!;

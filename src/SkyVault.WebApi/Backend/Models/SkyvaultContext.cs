@@ -250,9 +250,6 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.PassportNumber)
                 .HasMaxLength(100)
                 .HasColumnName("passport_number");
-            entity.Property(e => e.PlaceOfBirth)
-                .HasMaxLength(100)
-                .HasColumnName("place_of_birth");
 
             entity.HasOne(d => d.CustomerProfile).WithMany(p => p.Passports)
                 .HasForeignKey(d => d.CustomerProfileId)

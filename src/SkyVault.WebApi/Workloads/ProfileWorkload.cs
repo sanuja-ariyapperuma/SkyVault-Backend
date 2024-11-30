@@ -61,7 +61,7 @@ namespace SkyVault.WebApi.Workloads
 
         public static IResult AddPassport([FromBody] PassportRequest passportRequest,
             SkyvaultContext dbContext,
-            HttpContext context) 
+            HttpContext context, CacheService cacheService) 
         {
             try
             {
@@ -73,9 +73,10 @@ namespace SkyVault.WebApi.Workloads
                 {
 
 
-                    var userId = (String.IsNullOrEmpty(passportRequest.ParentId?.Trim())) ? 
-                        GetUserId(context, systemUserData) : 
-                        GetUserIdForCustomerProfile(context, systemUserData, customerProfileData, passportRequest.ParentId);
+                    //GetUserIdForCustomerProfile(context, systemUserData, customerProfileData, cacheService, passportRequest.ParentId);
+
+                    var userId = GetUserId(context, systemUserData); 
+                        
 
                     var validatePassportRequest = IsPassportDataValid(passportRequest);
 
@@ -103,6 +104,7 @@ namespace SkyVault.WebApi.Workloads
                         context,
                         systemUserData,
                         customer_profile_data,
+                        cacheService,
                         passportRequest.CustomerProfileId
                     );
 
@@ -132,7 +134,8 @@ namespace SkyVault.WebApi.Workloads
         public static IResult GetPassportsByCustomerProfileId(
             [FromRoute] string profileId,
             SkyvaultContext dbContext,
-            HttpContext context
+            HttpContext context,
+            CacheService cacheService
         )
         {
             try
@@ -148,6 +151,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customer_profile_data,
+                    cacheService,
                     profileId);
 
                 var passport = passportData.GetPassportByCustomerProfileId(Convert.ToInt32(profileId), _correlationId);
@@ -159,7 +163,6 @@ namespace SkyVault.WebApi.Workloads
                         p.PassportNumber,
                         p.Gender,
                         p.DateOfBirth.ToString(),
-                        p.PlaceOfBirth,
                         p.ExpiryDate.ToString(),
                         p.NationalityId.ToString(),
                         p.CountryId.ToString(),
@@ -183,42 +186,10 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
-        private static string getPassportCode(Passport p) 
-        {
-            return String.Concat(
-                            "SR DOCS YY HK1-P-",
-                            p.Country.CountryCode.ToUpper(), "-",
-                            p.PassportNumber, "-",
-                            p.PlaceOfBirth, "-",
-                            convertDateToCustomFormat(p.DateOfBirth), "-",
-                            p.Gender, "-",
-                            convertDateToCustomFormat(p.ExpiryDate), "-",
-                            p.LastName.ToUpper(), "-",
-                            p.OtherNames.ToUpper().Replace(" ", "-"), "-", "H/P1"
-                        );
-        }
-
-        private static string getVisaCode(Backend.Models.Visa visa) 
-        {
-            return String.Concat(
-                        "SR DOCO YY HK1", "-",
-                        visa.Passport.Country.CountryCode, "-",
-                        "V", "-",
-                        visa.VisaNumber, "-",
-                        visa.IssuedPlace, "-",
-                        convertDateToCustomFormat(visa.IssuedDate), "-",
-                        visa.Country.CountryCode, "-",
-                        convertDateToCustomFormat(visa.ExpireDate)
-                    );
-        }
-
-        private static string convertDateToCustomFormat(DateOnly date) => date.ToString("ddMMMyy").ToUpper();
-        
-
         public static IResult UpdatePassport(
                 [FromBody] PassportRequest passportRequest,
                 SkyvaultContext dbContext,
-                HttpContext context)
+                HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -233,6 +204,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     passportRequest.CustomerProfileId!);
 
                 var result = passportData.UpdatePassport(passportRequest, _correlationId);
@@ -259,7 +231,7 @@ namespace SkyVault.WebApi.Workloads
         public static IResult GetVisaByCustomerProfileId(
                 [FromRoute] string profileId,
                 SkyvaultContext dbContext,
-                HttpContext context) 
+                HttpContext context, CacheService cacheService) 
         {
             try
             {
@@ -273,6 +245,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customer_profile_data,
+                    cacheService,
                     profileId);
 
                 var result = visaData.GetVisaByCustomerProfileId(
@@ -307,7 +280,7 @@ namespace SkyVault.WebApi.Workloads
 
         public static IResult AddVisa([FromBody] VisaReqeust visaReqeust,
             SkyvaultContext dbContext,
-            HttpContext context)
+            HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -322,6 +295,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     visaReqeust.CustomerProfileId!);
 
                 var result = visaData.AddVisa(visaReqeust, _correlationId);
@@ -345,7 +319,7 @@ namespace SkyVault.WebApi.Workloads
 
         public static IResult UpdateVisa([FromRoute] string visaId,[FromBody] VisaReqeust visaReqeust,
             SkyvaultContext dbContext,
-            HttpContext context)
+            HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -356,14 +330,15 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                int userId = GetUserIdForCustomerProfile(
+                GetUserIdForCustomerProfile(
                                 context,
                                 systemUserData,
                                 customerProfileData,
+                                cacheService,
                                 visaReqeust.CustomerProfileId!
                              );
                     
-                var result = visaData.UpdateVisa(visaId, visaReqeust, userId, _correlationId);
+                var result = visaData.UpdateVisa(visaId, visaReqeust, _correlationId);
 
                 if (!result.Succeeded)
                     return Results.Problem(
@@ -385,7 +360,7 @@ namespace SkyVault.WebApi.Workloads
         public static IResult UpdateComMethod(
             [FromBody] ComMethodUpdateRequest comMethodRequest,
                        SkyvaultContext dbContext,
-                                  HttpContext context)
+                                  HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -412,6 +387,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     comMethodRequest.CustomerProfileId!
                 );
 
@@ -438,7 +414,8 @@ namespace SkyVault.WebApi.Workloads
         public static IResult GetCommMethod(
                         [FromBody] GetComMethodRequest comReqeust,
                         SkyvaultContext dbContext,
-                        HttpContext context) 
+                        HttpContext context, 
+                        CacheService cacheService) 
         {
             try
             {
@@ -451,6 +428,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     comReqeust.CustomerProfileId
                 );
 
@@ -477,18 +455,37 @@ namespace SkyVault.WebApi.Workloads
         public static IResult DeleteVisa(
             [FromRoute] string visaId,
             SkyvaultContext dbContext,
-            HttpContext context
+            HttpContext context,
+            CacheService cacheService
             ) 
         {
             try
             {
                 _correlationId = CorrelationHandler.Get(context);
 
-                var visaData = new VisaData(dbContext);
-
-
                 if (int.TryParse(visaId, out int deletingVisa))
                 {
+
+                    var visaData = new VisaData(dbContext);
+
+                    var systemUserData = new SystemUserData(dbContext);
+                    var customerProfileData = new CustomerProfileData(dbContext);
+                    var customerProfileId = customerProfileData.GetCustomerProfileIdByVisaId(deletingVisa, _correlationId);
+
+                    if(!customerProfileId.Succeeded)
+                        return Results.Problem(
+                                            new ValidationProblemDetails().ToValidationProblemDetails(
+                                                customerProfileId.Message, customerProfileId.ErrorCode, _correlationId));
+
+
+                    GetUserIdForCustomerProfile(
+                        context,
+                        systemUserData,
+                        customerProfileData,
+                        cacheService,
+                        customerProfileId.Value.ToString()
+    
+                    );
 
                     var result = visaData.DeleteVisa(deletingVisa, _correlationId);
 
@@ -515,7 +512,11 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
-        public static IResult AddFFN([FromBody] FFNRequest ffnRequest, SkyvaultContext dbContext, HttpContext context) 
+        public static IResult AddFFN(
+            [FromBody] FFNRequest ffnRequest, 
+            SkyvaultContext dbContext, 
+            HttpContext context,
+            CacheService cacheService) 
         {
             try
             {
@@ -531,6 +532,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     ffnRequest.CustomerProfileId!
                 );
 
@@ -562,7 +564,11 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
-        public static IResult UpdateFFN([FromRoute] string ffId, [FromBody] FFNRequest ffnRequest, SkyvaultContext dbContext, HttpContext context) 
+        public static IResult UpdateFFN(
+            [FromRoute] string ffId, 
+            [FromBody] FFNRequest ffnRequest, 
+            SkyvaultContext dbContext, 
+            HttpContext context, CacheService cacheService) 
         {
             try
             {
@@ -576,6 +582,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     ffnRequest.CustomerProfileId!
                 );
 
@@ -608,7 +615,12 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
-        public static IResult DeleteFFN([FromRoute] string ffId, [FromBody] FFNRequest ffnRequest, SkyvaultContext dbContext, HttpContext context) 
+        public static IResult DeleteFFN(
+            [FromRoute] string ffId, 
+            [FromBody] FFNRequest ffnRequest, 
+            SkyvaultContext dbContext, 
+            HttpContext context,
+            CacheService cacheService) 
         {
             try
             {
@@ -622,6 +634,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     ffnRequest.CustomerProfileId!
                 );
 
@@ -655,7 +668,10 @@ namespace SkyVault.WebApi.Workloads
 
         public static IResult GetFFNByCustomerId(
             [FromRoute] string profileId, 
-            SkyvaultContext dbContext, HttpContext context) 
+            SkyvaultContext dbContext, 
+            HttpContext context,
+            CacheService cacheService
+            ) 
         {
             try
             {
@@ -670,6 +686,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     profileId
                 );
 
@@ -701,6 +718,7 @@ namespace SkyVault.WebApi.Workloads
 
         public static IResult GetFamilyMembers([FromRoute] string profileId, 
             SkyvaultContext dbContext, 
+            CacheService cacheService,
             HttpContext context) 
         {
             _correlationId = CorrelationHandler.Get(context);
@@ -714,6 +732,7 @@ namespace SkyVault.WebApi.Workloads
                     context,
                     systemUserData,
                     customerProfileData,
+                    cacheService,
                     profileId
                 );
 
@@ -774,17 +793,29 @@ namespace SkyVault.WebApi.Workloads
             return new SkyResult<bool>().SucceededWithValue(true);
         }
 
-        private static int GetUserIdForCustomerProfile(
+        private static void GetUserIdForCustomerProfile(
             HttpContext context, 
             SystemUserData systemUserData, 
             CustomerProfileData customerProfileData,
+            CacheService cacheService,
             string customerProfileId
             )
         {
+
             var userUpn = context.User.Identity!.Name;
 
             if (String.IsNullOrEmpty(userUpn))
                 throw new UnauthorizedAccessException("Unauthorized");
+
+            var userRole = cacheService.GetUserRole(userUpn);
+
+            if (!userRole.Succeeded)
+                throw new UnauthorizedAccessException("Unauthorized");
+
+            if (userRole.Value == Payloads.CommonPayloads.SystemUserRole.SuperAdmin.ToString() ||
+                userRole.Value == Payloads.CommonPayloads.SystemUserRole.Admin.ToString()
+                )
+                return;
 
             var userId = systemUserData.GetUserIdByUpn(userUpn, _correlationId);
 
@@ -799,8 +830,6 @@ namespace SkyVault.WebApi.Workloads
 
             if (!authorized.Succeeded)
                 throw new UnauthorizedAccessException("Unauthorized");
-
-            return systemUserData.GetUserIdByUpn(userUpn, _correlationId).Value;
         }
 
         private static int GetUserId(
@@ -817,6 +846,37 @@ namespace SkyVault.WebApi.Workloads
 
             return userId.Value;
         }
+
+        private static string getPassportCode(Passport p)
+        {
+            return String.Concat(
+                            "SR DOCS YY HK1-P-",
+                            p.Country.CountryCode.ToUpper(), "-",
+                            p.PassportNumber, "-",
+                            //p.PlaceOfBirth, "-",
+                            convertDateToCustomFormat(p.DateOfBirth), "-",
+                            p.Gender, "-",
+                            convertDateToCustomFormat(p.ExpiryDate), "-",
+                            p.LastName.ToUpper(), "-",
+                            p.OtherNames.ToUpper().Replace(" ", "-"), "-", "H/P1"
+                        );
+        }
+
+        private static string getVisaCode(Backend.Models.Visa visa)
+        {
+            return String.Concat(
+                        "SR DOCS YY HK1", "-",
+                        visa.Passport.Country.CountryCode, "-",
+                        "V", "-",
+                        visa.VisaNumber, "-",
+                        visa.IssuedPlace, "-",
+                        convertDateToCustomFormat(visa.IssuedDate), "-",
+                        visa.Country.CountryCode, "-",
+                        convertDateToCustomFormat(visa.ExpireDate)
+                    );
+        }
+
+        private static string convertDateToCustomFormat(DateOnly date) => date.ToString("ddMMMyy").ToUpper();
 
         #endregion
 

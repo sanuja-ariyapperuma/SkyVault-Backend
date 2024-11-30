@@ -26,12 +26,11 @@ namespace SkyVault.WebApi.Backend
             
         }
 
-        public SkyResult<string> UpdateVisa(string visaId, VisaReqeust visaRequest, int userId, string correlationId)
+        public SkyResult<string> UpdateVisa(string visaId, VisaReqeust visaRequest, string correlationId)
         {
             var results = db.Visas
                .Where(v =>
-                    v.Id == Convert.ToInt32(visaId) &&
-                    v.Passport.CustomerProfile.SystemUserId == userId
+                    v.Id == Convert.ToInt32(visaId)
                     )
                .ExecuteUpdate(updates =>
                     updates.SetProperty(visa => visa.VisaNumber, visaRequest.VisaNumber)

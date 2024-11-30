@@ -87,11 +87,37 @@ namespace SkyVault.WebApi.Backend
                 e.LogException(correlationId);
 
                 return new SkyResult<int>().Fail(
-                    message: "An unexpected error occurred while fetching user. Please try again.",
+                    message: "An unexpected error occurred while fetching user id. Please try again.",
                     errorCode: "2ac5059f-0002",
                     correlationId: correlationId);
             }
 
+        }
+
+        public SkyResult<string> GetUserRoleByUpn(string upn, string? correlationId) 
+        {
+            try
+            {
+                var userRole = db.SystemUsers.AsNoTracking().FirstOrDefault(c => c.SamProfileId == upn)?.UserRole;
+
+                if (String.IsNullOrEmpty(userRole))
+                    return new SkyResult<string>().Fail(
+                        message: "User role not found.",
+                        errorCode: "2ac5059f-0004",
+                        correlationId: correlationId);
+
+                return new SkyResult<string>().SucceededWithValue(userRole);
+            }
+            catch (Exception e)
+            {
+
+                e.LogException(correlationId);
+
+                return new SkyResult<string>().Fail(
+                    message: "An unexpected error occurred while fetching user role. Please try again.",
+                    errorCode: "2ac5059f-0002",
+                    correlationId: correlationId);
+            }
         }
     }
 }

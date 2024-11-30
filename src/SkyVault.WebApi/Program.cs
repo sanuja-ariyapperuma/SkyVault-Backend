@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using SkyVault.WebApi.Authentication;
+using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
 using SkyVault.WebApi.MappingProfiles;
@@ -34,11 +35,7 @@ public static class Program
         });
 
         builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database");
-
-
         builder.Services.AddAutoMapper(typeof(Program).Assembly,typeof(MappingProfile).Assembly);
-
-
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options =>
     {
@@ -72,7 +69,7 @@ public static class Program
             options.AddPolicy(MyAllowSpecificOrigins,
                 builder =>
                 {
-                    builder.WithOrigins("http://localhost:5173", "https://witty-wave-03975c200.5.azurestaticapps.net")
+                    builder.WithOrigins("http://localhost:5173", "https://travelchannelcrm.com")
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();
@@ -80,6 +77,9 @@ public static class Program
         });
 
         builder.Services.AddMemoryCache();
+
+        builder.Services.AddScoped<CacheService>();
+        builder.Services.AddHttpContextAccessor();
 
         Log.Logger = new LoggerConfiguration()
             .WriteTo.ApplicationInsights(

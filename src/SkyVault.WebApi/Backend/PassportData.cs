@@ -21,8 +21,7 @@ namespace SkyVault.WebApi.Backend
                     CustomerProfileId = Convert.ToInt32(newPassport.CustomerProfileId),
                     Gender = newPassport.Gender!,
                     IsPrimary = newPassport.IsPrimary!,
-                    NationalityId = Convert.ToInt32(newPassport.NationalityId),
-                    PlaceOfBirth = newPassport.PlaceOfBirth
+                    NationalityId = Convert.ToInt32(newPassport.NationalityId)
                 };
 
                 var savepassport = db.Passports.Add(passport);
@@ -47,7 +46,6 @@ namespace SkyVault.WebApi.Backend
                             DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
                         .SetProperty(passport => passport.ExpiryDate,
                             DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
-                        .SetProperty(passport => passport.PlaceOfBirth, passportRequest.PlaceOfBirth)
                         .SetProperty(passport => passport.NationalityId,
                             Convert.ToInt32(passportRequest.NationalityId))
                         .SetProperty(passport => passport.CountryId,

@@ -54,8 +54,7 @@ namespace SkyVault.WebApi.Backend
                     ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     Gender = passportRequest.Gender!,
                     IsPrimary = passportRequest.IsPrimary!,
-                    NationalityId = Convert.ToInt32(passportRequest.NationalityId),
-                    PlaceOfBirth = passportRequest.PlaceOfBirth
+                    NationalityId = Convert.ToInt32(passportRequest.NationalityId)
                 };
 
                 var newProfile = new CustomerProfile
@@ -209,6 +208,18 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<List<FamilyMembersResponse>>().SucceededWithValue(familyMembers);
 
+        }
+
+        public SkyResult<int> GetCustomerProfileIdByVisaId(int visaId, string correlationId) 
+        {
+            var customerProfileId = db.Visas
+                .Include(u => u.Passport).FirstOrDefault(a => a.Id == visaId)?
+                .Passport.CustomerProfileId;
+
+            if (customerProfileId == null)
+                return new SkyResult<int>().Fail("No profile found", "", correlationId);
+
+            return new SkyResult<int>().SucceededWithValue((int)customerProfileId);
         }
     }
 }

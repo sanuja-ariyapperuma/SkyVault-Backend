@@ -7,7 +7,6 @@ public sealed record PassportResponse(
     string? PassportNumber,
     string? GenderId,
     string? DateOfBirth,
-    string? PlaceOfBirth,
     string? PassportExpiryDate,
     string? NationalityId,
     string? CountryId,

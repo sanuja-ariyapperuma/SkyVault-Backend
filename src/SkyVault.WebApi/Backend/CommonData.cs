@@ -6,7 +6,7 @@ namespace SkyVault.WebApi.Backend
     public sealed class CommonData(SkyvaultContext _db)
     {
 
-        public List<Salutation> Salutations() => _db.Salutations.AsNoTracking().ToList();
+        public List<Salutation> GetSalutations() => _db.Salutations.AsNoTracking().ToList();
 
         public List<Country> GetCountries() => _db.Countries.AsNoTracking().ToList();
 

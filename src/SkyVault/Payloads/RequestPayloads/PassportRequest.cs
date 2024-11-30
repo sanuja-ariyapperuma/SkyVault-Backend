@@ -14,7 +14,6 @@ namespace SkyVault.Payloads.RequestPayloads;
             string? PassportNumber,
             string? Gender,
             string? DateOfBirth,
-            string? PlaceOfBirth,
             string? ExpiryDate,
             string? NationalityId,
             string? CountryId,
