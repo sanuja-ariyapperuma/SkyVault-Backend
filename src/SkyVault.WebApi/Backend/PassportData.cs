@@ -64,6 +64,7 @@ namespace SkyVault.WebApi.Backend
                     .AsNoTracking()
                     .Include(c => c.CustomerProfile)
                     .Include(c => c.Country)
+                    .Include(c => c.Nationality)
                     .Where(p => p.CustomerProfileId == customerProfileId).ToList();
 
                 return new SkyResult<List<Passport>>().SucceededWithValue(result);

@@ -853,7 +853,7 @@ namespace SkyVault.WebApi.Workloads
                             "SR DOCS YY HK1-P-",
                             p.Country.CountryCode.ToUpper(), "-",
                             p.PassportNumber, "-",
-                            //p.PlaceOfBirth, "-",
+                            p.Nationality.NationalityCode, "-",
                             convertDateToCustomFormat(p.DateOfBirth), "-",
                             p.Gender, "-",
                             convertDateToCustomFormat(p.ExpiryDate), "-",
