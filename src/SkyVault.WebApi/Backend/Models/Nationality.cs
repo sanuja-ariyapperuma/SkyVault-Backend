@@ -9,5 +9,7 @@ public partial class Nationality
 
     public string NationalityName { get; set; } = null!;
 
+    public string NationalityCode { get; set; } = String.Empty;
+
     public virtual ICollection<Passport> Passports { get; set; } = new List<Passport>();
 }

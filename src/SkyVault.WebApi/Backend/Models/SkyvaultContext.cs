@@ -186,6 +186,11 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.NationalityName)
                 .HasMaxLength(100)
                 .HasColumnName("nationality_name");
+
+            entity.Property(e => e.NationalityCode)
+                .HasColumnName("nationality_code")
+                .HasMaxLength(6)
+                .IsFixedLength(true);
         });
 
         modelBuilder.Entity<NotificationTemplate>(entity =>

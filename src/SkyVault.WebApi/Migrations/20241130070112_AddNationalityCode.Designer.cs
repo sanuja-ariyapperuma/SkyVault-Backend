@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyVault.WebApi.Backend.Models;
 
@@ -11,9 +12,11 @@ using SkyVault.WebApi.Backend.Models;
 namespace SkyVault.WebApi.Migrations
 {
     [DbContext(typeof(SkyvaultContext))]
-    partial class SkyvaultContextModelSnapshot : ModelSnapshot
+    [Migration("20241130070112_AddNationalityCode")]
+    partial class AddNationalityCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1527,8 +1530,8 @@ namespace SkyVault.WebApi.Migrations
 
                     b.Property<string>("NationalityCode")
                         .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("char(6)")
+                        .HasMaxLength(3)
+                        .HasColumnType("char(3)")
                         .HasColumnName("nationality_code")
                         .IsFixedLength();
 
@@ -1547,1165 +1550,1159 @@ namespace SkyVault.WebApi.Migrations
                         new
                         {
                             Id = 1,
-                            NationalityCode = "AFG",
+                            NationalityCode = "",
                             NationalityName = "Afghan"
                         },
                         new
                         {
                             Id = 2,
-                            NationalityCode = "ALB",
+                            NationalityCode = "",
                             NationalityName = "Albanian"
                         },
                         new
                         {
                             Id = 3,
-                            NationalityCode = "DZA",
+                            NationalityCode = "",
                             NationalityName = "Algerian"
                         },
                         new
                         {
                             Id = 4,
-                            NationalityCode = "USA",
+                            NationalityCode = "",
                             NationalityName = "American"
                         },
                         new
                         {
                             Id = 5,
-                            NationalityCode = "AND",
+                            NationalityCode = "",
                             NationalityName = "Andorran"
                         },
                         new
                         {
                             Id = 6,
-                            NationalityCode = "AGO",
+                            NationalityCode = "",
                             NationalityName = "Angolan"
                         },
                         new
                         {
                             Id = 7,
-                            NationalityCode = "ATG",
+                            NationalityCode = "",
                             NationalityName = "Antiguans"
                         },
                         new
                         {
                             Id = 8,
-                            NationalityCode = "ARG",
+                            NationalityCode = "",
                             NationalityName = "Argentinean"
                         },
                         new
                         {
                             Id = 9,
-                            NationalityCode = "ARM",
+                            NationalityCode = "",
                             NationalityName = "Armenian"
                         },
                         new
                         {
                             Id = 10,
-                            NationalityCode = "AUS",
+                            NationalityCode = "",
                             NationalityName = "Australian"
                         },
                         new
                         {
                             Id = 11,
-                            NationalityCode = "AUT",
+                            NationalityCode = "",
                             NationalityName = "Austrian"
                         },
                         new
                         {
                             Id = 12,
-                            NationalityCode = "AZE",
+                            NationalityCode = "",
                             NationalityName = "Azerbaijani"
                         },
                         new
                         {
                             Id = 13,
-                            NationalityCode = "BHS",
+                            NationalityCode = "",
                             NationalityName = "Bahamian"
                         },
                         new
                         {
                             Id = 14,
-                            NationalityCode = "BHR",
+                            NationalityCode = "",
                             NationalityName = "Bahraini"
                         },
                         new
                         {
                             Id = 15,
-                            NationalityCode = "BGD",
+                            NationalityCode = "",
                             NationalityName = "Bangladeshi"
                         },
                         new
                         {
                             Id = 16,
-                            NationalityCode = "BRB",
+                            NationalityCode = "",
                             NationalityName = "Barbadian"
                         },
                         new
                         {
                             Id = 17,
-                            NationalityCode = "BLR",
+                            NationalityCode = "",
                             NationalityName = "Belarusian"
                         },
                         new
                         {
                             Id = 18,
-                            NationalityCode = "BEL",
+                            NationalityCode = "",
                             NationalityName = "Belgian"
                         },
                         new
                         {
                             Id = 19,
-                            NationalityCode = "BLZ",
+                            NationalityCode = "",
                             NationalityName = "Belizean"
                         },
                         new
                         {
                             Id = 20,
-                            NationalityCode = "BEN",
+                            NationalityCode = "",
                             NationalityName = "Beninese"
                         },
                         new
                         {
                             Id = 21,
-                            NationalityCode = "BTN",
+                            NationalityCode = "",
                             NationalityName = "Bhutanese"
                         },
                         new
                         {
                             Id = 22,
-                            NationalityCode = "BOL",
+                            NationalityCode = "",
                             NationalityName = "Bolivian"
                         },
                         new
                         {
                             Id = 23,
-                            NationalityCode = "BIH",
+                            NationalityCode = "",
                             NationalityName = "Bosnian"
                         },
                         new
                         {
                             Id = 24,
-                            NationalityCode = "BWA",
+                            NationalityCode = "",
                             NationalityName = "Botswanan"
                         },
                         new
                         {
                             Id = 25,
-                            NationalityCode = "BRA",
+                            NationalityCode = "",
                             NationalityName = "Brazilian"
                         },
                         new
                         {
                             Id = 26,
-                            NationalityCode = "GBR",
+                            NationalityCode = "",
                             NationalityName = "British"
                         },
                         new
                         {
                             Id = 27,
-                            NationalityCode = "BRN",
+                            NationalityCode = "",
                             NationalityName = "Bruneian"
                         },
                         new
                         {
                             Id = 28,
-                            NationalityCode = "BGR",
+                            NationalityCode = "",
                             NationalityName = "Bulgarian"
                         },
                         new
                         {
                             Id = 29,
-                            NationalityCode = "BFA",
+                            NationalityCode = "",
                             NationalityName = "Burkinabe"
                         },
                         new
                         {
                             Id = 30,
-                            NationalityCode = "BDI",
+                            NationalityCode = "",
                             NationalityName = "Burundian"
                         },
                         new
                         {
                             Id = 31,
-                            NationalityCode = "KHM",
+                            NationalityCode = "",
                             NationalityName = "Cambodian"
                         },
                         new
                         {
                             Id = 32,
-                            NationalityCode = "CMR",
+                            NationalityCode = "",
                             NationalityName = "Cameroonian"
                         },
                         new
                         {
                             Id = 33,
-                            NationalityCode = "CAN",
+                            NationalityCode = "",
                             NationalityName = "Canadian"
                         },
                         new
                         {
                             Id = 34,
-                            NationalityCode = "CPV",
+                            NationalityCode = "",
                             NationalityName = "Cape Verdean"
                         },
                         new
                         {
                             Id = 35,
-                            NationalityCode = "CAF",
+                            NationalityCode = "",
                             NationalityName = "Central African"
                         },
                         new
                         {
                             Id = 36,
-                            NationalityCode = "TCD",
+                            NationalityCode = "",
                             NationalityName = "Chadian"
                         },
                         new
                         {
                             Id = 37,
-                            NationalityCode = "CHL",
+                            NationalityCode = "",
                             NationalityName = "Chilean"
                         },
                         new
                         {
                             Id = 38,
-                            NationalityCode = "CHN",
+                            NationalityCode = "",
                             NationalityName = "Chinese"
                         },
                         new
                         {
                             Id = 39,
-                            NationalityCode = "COL",
+                            NationalityCode = "",
                             NationalityName = "Colombian"
                         },
                         new
                         {
                             Id = 40,
-                            NationalityCode = "COM",
+                            NationalityCode = "",
                             NationalityName = "Comoran"
                         },
                         new
                         {
                             Id = 41,
-                            NationalityCode = "COG",
+                            NationalityCode = "",
                             NationalityName = "Congolese"
                         },
                         new
                         {
                             Id = 42,
-                            NationalityCode = "CRI",
+                            NationalityCode = "",
                             NationalityName = "Costa Rican"
                         },
                         new
                         {
                             Id = 43,
-                            NationalityCode = "HRV",
+                            NationalityCode = "",
                             NationalityName = "Croatian"
                         },
                         new
                         {
                             Id = 44,
-                            NationalityCode = "CUB",
+                            NationalityCode = "",
                             NationalityName = "Cuban"
                         },
                         new
                         {
                             Id = 45,
-                            NationalityCode = "CYP",
+                            NationalityCode = "",
                             NationalityName = "Cypriot"
                         },
                         new
                         {
                             Id = 46,
-                            NationalityCode = "CZE",
+                            NationalityCode = "",
                             NationalityName = "Czech"
                         },
                         new
                         {
                             Id = 47,
-                            NationalityCode = "DNK",
+                            NationalityCode = "",
                             NationalityName = "Danish"
                         },
                         new
                         {
                             Id = 48,
-                            NationalityCode = "DJI",
+                            NationalityCode = "",
                             NationalityName = "Djiboutian"
                         },
                         new
                         {
                             Id = 49,
-                            NationalityCode = "DOM",
+                            NationalityCode = "",
                             NationalityName = "Dominican"
                         },
                         new
                         {
                             Id = 50,
-                            NationalityCode = "NLD",
+                            NationalityCode = "",
                             NationalityName = "Dutch"
                         },
                         new
                         {
                             Id = 51,
-                            NationalityCode = "TLS",
+                            NationalityCode = "",
                             NationalityName = "East Timorese"
                         },
                         new
                         {
                             Id = 52,
-                            NationalityCode = "ECU",
+                            NationalityCode = "",
                             NationalityName = "Ecuadorean"
                         },
                         new
                         {
                             Id = 53,
-                            NationalityCode = "EGY",
+                            NationalityCode = "",
                             NationalityName = "Egyptian"
                         },
                         new
                         {
                             Id = 54,
-                            NationalityCode = "ARE",
+                            NationalityCode = "",
                             NationalityName = "Emirian"
                         },
                         new
                         {
                             Id = 55,
-                            NationalityCode = "GNQ",
+                            NationalityCode = "",
                             NationalityName = "Equatorial Guinean"
                         },
                         new
                         {
                             Id = 56,
-                            NationalityCode = "ERI",
+                            NationalityCode = "",
                             NationalityName = "Eritrean"
                         },
                         new
                         {
                             Id = 57,
-                            NationalityCode = "EST",
+                            NationalityCode = "",
                             NationalityName = "Estonian"
                         },
                         new
                         {
                             Id = 58,
-                            NationalityCode = "ETH",
+                            NationalityCode = "",
                             NationalityName = "Ethiopian"
                         },
                         new
                         {
                             Id = 59,
-                            NationalityCode = "FJI",
+                            NationalityCode = "",
                             NationalityName = "Fijian"
                         },
                         new
                         {
                             Id = 60,
-                            NationalityCode = "PHL",
+                            NationalityCode = "",
                             NationalityName = "Filipino"
                         },
                         new
                         {
                             Id = 61,
-                            NationalityCode = "FIN",
+                            NationalityCode = "",
                             NationalityName = "Finnish"
                         },
                         new
                         {
                             Id = 62,
-                            NationalityCode = "FRA",
+                            NationalityCode = "",
                             NationalityName = "French"
                         },
                         new
                         {
                             Id = 63,
-                            NationalityCode = "GAB",
+                            NationalityCode = "",
                             NationalityName = "Gabonese"
                         },
                         new
                         {
                             Id = 64,
-                            NationalityCode = "GMB",
+                            NationalityCode = "",
                             NationalityName = "Gambian"
                         },
                         new
                         {
                             Id = 65,
-                            NationalityCode = "GEO",
+                            NationalityCode = "",
                             NationalityName = "Georgian"
                         },
                         new
                         {
                             Id = 66,
-                            NationalityCode = "DEU",
+                            NationalityCode = "",
                             NationalityName = "German"
                         },
                         new
                         {
                             Id = 67,
-                            NationalityCode = "GHA",
+                            NationalityCode = "",
                             NationalityName = "Ghanaian"
                         },
                         new
                         {
                             Id = 68,
-                            NationalityCode = "GRC",
+                            NationalityCode = "",
                             NationalityName = "Greek"
                         },
                         new
                         {
                             Id = 69,
-                            NationalityCode = "GRD",
+                            NationalityCode = "",
                             NationalityName = "Grenadian"
                         },
                         new
                         {
                             Id = 70,
-                            NationalityCode = "GTM",
+                            NationalityCode = "",
                             NationalityName = "Guatemalan"
                         },
                         new
                         {
                             Id = 71,
-                            NationalityCode = "GNB",
+                            NationalityCode = "",
                             NationalityName = "Guinea-Bissauan"
                         },
                         new
                         {
                             Id = 72,
-                            NationalityCode = "GIN",
+                            NationalityCode = "",
                             NationalityName = "Guinean"
                         },
                         new
                         {
                             Id = 73,
-                            NationalityCode = "GUY",
+                            NationalityCode = "",
                             NationalityName = "Guyanese"
                         },
                         new
                         {
                             Id = 74,
-                            NationalityCode = "HTI",
+                            NationalityCode = "",
                             NationalityName = "Haitian"
                         },
                         new
                         {
                             Id = 75,
-                            NationalityCode = "BIH",
+                            NationalityCode = "",
                             NationalityName = "Herzegovinian"
                         },
                         new
                         {
                             Id = 76,
-                            NationalityCode = "HND",
+                            NationalityCode = "",
                             NationalityName = "Honduran"
                         },
                         new
                         {
                             Id = 77,
-                            NationalityCode = "HUN",
+                            NationalityCode = "",
                             NationalityName = "Hungarian"
                         },
                         new
                         {
                             Id = 78,
-                            NationalityCode = "KIR",
+                            NationalityCode = "",
                             NationalityName = "I-Kiribati"
                         },
                         new
                         {
                             Id = 79,
-                            NationalityCode = "ISL",
+                            NationalityCode = "",
                             NationalityName = "Icelander"
                         },
                         new
                         {
                             Id = 80,
-                            NationalityCode = "IND",
+                            NationalityCode = "",
                             NationalityName = "Indian"
                         },
                         new
                         {
                             Id = 81,
-                            NationalityCode = "IDN",
+                            NationalityCode = "",
                             NationalityName = "Indonesian"
                         },
                         new
                         {
                             Id = 82,
-                            NationalityCode = "IRN",
+                            NationalityCode = "",
                             NationalityName = "Iranian"
                         },
                         new
                         {
                             Id = 83,
-                            NationalityCode = "IRQ",
+                            NationalityCode = "",
                             NationalityName = "Iraqi"
                         },
                         new
                         {
                             Id = 84,
-                            NationalityCode = "IRL",
+                            NationalityCode = "",
                             NationalityName = "Irish"
                         },
                         new
                         {
                             Id = 85,
-                            NationalityCode = "ISR",
+                            NationalityCode = "",
                             NationalityName = "Israeli"
                         },
                         new
                         {
                             Id = 86,
-                            NationalityCode = "ITA",
+                            NationalityCode = "",
                             NationalityName = "Italian"
                         },
                         new
                         {
                             Id = 87,
-                            NationalityCode = "CIV",
+                            NationalityCode = "",
                             NationalityName = "Ivorian"
                         },
                         new
                         {
                             Id = 88,
-                            NationalityCode = "JAM",
+                            NationalityCode = "",
                             NationalityName = "Jamaican"
                         },
                         new
                         {
                             Id = 89,
-                            NationalityCode = "JPN",
+                            NationalityCode = "",
                             NationalityName = "Japanese"
                         },
                         new
                         {
                             Id = 90,
-                            NationalityCode = "JOR",
+                            NationalityCode = "",
                             NationalityName = "Jordanian"
                         },
                         new
                         {
                             Id = 91,
-                            NationalityCode = "KAZ",
+                            NationalityCode = "",
                             NationalityName = "Kazakhstani"
                         },
                         new
                         {
                             Id = 92,
-                            NationalityCode = "KEN",
+                            NationalityCode = "",
                             NationalityName = "Kenyan"
                         },
                         new
                         {
                             Id = 93,
-                            NationalityCode = "KNA",
+                            NationalityCode = "",
                             NationalityName = "Kittian and Nevisian"
                         },
                         new
                         {
                             Id = 94,
-                            NationalityCode = "KWT",
+                            NationalityCode = "",
                             NationalityName = "Kuwaiti"
                         },
                         new
                         {
                             Id = 95,
-                            NationalityCode = "KGZ",
+                            NationalityCode = "",
                             NationalityName = "Kyrgyz"
                         },
                         new
                         {
                             Id = 96,
-                            NationalityCode = "LAO",
+                            NationalityCode = "",
                             NationalityName = "Laotian"
                         },
                         new
                         {
                             Id = 97,
-                            NationalityCode = "LVA",
+                            NationalityCode = "",
                             NationalityName = "Latvian"
                         },
                         new
                         {
                             Id = 98,
-                            NationalityCode = "LBN",
+                            NationalityCode = "",
                             NationalityName = "Lebanese"
                         },
                         new
                         {
                             Id = 99,
-                            NationalityCode = "LBR",
+                            NationalityCode = "",
                             NationalityName = "Liberian"
                         },
                         new
                         {
                             Id = 100,
-                            NationalityCode = "LBY",
+                            NationalityCode = "",
                             NationalityName = "Libyan"
                         },
                         new
                         {
                             Id = 101,
-                            NationalityCode = "LIE",
+                            NationalityCode = "",
                             NationalityName = "Liechtensteiner"
                         },
                         new
                         {
                             Id = 102,
-                            NationalityCode = "LTU",
+                            NationalityCode = "",
                             NationalityName = "Lithuanian"
                         },
                         new
                         {
                             Id = 103,
-                            NationalityCode = "LUX",
+                            NationalityCode = "",
                             NationalityName = "Luxembourger"
                         },
                         new
                         {
                             Id = 104,
-                            NationalityCode = "MDG",
+                            NationalityCode = "",
                             NationalityName = "Malagasy"
                         },
                         new
                         {
                             Id = 105,
-                            NationalityCode = "MWI",
+                            NationalityCode = "",
                             NationalityName = "Malawian"
                         },
                         new
                         {
                             Id = 106,
-                            NationalityCode = "MYS",
+                            NationalityCode = "",
                             NationalityName = "Malaysian"
                         },
                         new
                         {
                             Id = 107,
-                            NationalityCode = "MDV",
+                            NationalityCode = "",
                             NationalityName = "Maldivan"
                         },
                         new
                         {
                             Id = 108,
-                            NationalityCode = "MLI",
+                            NationalityCode = "",
                             NationalityName = "Malian"
                         },
                         new
                         {
                             Id = 109,
-                            NationalityCode = "MLT",
+                            NationalityCode = "",
                             NationalityName = "Maltese"
                         },
                         new
                         {
                             Id = 110,
-                            NationalityCode = "MHL",
+                            NationalityCode = "",
                             NationalityName = "Marshallese"
                         },
                         new
                         {
                             Id = 111,
-                            NationalityCode = "MRT",
+                            NationalityCode = "",
                             NationalityName = "Mauritanian"
                         },
                         new
                         {
                             Id = 112,
-                            NationalityCode = "MUS",
+                            NationalityCode = "",
                             NationalityName = "Mauritian"
                         },
                         new
                         {
                             Id = 113,
-                            NationalityCode = "MEX",
+                            NationalityCode = "",
                             NationalityName = "Mexican"
                         },
                         new
                         {
                             Id = 114,
-                            NationalityCode = "FSM",
+                            NationalityCode = "",
                             NationalityName = "Micronesian"
                         },
                         new
                         {
                             Id = 115,
-                            NationalityCode = "MDA",
+                            NationalityCode = "",
                             NationalityName = "Moldovan"
                         },
                         new
                         {
                             Id = 116,
-                            NationalityCode = "MCO",
+                            NationalityCode = "",
                             NationalityName = "Monacan"
                         },
                         new
                         {
                             Id = 117,
-                            NationalityCode = "MNG",
+                            NationalityCode = "",
                             NationalityName = "Mongolian"
                         },
                         new
                         {
                             Id = 118,
-                            NationalityCode = "MNE",
+                            NationalityCode = "",
                             NationalityName = "Montenegrin"
                         },
                         new
                         {
                             Id = 119,
-                            NationalityCode = "MAR",
+                            NationalityCode = "",
                             NationalityName = "Moroccan"
                         },
                         new
                         {
                             Id = 120,
-                            NationalityCode = "LSO",
+                            NationalityCode = "",
                             NationalityName = "Mosotho"
                         },
                         new
                         {
                             Id = 121,
-                            NationalityCode = "BWA",
+                            NationalityCode = "",
                             NationalityName = "Motswana"
                         },
                         new
                         {
                             Id = 122,
-                            NationalityCode = "MOZ",
+                            NationalityCode = "",
                             NationalityName = "Mozambican"
                         },
                         new
                         {
                             Id = 123,
-                            NationalityCode = "NAM",
+                            NationalityCode = "",
                             NationalityName = "Namibian"
                         },
                         new
                         {
                             Id = 124,
-                            NationalityCode = "NRU",
+                            NationalityCode = "",
                             NationalityName = "Nauruan"
                         },
                         new
                         {
                             Id = 125,
-                            NationalityCode = "NPL",
+                            NationalityCode = "",
                             NationalityName = "Nepalese"
                         },
                         new
                         {
                             Id = 126,
-                            NationalityCode = "NLD",
+                            NationalityCode = "",
                             NationalityName = "Netherlander"
                         },
                         new
                         {
                             Id = 127,
-                            NationalityCode = "NZL",
+                            NationalityCode = "",
                             NationalityName = "New Zealander"
                         },
                         new
                         {
                             Id = 128,
-                            NationalityCode = "NIC",
+                            NationalityCode = "",
                             NationalityName = "Nicaraguan"
                         },
                         new
                         {
                             Id = 129,
-                            NationalityCode = "NGA",
+                            NationalityCode = "",
                             NationalityName = "Nigerian"
                         },
                         new
                         {
                             Id = 130,
-                            NationalityCode = "PRK",
+                            NationalityCode = "",
                             NationalityName = "North Korean"
                         },
                         new
                         {
                             Id = 131,
-                            NationalityCode = "GB-NIR",
+                            NationalityCode = "",
                             NationalityName = "Northern Irish"
                         },
                         new
                         {
                             Id = 132,
-                            NationalityCode = "NOR",
+                            NationalityCode = "",
                             NationalityName = "Norwegian"
                         },
                         new
                         {
                             Id = 133,
-                            NationalityCode = "OMN",
+                            NationalityCode = "",
                             NationalityName = "Omani"
                         },
                         new
                         {
                             Id = 134,
-                            NationalityCode = "PAK",
+                            NationalityCode = "",
                             NationalityName = "Pakistani"
                         },
                         new
                         {
                             Id = 135,
-                            NationalityCode = "PLW",
+                            NationalityCode = "",
                             NationalityName = "Palauan"
                         },
                         new
                         {
                             Id = 136,
-                            NationalityCode = "PAN",
+                            NationalityCode = "",
                             NationalityName = "Panamanian"
                         },
                         new
                         {
                             Id = 137,
-                            NationalityCode = "PNG",
+                            NationalityCode = "",
                             NationalityName = "Papua New Guinean"
                         },
                         new
                         {
                             Id = 138,
-                            NationalityCode = "PRY",
+                            NationalityCode = "",
                             NationalityName = "Paraguayan"
                         },
                         new
                         {
                             Id = 139,
-                            NationalityCode = "PER",
+                            NationalityCode = "",
                             NationalityName = "Peruvian"
                         },
                         new
                         {
                             Id = 140,
-                            NationalityCode = "POL",
+                            NationalityCode = "",
                             NationalityName = "Polish"
                         },
                         new
                         {
                             Id = 141,
-                            NationalityCode = "PRT",
+                            NationalityCode = "",
                             NationalityName = "Portuguese"
                         },
                         new
                         {
                             Id = 142,
-                            NationalityCode = "QAT",
+                            NationalityCode = "",
                             NationalityName = "Qatari"
                         },
                         new
                         {
                             Id = 143,
-                            NationalityCode = "ROU",
+                            NationalityCode = "",
                             NationalityName = "Romanian"
                         },
                         new
                         {
                             Id = 144,
-                            NationalityCode = "RUS",
+                            NationalityCode = "",
                             NationalityName = "Russian"
                         },
                         new
                         {
                             Id = 145,
-                            NationalityCode = "RWA",
+                            NationalityCode = "",
                             NationalityName = "Rwandan"
                         },
                         new
                         {
                             Id = 146,
-                            NationalityCode = "KNA",
-                            NationalityName = "Saint Kitts and Nevis"
-                        },
-                        new
-                        {
-                            Id = 147,
-                            NationalityCode = "LCA",
+                            NationalityCode = "",
                             NationalityName = "Saint Lucian"
                         },
                         new
                         {
-                            Id = 148,
-                            NationalityCode = "VCT",
-                            NationalityName = "Saint Vincent and Grenadines"
+                            Id = 147,
+                            NationalityCode = "",
+                            NationalityName = "Salvadoran"
                         },
                         new
                         {
-                            Id = 149,
-                            NationalityCode = "WSM",
+                            Id = 148,
+                            NationalityCode = "",
                             NationalityName = "Samoan"
                         },
                         new
                         {
-                            Id = 150,
-                            NationalityCode = "SMR",
+                            Id = 149,
+                            NationalityCode = "",
                             NationalityName = "San Marinese"
                         },
                         new
                         {
-                            Id = 151,
-                            NationalityCode = "STP",
+                            Id = 150,
+                            NationalityCode = "",
                             NationalityName = "Sao Tomean"
                         },
                         new
                         {
-                            Id = 152,
-                            NationalityCode = "SAU",
+                            Id = 151,
+                            NationalityCode = "",
                             NationalityName = "Saudi"
                         },
                         new
                         {
-                            Id = 153,
-                            NationalityCode = "GB-SCT",
+                            Id = 152,
+                            NationalityCode = "",
                             NationalityName = "Scottish"
                         },
                         new
                         {
-                            Id = 154,
-                            NationalityCode = "SEN",
+                            Id = 153,
+                            NationalityCode = "",
                             NationalityName = "Senegalese"
                         },
                         new
                         {
-                            Id = 155,
-                            NationalityCode = "SRB",
+                            Id = 154,
+                            NationalityCode = "",
                             NationalityName = "Serbian"
                         },
                         new
                         {
-                            Id = 156,
-                            NationalityCode = "SYC",
+                            Id = 155,
+                            NationalityCode = "",
                             NationalityName = "Seychellois"
                         },
                         new
                         {
-                            Id = 157,
-                            NationalityCode = "SLE",
+                            Id = 156,
+                            NationalityCode = "",
                             NationalityName = "Sierra Leonean"
                         },
                         new
                         {
-                            Id = 158,
-                            NationalityCode = "SGP",
+                            Id = 157,
+                            NationalityCode = "",
                             NationalityName = "Singaporean"
                         },
                         new
                         {
-                            Id = 159,
-                            NationalityCode = "SVK",
+                            Id = 158,
+                            NationalityCode = "",
                             NationalityName = "Slovak"
                         },
                         new
                         {
-                            Id = 160,
-                            NationalityCode = "SVN",
-                            NationalityName = "Slovene"
+                            Id = 159,
+                            NationalityCode = "",
+                            NationalityName = "Slovenian"
                         },
                         new
                         {
-                            Id = 161,
-                            NationalityCode = "SLB",
+                            Id = 160,
+                            NationalityCode = "",
                             NationalityName = "Solomon Islander"
                         },
                         new
                         {
-                            Id = 162,
-                            NationalityCode = "SOM",
+                            Id = 161,
+                            NationalityCode = "",
                             NationalityName = "Somali"
                         },
                         new
                         {
-                            Id = 163,
-                            NationalityCode = "ZAF",
+                            Id = 162,
+                            NationalityCode = "",
                             NationalityName = "South African"
                         },
                         new
                         {
-                            Id = 164,
-                            NationalityCode = "KOR",
+                            Id = 163,
+                            NationalityCode = "",
                             NationalityName = "South Korean"
                         },
                         new
                         {
+                            Id = 164,
+                            NationalityCode = "",
+                            NationalityName = "South Sudanese"
+                        },
+                        new
+                        {
                             Id = 165,
-                            NationalityCode = "ESP",
+                            NationalityCode = "",
                             NationalityName = "Spanish"
                         },
                         new
                         {
                             Id = 166,
-                            NationalityCode = "LKA",
+                            NationalityCode = "",
                             NationalityName = "Sri Lankan"
                         },
                         new
                         {
                             Id = 167,
-                            NationalityCode = "SDN",
+                            NationalityCode = "",
                             NationalityName = "Sudanese"
                         },
                         new
                         {
                             Id = 168,
-                            NationalityCode = "SUR",
-                            NationalityName = "Surinamese"
+                            NationalityCode = "",
+                            NationalityName = "Surinamer"
                         },
                         new
                         {
                             Id = 169,
-                            NationalityCode = "SWZ",
+                            NationalityCode = "",
                             NationalityName = "Swazi"
                         },
                         new
                         {
                             Id = 170,
-                            NationalityCode = "SWE",
+                            NationalityCode = "",
                             NationalityName = "Swedish"
                         },
                         new
                         {
                             Id = 171,
-                            NationalityCode = "CHE",
+                            NationalityCode = "",
                             NationalityName = "Swiss"
                         },
                         new
                         {
                             Id = 172,
-                            NationalityCode = "SYR",
+                            NationalityCode = "",
                             NationalityName = "Syrian"
                         },
                         new
                         {
                             Id = 173,
-                            NationalityCode = "TWN",
+                            NationalityCode = "",
                             NationalityName = "Taiwanese"
                         },
                         new
                         {
                             Id = 174,
-                            NationalityCode = "TJK",
+                            NationalityCode = "",
                             NationalityName = "Tajik"
                         },
                         new
                         {
                             Id = 175,
-                            NationalityCode = "TZA",
+                            NationalityCode = "",
                             NationalityName = "Tanzanian"
                         },
                         new
                         {
                             Id = 176,
-                            NationalityCode = "THA",
+                            NationalityCode = "",
                             NationalityName = "Thai"
                         },
                         new
                         {
                             Id = 177,
-                            NationalityCode = "TGO",
+                            NationalityCode = "",
                             NationalityName = "Togolese"
                         },
                         new
                         {
                             Id = 178,
-                            NationalityCode = "TON",
+                            NationalityCode = "",
                             NationalityName = "Tongan"
                         },
                         new
                         {
                             Id = 179,
-                            NationalityCode = "TTO",
+                            NationalityCode = "",
                             NationalityName = "Trinidadian or Tobagonian"
                         },
                         new
                         {
                             Id = 180,
-                            NationalityCode = "TUN",
+                            NationalityCode = "",
                             NationalityName = "Tunisian"
                         },
                         new
                         {
                             Id = 181,
-                            NationalityCode = "TUR",
+                            NationalityCode = "",
                             NationalityName = "Turkish"
                         },
                         new
                         {
                             Id = 182,
-                            NationalityCode = "TUV",
-                            NationalityName = "Tuvaluan"
+                            NationalityCode = "",
+                            NationalityName = "Turkmen"
                         },
                         new
                         {
                             Id = 183,
-                            NationalityCode = "UGA",
-                            NationalityName = "Ugandan"
+                            NationalityCode = "",
+                            NationalityName = "Tuvaluan"
                         },
                         new
                         {
                             Id = 184,
-                            NationalityCode = "UKR",
-                            NationalityName = "Ukrainian"
+                            NationalityCode = "",
+                            NationalityName = "Ugandan"
                         },
                         new
                         {
                             Id = 185,
-                            NationalityCode = "URY",
-                            NationalityName = "Uruguayan"
+                            NationalityCode = "",
+                            NationalityName = "Ukrainian"
                         },
                         new
                         {
                             Id = 186,
-                            NationalityCode = "UZB",
-                            NationalityName = "Uzbek"
+                            NationalityCode = "",
+                            NationalityName = "Uruguayan"
                         },
                         new
                         {
                             Id = 187,
-                            NationalityCode = "VUT",
-                            NationalityName = "Vanuatu"
+                            NationalityCode = "",
+                            NationalityName = "Uzbekistani"
                         },
                         new
                         {
                             Id = 188,
-                            NationalityCode = "VAT",
-                            NationalityName = "Vatican"
+                            NationalityCode = "",
+                            NationalityName = "Vanuatuan"
                         },
                         new
                         {
                             Id = 189,
-                            NationalityCode = "VEN",
+                            NationalityCode = "",
                             NationalityName = "Venezuelan"
                         },
                         new
                         {
                             Id = 190,
-                            NationalityCode = "VNM",
+                            NationalityCode = "",
                             NationalityName = "Vietnamese"
                         },
                         new
                         {
                             Id = 191,
-                            NationalityCode = "GB-WLS",
-                            NationalityName = "Welsh"
-                        },
-                        new
-                        {
-                            Id = 192,
-                            NationalityCode = "YEM",
+                            NationalityCode = "",
                             NationalityName = "Yemeni"
                         },
                         new
                         {
-                            Id = 193,
-                            NationalityCode = "ZMB",
+                            Id = 192,
+                            NationalityCode = "",
                             NationalityName = "Zambian"
                         },
                         new
                         {
-                            Id = 194,
-                            NationalityCode = "ZWE",
+                            Id = 193,
+                            NationalityCode = "",
                             NationalityName = "Zimbabwean"
                         });
                 });

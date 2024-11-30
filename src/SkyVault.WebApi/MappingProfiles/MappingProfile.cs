@@ -14,7 +14,8 @@ namespace SkyVault.WebApi.MappingProfiles
 
             CreateMap<Nationality,  Payloads.CommonPayloads.Nationality>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.NationalityName));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.NationalityName))
+                .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.NationalityCode));
 
             CreateMap<Country, Payloads.CommonPayloads.Country>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
