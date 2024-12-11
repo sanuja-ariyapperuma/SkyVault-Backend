@@ -7,7 +7,7 @@ namespace SkyVault.WebApi.Backend
 {
     public sealed class VisaData(SkyvaultContext db)
     {
-        public SkyResult<string> AddVisa(VisaReqeust visaRequest, string correlationId)
+        public SkyResult<Models.Visa> AddVisa(VisaReqeust visaRequest, string correlationId)
         {
                 var newvisa = new Visa
                 {
@@ -22,7 +22,15 @@ namespace SkyVault.WebApi.Backend
                 db.Visas.Add(newvisa);
                 db.SaveChanges();
 
-                return new SkyResult<string>().SucceededWithValue(newvisa.Id.ToString());
+                var returningVisa =
+                    db.Visas.Include(v => v.Country)
+                    .Include(v => v.Passport)
+                    .ThenInclude(p => p.CustomerProfile)
+                    .Include(v => v.Passport)
+                    .ThenInclude(p => p.Country)
+                    .FirstOrDefaultAsync(v => v.Id == newvisa.Id).Result;
+
+                return new SkyResult<Visa>().SucceededWithValue(returningVisa!);
             
         }
 

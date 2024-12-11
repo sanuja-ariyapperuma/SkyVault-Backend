@@ -305,7 +305,10 @@ namespace SkyVault.WebApi.Workloads
                                         new ValidationProblemDetails().ToValidationProblemDetails(
                                             result.Message, result.ErrorCode, _correlationId));
 
-                return Results.Ok(new AddVISAResponse(result.Value!));    
+                var resultValue = result.Value;
+                var visaCode = getVisaCode(resultValue!);
+
+                return Results.Ok(new AddVISAResponse(resultValue!.Id.ToString(), visaCode));    
             }
             catch (Exception e)
             {

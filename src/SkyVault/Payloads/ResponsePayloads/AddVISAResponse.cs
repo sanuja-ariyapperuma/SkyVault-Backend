@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace SkyVault.Payloads.ResponsePayloads
 {
-    public record AddVISAResponse(string VisaId);
+    public record AddVISAResponse(string VisaId, string VisaCode);
 }
