@@ -16,7 +16,8 @@ namespace SkyVault.WebApi.Backend
                     IssuedDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.IssuedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     ExpireDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     CountryId = Convert.ToInt32(visaRequest.CountryId),
-                    PassportId = Convert.ToInt32(visaRequest.PassportId)
+                    PassportId = Convert.ToInt32(visaRequest.PassportId),
+                    BirthPlace = visaRequest.BirthPlace!
                 };
 
                 db.Visas.Add(newvisa);
@@ -49,6 +50,7 @@ namespace SkyVault.WebApi.Backend
                             DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)))
                         .SetProperty(visa => visa.CountryId, Convert.ToInt32(visaRequest.CountryId))
                         .SetProperty(visa => visa.PassportId, Convert.ToInt32(visaRequest.PassportId))
+                        .SetProperty(visa => visa.BirthPlace, visaRequest.BirthPlace)
                         );
 
             if (results == 0)

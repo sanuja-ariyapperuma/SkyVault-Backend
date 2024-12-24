@@ -262,7 +262,8 @@ namespace SkyVault.WebApi.Workloads
                     visa.Passport.IsPrimary.ToString(),
                     visa.Passport.PassportNumber,
                     visa.Country.CountryName,
-                    getVisaCode(visa)
+                    getVisaCode(visa),
+                    visa.BirthPlace.ToString()
                 )).ToArray();
 
                 return Results.Ok(response);
@@ -867,14 +868,20 @@ namespace SkyVault.WebApi.Workloads
 
         private static string getVisaCode(Backend.Models.Visa visa)
         {
+            //SR*DOCO YY HK1-Place of birth (space) country code – V - Visa number – Visa issued place (space) visa issued country code – visa issued date – destination county code – visa expired date
+
             return String.Concat(
                         "SR DOCS YY HK1", "-",
+                        visa.BirthPlace, "-",
+                        " ",
                         visa.Passport.Country.CountryCode, "-",
                         "V", "-",
                         visa.VisaNumber, "-",
                         visa.IssuedPlace, "-",
-                        convertDateToCustomFormat(visa.IssuedDate), "-",
+                        " ",
                         visa.Country.CountryCode, "-",
+                        convertDateToCustomFormat(visa.IssuedDate), "-",
+                        visa.Country.CountryCode, "-", // Destination
                         convertDateToCustomFormat(visa.ExpireDate)
                     );
         }

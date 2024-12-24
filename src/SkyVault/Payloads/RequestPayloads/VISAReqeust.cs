@@ -13,6 +13,7 @@ namespace SkyVault.Payloads.RequestPayloads;
         string? IssuedPlace,
         string? IssuedDate,
         string? ExpiryDate,
-        string? CountryId
+        string? CountryId,
+        string? BirthPlace
     );
 

@@ -10,6 +10,7 @@ public sealed record Visa(
     string? AssignedToPrimaryPassport,
     string? PassportNumber,
     string? CountryName,
-    string? VisaCode
+    string? VisaCode,
+    string? BirthPlace
     );
 

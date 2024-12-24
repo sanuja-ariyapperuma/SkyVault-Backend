@@ -18,6 +18,7 @@ public partial class Visa
     public int CountryId { get; set; }
 
     public int PassportId { get; set; }
+    public string BirthPlace { get; set; } = null!;
 
     public virtual Country Country { get; set; } = null!;
 
