@@ -14,6 +14,7 @@ namespace SkyVault.Payloads.RequestPayloads;
         string? IssuedDate,
         string? ExpiryDate,
         string? CountryId,
-        string? BirthPlace
+        string? BirthPlace,
+        string? DestinationCountryId
     );
 

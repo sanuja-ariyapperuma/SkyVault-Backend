@@ -17,7 +17,8 @@ namespace SkyVault.WebApi.Backend
                     ExpireDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                     CountryId = Convert.ToInt32(visaRequest.CountryId),
                     PassportId = Convert.ToInt32(visaRequest.PassportId),
-                    BirthPlace = visaRequest.BirthPlace!
+                    BirthPlace = visaRequest.BirthPlace!,
+                    DestinationCountryId = Convert.ToInt32(visaRequest.DestinationCountryId)
                 };
 
                 db.Visas.Add(newvisa);
@@ -29,6 +30,7 @@ namespace SkyVault.WebApi.Backend
                     .ThenInclude(p => p.CustomerProfile)
                     .Include(v => v.Passport)
                     .ThenInclude(p => p.Country)
+                    .Include(v => v.DestinationCountry)
                     .FirstOrDefaultAsync(v => v.Id == newvisa.Id).Result;
 
                 return new SkyResult<Visa>().SucceededWithValue(returningVisa!);
@@ -51,6 +53,7 @@ namespace SkyVault.WebApi.Backend
                         .SetProperty(visa => visa.CountryId, Convert.ToInt32(visaRequest.CountryId))
                         .SetProperty(visa => visa.PassportId, Convert.ToInt32(visaRequest.PassportId))
                         .SetProperty(visa => visa.BirthPlace, visaRequest.BirthPlace)
+                        .SetProperty(visa => visa.DestinationCountryId, Convert.ToInt32(visaRequest.DestinationCountryId))
                         );
 
             if (results == 0)
@@ -78,6 +81,7 @@ namespace SkyVault.WebApi.Backend
                 .ThenInclude(p => p.CustomerProfile)
                 .Include(v => v.Passport)
                 .ThenInclude(p => p.Country)
+                .Include(v => v.DestinationCountry)
                 .Where(v => v.Passport.CustomerProfileId == customerProfileId)
                 .OrderByDescending(v => v.IssuedDate)
                 .ToList();

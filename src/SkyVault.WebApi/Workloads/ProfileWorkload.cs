@@ -263,7 +263,8 @@ namespace SkyVault.WebApi.Workloads
                     visa.Passport.PassportNumber,
                     visa.Country.CountryName,
                     getVisaCode(visa),
-                    visa.BirthPlace.ToString()
+                    visa.BirthPlace.ToString(),
+                    visa.DestinationCountryId.ToString()
                 )).ToArray();
 
                 return Results.Ok(response);
@@ -872,16 +873,16 @@ namespace SkyVault.WebApi.Workloads
 
             return String.Concat(
                         "SR DOCS YY HK1", "-",
-                        visa.BirthPlace, "-",
+                        visa.BirthPlace,
                         " ",
                         visa.Passport.Country.CountryCode, "-",
                         "V", "-",
                         visa.VisaNumber, "-",
-                        visa.IssuedPlace, "-",
+                        visa.IssuedPlace,
                         " ",
-                        visa.Country.CountryCode, "-",
+                        visa.Country.CountryCode, "-", // Visa Issued Country
                         convertDateToCustomFormat(visa.IssuedDate), "-",
-                        visa.Country.CountryCode, "-", // Destination
+                        visa.DestinationCountry?.CountryCode, "-", // Destination
                         convertDateToCustomFormat(visa.ExpireDate)
                     );
         }

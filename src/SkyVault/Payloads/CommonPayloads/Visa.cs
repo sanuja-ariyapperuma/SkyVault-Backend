@@ -11,6 +11,7 @@ public sealed record Visa(
     string? PassportNumber,
     string? CountryName,
     string? VisaCode,
-    string? BirthPlace
+    string? BirthPlace,
+    string? DestinationCountryId
     );
 
