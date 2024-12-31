@@ -231,8 +231,11 @@ public partial class SkyvaultContext : DbContext
             entity.ToTable("passports");
 
             entity.HasIndex(e => e.CustomerProfileId, "fk_passports_customerprofiles");
-
             entity.HasIndex(e => e.NationalityId, "fk_passports_nationalities");
+
+            entity.HasIndex(e => e.LastName, "idx_passports_last_name");
+            entity.HasIndex(e => e.OtherNames, "idx_passports_other_names");
+            entity.HasIndex(e => e.PassportNumber, "idx_passports_passport_number");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CustomerProfileId).HasColumnName("customer_profile_id");
