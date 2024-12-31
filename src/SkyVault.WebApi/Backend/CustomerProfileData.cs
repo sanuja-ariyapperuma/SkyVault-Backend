@@ -14,8 +14,8 @@ namespace SkyVault.WebApi.Backend
         public List<SearchProfileItem>? Search(string searchQuery, string systemUserUniqueIdentifier)
         {
             var systemUser = db.SystemUsers.AsNoTracking().FirstOrDefault(e => e.SamProfileId == systemUserUniqueIdentifier);
-
             var systemUserRole = systemUser!.UserRole;
+            var searchQueryUpper = searchQuery.ToUpper();
 
             var query = db.Passports.Where(p =>
                 (
@@ -24,11 +24,11 @@ namespace SkyVault.WebApi.Backend
                     p.CustomerProfile.SystemUserId == systemUser.Id
                 ) &&
                 (
-                    p.PassportNumber.Contains(searchQuery) ||
-                    p.LastName.Contains(searchQuery) ||
+                    p.PassportNumber.ToUpper().Contains(searchQueryUpper) ||
+                    p.LastName.ToUpper().Contains(searchQueryUpper) ||
 
                         p.OtherNames != null &&
-                        p.OtherNames.Contains(searchQuery)
+                        p.OtherNames.ToUpper().Contains(searchQueryUpper)
 
                 ));
 
