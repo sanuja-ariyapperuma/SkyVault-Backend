@@ -1,4 +1,5 @@
 
+using DotNetEnv;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -28,7 +29,10 @@ public static class Program
 
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddHttpContextAccessor();
-        
+
+        Env.Load();
+
+
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
             var connectionString = Environment.GetEnvironmentVariable("TravelChannelCRMConnectionString");
@@ -54,6 +58,8 @@ public static class Program
     });
 
         //builder.Services.AddAuthorization();
+
+       
 
         //builder.Services.AddAuthorization(options =>
         //{
