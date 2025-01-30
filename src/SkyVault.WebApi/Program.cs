@@ -31,7 +31,8 @@ public static class Program
         
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
-            options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0)));
+            var connectionString = Environment.GetEnvironmentVariable("TravelChannelCRMConnectionString");
+            options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
         });
 
         builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database");
@@ -69,7 +70,7 @@ public static class Program
             options.AddPolicy(MyAllowSpecificOrigins,
                 builder =>
                 {
-                    builder.WithOrigins("http://localhost:5173", "https://travelchannelcrm.com")
+                    builder.WithOrigins("http://localhost:5173", "https://travelchannelcrm.com", "https://jolly-river-0af900a00.4.azurestaticapps.net/")
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();
