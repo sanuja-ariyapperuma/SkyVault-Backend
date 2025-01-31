@@ -76,7 +76,7 @@ public static class Program
             options.AddPolicy(MyAllowSpecificOrigins,
                 builder =>
                 {
-                    builder.WithOrigins("http://localhost:5173", "https://travelchannelcrm.com", "https://jolly-river-0af900a00.4.azurestaticapps.net/")
+                    builder.WithOrigins("http://localhost:5173", "https://travelchannelcrm.com", "https://jolly-river-0af900a00.4.azurestaticapps.net")
                            .AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowCredentials();
