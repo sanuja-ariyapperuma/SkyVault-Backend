@@ -12,7 +12,7 @@ namespace SkyVault.WebApi.Workloads;
 public static class CustomWorkload
 {
     public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
-        IMapper mapper,IMemoryCache cache, IConfiguration configuration, HttpContext context)
+        IMapper mapper, IMemoryCache cache, IConfiguration configuration, HttpContext context)
     {
         var correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
@@ -24,7 +24,7 @@ public static class CustomWorkload
         try
         {
 
-            var cacheService = new CacheService(cache,dbContext);
+            var cacheService = new CacheService(cache, dbContext);
 
             salutations = cacheService.GetSalutations();
             countries = cacheService.GetCountries();
@@ -46,6 +46,36 @@ public static class CustomWorkload
             return Results.Problem(new ProblemDetails().ToProblemDetails(
                 "An unexpected error occurred. Please try again later.",
                 "2adb05bf-0000", correlationId));
+        }
+    }
+
+    //Health check for api and database
+    public static async Task<IResult> HealthCheckAsync(SkyvaultContext dbContext, IConfiguration configuration)
+    {
+        const string correlationId = "00000000-0000";
+        try
+        {
+            var canConnect = await dbContext.Database.CanConnectAsync();
+            if (canConnect)
+            {
+                return Results.Ok("API and Database are healthy");
+            }
+            else
+            {
+                return Results.Problem(new ProblemDetails().ToProblemDetails(
+                    "Database cannot be connected",
+                    correlationId,
+                    correlationId));
+            }
+        }
+        catch (Exception e)
+        {
+            e.LogException(correlationId);
+
+            return Results.Problem(new ProblemDetails().ToProblemDetails(
+                "An error occurred while checking the database connection",
+                correlationId,
+                correlationId));
         }
     }
 }
