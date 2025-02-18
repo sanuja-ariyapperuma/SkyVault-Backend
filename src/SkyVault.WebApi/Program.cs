@@ -57,20 +57,6 @@ public static class Program
         builder.Configuration.Bind("AzureAd", options);
     });
 
-        //builder.Services.AddAuthorization();
-
-       
-
-        //builder.Services.AddAuthorization(options =>
-        //{
-        //    options.AddPolicy("RequireAppRole", policy => policy.RequireClaim("roles", "YourAppRole"));
-        //});
-
-        //builder.Services.AddMicrosoftGraph(options => {
-        //    options.Scopes = ["User.Read"];
-        //});
-
-
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(MyAllowSpecificOrigins,
