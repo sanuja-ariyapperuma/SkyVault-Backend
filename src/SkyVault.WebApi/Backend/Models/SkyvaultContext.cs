@@ -59,10 +59,8 @@ public partial class SkyvaultContext : DbContext
                 .HasColumnName("comm_title");
 
             // Seed data
-            modelBuilder.Entity<Country>().HasData(CountrySeedData.countries);
-            modelBuilder.Entity<Salutation>().HasData(SalutationSeedData.salutations);
-            modelBuilder.Entity<Nationality>().HasData(NationalitySeedData.nationalities);
             modelBuilder.Entity<CommunicationMethod>().HasData(ComMethodSeedData.comMethod);
+            
 
         });
 
@@ -79,6 +77,9 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.CountryName)
                 .HasMaxLength(100)
                 .HasColumnName("country_name");
+
+            // Seed data
+            modelBuilder.Entity<Country>().HasData(CountrySeedData.countries);
         });
 
         modelBuilder.Entity<CustomerProfile>(entity =>
@@ -191,6 +192,9 @@ public partial class SkyvaultContext : DbContext
                 .HasColumnName("nationality_code")
                 .HasMaxLength(6)
                 .IsFixedLength(true);
+
+            // Seed data
+            modelBuilder.Entity<Nationality>().HasData(NationalitySeedData.nationalities);
         });
 
         modelBuilder.Entity<NotificationTemplate>(entity =>
@@ -222,6 +226,9 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.TypeName)
                 .HasMaxLength(100)
                 .HasColumnName("type_name");
+
+            // Seed data
+            modelBuilder.Entity<NotificationType>().HasData(NotificationTypeSeedData.notifications);
         });
 
         modelBuilder.Entity<Passport>(entity =>
@@ -280,6 +287,9 @@ public partial class SkyvaultContext : DbContext
             entity.Property(e => e.SalutationName)
                 .HasMaxLength(100)
                 .HasColumnName("salutation_name");
+
+            // Seed data
+            modelBuilder.Entity<Salutation>().HasData(SalutationSeedData.salutations);
         });
 
         modelBuilder.Entity<SystemUser>(entity =>
