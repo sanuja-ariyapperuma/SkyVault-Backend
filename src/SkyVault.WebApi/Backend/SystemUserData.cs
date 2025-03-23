@@ -3,7 +3,6 @@
 using Microsoft.EntityFrameworkCore;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
-using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.Backend
@@ -26,10 +25,10 @@ namespace SkyVault.WebApi.Backend
                     SamProfileId = requestUser.Upn,
                     UserRole = requestUser.UserRole.ToString()
                 };
-                
+
                 db.SystemUsers.Add(sysUser);
                 db.SaveChanges();
-                
+
                 return new SkyResult<SystemUser>().SucceededWithValue(sysUser);
             }
             catch (Exception e)
@@ -43,32 +42,32 @@ namespace SkyVault.WebApi.Backend
             }
         }
 
-        public SkyResult<SystemUser> GetUserByProfileId(int sysUserId, string? correlationId)
-        {
-            try
-            {
-                var user = db.SystemUsers.Find(sysUserId);
+        //public SkyResult<SystemUser> GetUserByProfileId(int sysUserId, string? correlationId)
+        //{
+        //    try
+        //    {
+        //        var user = db.SystemUsers.Find(sysUserId);
 
-                if (user == null)
-                    return new SkyResult<SystemUser>().Fail(
-                        message: "User not found.",
-                        errorCode: "2ac5059f-0001",
-                        correlationId: correlationId);
+        //        if (user == null)
+        //            return new SkyResult<SystemUser>().Fail(
+        //                message: "User not found.",
+        //                errorCode: "2ac5059f-0001",
+        //                correlationId: correlationId);
 
-                return new SkyResult<SystemUser>().SucceededWithValue(user);
-            }
-            catch (Exception e)
-            {
-                e.LogException(correlationId);
-                
-                return new SkyResult<SystemUser>().Fail(
-                    message: "An unexpected error occurred while fetching user. Please try again.",
-                    errorCode: "2ac5059f-0002",
-                    correlationId: correlationId);
-            }
-        }
+        //        return new SkyResult<SystemUser>().SucceededWithValue(user);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        e.LogException(correlationId);
 
-        public SkyResult<int> GetUserIdByUpn(string upn, string? correlationId) 
+        //        return new SkyResult<SystemUser>().Fail(
+        //            message: "An unexpected error occurred while fetching user. Please try again.",
+        //            errorCode: "2ac5059f-0002",
+        //            correlationId: correlationId);
+        //    }
+        //}
+
+        public SkyResult<int> GetUserIdByUpn(string upn, string? correlationId)
         {
             try
             {
@@ -94,7 +93,7 @@ namespace SkyVault.WebApi.Backend
 
         }
 
-        public SkyResult<string> GetUserRoleByUpn(string upn, string? correlationId) 
+        public SkyResult<string> GetUserRoleByUpn(string upn, string? correlationId)
         {
             try
             {

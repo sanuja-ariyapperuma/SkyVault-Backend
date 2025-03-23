@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend.Models;
 
@@ -11,16 +10,16 @@ namespace SkyVault.WebApi.Backend
         {
 
 
-                var newFFN = new FrequentFlyerNumber
-                {
-                    CustomerProfileId = customerId,
-                    FlyerNumber = ffn
-                };
+            var newFFN = new FrequentFlyerNumber
+            {
+                CustomerProfileId = customerId,
+                FlyerNumber = ffn
+            };
 
-                db.FrequentFlyerNumbers.Add(newFFN);
-                db.SaveChanges();
+            db.FrequentFlyerNumbers.Add(newFFN);
+            db.SaveChanges();
 
-                return new SkyResult<string>().SucceededWithValue(newFFN.Id.ToString());
+            return new SkyResult<string>().SucceededWithValue(newFFN.Id.ToString());
 
         }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+﻿using Microsoft.EntityFrameworkCore;
 using SkyVault.WebApi.Backend.Seeds;
 
 namespace SkyVault.WebApi.Backend.Models;
@@ -60,7 +57,7 @@ public partial class SkyvaultContext : DbContext
 
             // Seed data
             modelBuilder.Entity<CommunicationMethod>().HasData(ComMethodSeedData.comMethod);
-            
+
 
         });
 

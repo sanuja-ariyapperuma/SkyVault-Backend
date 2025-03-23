@@ -5,5 +5,5 @@
         string? FullName,
         string? PassportNumber
     );
-        
+
 }

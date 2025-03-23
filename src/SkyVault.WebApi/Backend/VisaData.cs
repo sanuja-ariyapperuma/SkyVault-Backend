@@ -9,32 +9,32 @@ namespace SkyVault.WebApi.Backend
     {
         public SkyResult<Models.Visa> AddVisa(VisaReqeust visaRequest, string correlationId)
         {
-                var newvisa = new Visa
-                {
-                    VisaNumber = visaRequest.VisaNumber!,
-                    IssuedPlace = visaRequest.IssuedPlace!,
-                    IssuedDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.IssuedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
-                    ExpireDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
-                    CountryId = Convert.ToInt32(visaRequest.CountryId),
-                    PassportId = Convert.ToInt32(visaRequest.PassportId),
-                    BirthPlace = visaRequest.BirthPlace!,
-                    DestinationCountryId = Convert.ToInt32(visaRequest.DestinationCountryId)
-                };
+            var newvisa = new Visa
+            {
+                VisaNumber = visaRequest.VisaNumber!,
+                IssuedPlace = visaRequest.IssuedPlace!,
+                IssuedDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.IssuedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                ExpireDate = DateOnly.FromDateTime(DateTime.ParseExact(visaRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                CountryId = Convert.ToInt32(visaRequest.CountryId),
+                PassportId = Convert.ToInt32(visaRequest.PassportId),
+                BirthPlace = visaRequest.BirthPlace!,
+                DestinationCountryId = Convert.ToInt32(visaRequest.DestinationCountryId)
+            };
 
-                db.Visas.Add(newvisa);
-                db.SaveChanges();
+            db.Visas.Add(newvisa);
+            db.SaveChanges();
 
-                var returningVisa =
-                    db.Visas.Include(v => v.Country)
-                    .Include(v => v.Passport)
-                    .ThenInclude(p => p.CustomerProfile)
-                    .Include(v => v.Passport)
-                    .ThenInclude(p => p.Country)
-                    .Include(v => v.DestinationCountry)
-                    .FirstOrDefaultAsync(v => v.Id == newvisa.Id).Result;
+            var returningVisa =
+                db.Visas.Include(v => v.Country)
+                .Include(v => v.Passport)
+                .ThenInclude(p => p.CustomerProfile)
+                .Include(v => v.Passport)
+                .ThenInclude(p => p.Country)
+                .Include(v => v.DestinationCountry)
+                .FirstOrDefaultAsync(v => v.Id == newvisa.Id).Result;
 
-                return new SkyResult<Visa>().SucceededWithValue(returningVisa!);
-            
+            return new SkyResult<Visa>().SucceededWithValue(returningVisa!);
+
         }
 
         public SkyResult<string> UpdateVisa(string visaId, VisaReqeust visaRequest, string correlationId)

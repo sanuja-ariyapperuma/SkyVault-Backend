@@ -11,7 +11,7 @@ public static class SkyExceptionHandler
     private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         if (e.ExceptionObject is not Exception exception) return;
-        
+
         exception.LogException(Guid.NewGuid().ToString());
     }
 }

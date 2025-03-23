@@ -15,6 +15,6 @@ namespace SkyVault.WebApi.Backend.Seeds
             new Salutation { Id=idCounter++, SalutationName = "Prof" },
             new Salutation { Id=idCounter++, SalutationName = "Rev" },
             new Salutation { Id=idCounter++, SalutationName = "Hon" }
-        };  
+        };
     }
 }

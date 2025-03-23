@@ -1,11 +1,4 @@
-﻿using SkyVault.Payloads.CommonPayloads;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkyVault.Payloads.ResponsePayloads
+﻿namespace SkyVault.Payloads.ResponsePayloads
 {
     public class ComMethod
     {

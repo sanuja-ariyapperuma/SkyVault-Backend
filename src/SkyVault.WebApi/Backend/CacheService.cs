@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using SkyVault.WebApi.Backend.Models;
-using SkyVault.WebApi.Helper;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -21,12 +18,12 @@ namespace SkyVault.WebApi.Backend
             _correlationId = "";
         }
 
-        public List<Salutation> GetSalutations() 
+        public List<Salutation> GetSalutations()
         {
             if (!_cache.TryGetValue("Salutations", out List<Salutation> salutations))
             {
                 salutations = _commonData.GetSalutations();
-                if (salutations.Count > 0) 
+                if (salutations.Count > 0)
                 {
                     SetCache("Salutations", salutations);
                 }
@@ -88,7 +85,7 @@ namespace SkyVault.WebApi.Backend
                 new Gender(){Id = "F", Name = "Female"}
         };
 
-        private void SetCache(string name, Object data) 
+        private void SetCache(string name, Object data)
         {
             _cache.Set(name, data, new MemoryCacheEntryOptions
             {
@@ -102,7 +99,7 @@ namespace SkyVault.WebApi.Backend
             _cache.Set(name, data, new MemoryCacheEntryOptions
             {
                 Priority = CacheItemPriority.NeverRemove,
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) 
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
         }
     }

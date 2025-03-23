@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using SkyVault.Payloads.RequestPayloads;
-using SkyVault.WebApi.Backend.Models;
-using SkyVault.Payloads.ResponsePayloads;
+﻿using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.CommonPayloads;
+using SkyVault.Payloads.RequestPayloads;
+using SkyVault.Payloads.ResponsePayloads;
+using SkyVault.WebApi.Backend.Models;
 using System.Globalization;
 
 namespace SkyVault.WebApi.Backend
@@ -41,37 +39,37 @@ namespace SkyVault.WebApi.Backend
                 p.CustomerProfile.Salutation.SalutationName
             )).ToList();
         }
-        
+
         public SkyResult<CustomerProfile> SaveProfile(PassportRequest passportRequest, int systemUserId, string correlationId)
         {
-                var passport = new Passport
-                {
-                    PassportNumber = passportRequest.PassportNumber!,
-                    LastName = passportRequest.LastName!,
-                    OtherNames = passportRequest.OtherNames,
-                    CountryId = Convert.ToInt32(passportRequest.CountryId),
-                    DateOfBirth = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
-                    ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
-                    Gender = passportRequest.Gender!,
-                    IsPrimary = passportRequest.IsPrimary!,
-                    NationalityId = Convert.ToInt32(passportRequest.NationalityId)
-                };
+            var passport = new Passport
+            {
+                PassportNumber = passportRequest.PassportNumber!,
+                LastName = passportRequest.LastName!,
+                OtherNames = passportRequest.OtherNames,
+                CountryId = Convert.ToInt32(passportRequest.CountryId),
+                DateOfBirth = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                Gender = passportRequest.Gender!,
+                IsPrimary = passportRequest.IsPrimary!,
+                NationalityId = Convert.ToInt32(passportRequest.NationalityId)
+            };
 
-                var newProfile = new CustomerProfile
-                {
-                    SystemUserId = Convert.ToInt32(systemUserId),
-                    SalutationId = Convert.ToInt32(passportRequest.SalutationId),
-                    PreferredCommId = (int)PreferedCommiunicationMethod.None,
-                    ParentId = string.IsNullOrWhiteSpace(passportRequest.ParentId) ? null : Convert.ToInt32(passportRequest.ParentId),
-                    Passports = new List<Passport> { passport }
-                };
+            var newProfile = new CustomerProfile
+            {
+                SystemUserId = Convert.ToInt32(systemUserId),
+                SalutationId = Convert.ToInt32(passportRequest.SalutationId),
+                PreferredCommId = (int)PreferedCommiunicationMethod.None,
+                ParentId = string.IsNullOrWhiteSpace(passportRequest.ParentId) ? null : Convert.ToInt32(passportRequest.ParentId),
+                Passports = new List<Passport> { passport }
+            };
 
-                var savedprofile = db.CustomerProfiles.Add(newProfile);
-                db.SaveChanges();
+            var savedprofile = db.CustomerProfiles.Add(newProfile);
+            db.SaveChanges();
 
-                return new SkyResult<CustomerProfile>().SucceededWithValue(savedprofile.Entity);
+            return new SkyResult<CustomerProfile>().SucceededWithValue(savedprofile.Entity);
 
-            
+
         }
         public bool CheckPassportExists(string passportNumber)
             => db.Passports.Any(p => p.PassportNumber == passportNumber);
@@ -97,7 +95,7 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<string>().SucceededWithValue("Preffered Commiunication Method Updated");
         }
-        
+
         public SkyResult<string> CheckAccessToTheProfile(int customerProfileId, int systemUserId, string correlationId)
         {
             var systemUserRole = db.SystemUsers.Find(systemUserId)?.UserRole;
@@ -136,10 +134,10 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<ComMethod>().SucceededWithValue(response);
         }
-        
-        public SkyResult<List<FamilyMembersResponse>> GetFamilyMembers(int customerId, string correlationId) 
+
+        public SkyResult<List<FamilyMembersResponse>> GetFamilyMembers(int customerId, string correlationId)
         {
-            
+
             var isCustomerParent = db.CustomerProfiles.AsNoTracking().Where(cp => cp.Id == customerId && cp.ParentId == null).Any();
             var familyMembers = new List<FamilyMembersResponse>();
 
@@ -210,7 +208,7 @@ namespace SkyVault.WebApi.Backend
 
         }
 
-        public SkyResult<int> GetCustomerProfileIdByVisaId(int visaId, string correlationId) 
+        public SkyResult<int> GetCustomerProfileIdByVisaId(int visaId, string correlationId)
         {
             var customerProfileId = db.Visas
                 .Include(u => u.Passport).FirstOrDefault(a => a.Id == visaId)?

@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend.Models;
 
 namespace SkyVault.WebApi.MappingProfiles
 {
-    public sealed class MappingProfile: Profile
+    public sealed class MappingProfile : Profile
     {
         public MappingProfile()
         {
@@ -12,7 +11,7 @@ namespace SkyVault.WebApi.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.SalutationName));
 
-            CreateMap<Nationality,  Payloads.CommonPayloads.Nationality>()
+            CreateMap<Nationality, Payloads.CommonPayloads.Nationality>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.NationalityName))
                 .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.NationalityCode));

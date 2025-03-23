@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SkyVault.WebApi.Backend.Models;
+﻿namespace SkyVault.WebApi.Backend.Models;
 
 public partial class Passport
 {

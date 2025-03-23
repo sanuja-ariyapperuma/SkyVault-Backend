@@ -1,5 +1,5 @@
-﻿using System.Net;
-using SkyVault.Exceptions;
+﻿using SkyVault.Exceptions;
+using System.Net;
 
 namespace SkyVault.WebApi.Middlewares
 {

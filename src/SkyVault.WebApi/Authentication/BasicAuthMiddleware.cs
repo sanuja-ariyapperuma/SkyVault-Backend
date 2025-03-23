@@ -17,8 +17,8 @@ internal sealed class BasicAuthMiddleware
     {
         var apiKey = _configuration.GetValue<string>(AuthKeys.ApiKey)
             ?? throw new InvalidOperationException(EmptyApiAuthKey);
-        
-        if (!context.Request.Headers.TryGetValue(AuthKeys.ApiAuthKey, 
+
+        if (!context.Request.Headers.TryGetValue(AuthKeys.ApiAuthKey,
                 out var extractedApiKey))
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;

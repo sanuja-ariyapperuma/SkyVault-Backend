@@ -1,19 +1,12 @@
-using Azure.Core;
-using Azure;
 using Microsoft.AspNetCore.Mvc;
-using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
-using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text.Json.Nodes;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
 
 namespace SkyVault.WebApi.Workloads;
 
@@ -22,7 +15,7 @@ internal static class AuthenticationWorkload
 
     public static IResult AuthenticateUser(
         [FromBody] LoginUserRequest request,
-        HttpContext context, 
+        HttpContext context,
         SkyvaultContext dbContext
         )
     {
@@ -44,7 +37,7 @@ internal static class AuthenticationWorkload
         var firstname = context.User.FindFirst("name")?.Value;
         var lastName = context.User.FindFirst(ClaimTypes.Surname)?.Value;
 
-        Payloads.CommonPayloads.SystemUserRole userRole = request.UserRole switch 
+        Payloads.CommonPayloads.SystemUserRole userRole = request.UserRole switch
         {
             "SuperAdmin" => Payloads.CommonPayloads.SystemUserRole.SuperAdmin,
             "Admin" => Payloads.CommonPayloads.SystemUserRole.Admin,
@@ -76,7 +69,7 @@ internal static class AuthenticationWorkload
             accessToken!
         );
 
-        var serializedCookieData = JsonSerializer.Serialize(cookieData);  
+        var serializedCookieData = JsonSerializer.Serialize(cookieData);
         var encodedCookieData = Convert.ToBase64String(Encoding.UTF8.GetBytes(serializedCookieData));
 
         // Set the access token in a cookie

@@ -1,15 +1,11 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using System.Text.RegularExpressions;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
 using SkyVault.Exceptions;
-using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
+using System.Text.RegularExpressions;
 
 namespace SkyVault.WebApi.Workloads
 {
@@ -37,10 +33,11 @@ namespace SkyVault.WebApi.Workloads
                     searchProfileRequest.SearchQuery!,
                     userIdentifyer!);
 
-                return Results.Ok(new SearchProfileResponse(searchProfileRequest.SearchQuery!, 
+                return Results.Ok(new SearchProfileResponse(searchProfileRequest.SearchQuery!,
                     customerProfiles!));
             }
-            catch(FormatException e){
+            catch (FormatException e)
+            {
                 e.LogException(_correlationId);
 
                 return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
@@ -57,11 +54,11 @@ namespace SkyVault.WebApi.Workloads
             }
         }
 
-       
+
 
         public static IResult AddPassport([FromBody] PassportRequest passportRequest,
             SkyvaultContext dbContext,
-            HttpContext context, CacheService cacheService) 
+            HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -69,19 +66,19 @@ namespace SkyVault.WebApi.Workloads
                 var customerProfileData = new CustomerProfileData(dbContext);
                 var systemUserData = new SystemUserData(dbContext);
 
-                if (String.IsNullOrEmpty(passportRequest.CustomerProfileId?.Trim())) 
+                if (String.IsNullOrEmpty(passportRequest.CustomerProfileId?.Trim()))
                 {
 
 
                     //GetUserIdForCustomerProfile(context, systemUserData, customerProfileData, cacheService, passportRequest.ParentId);
 
-                    var userId = GetUserId(context, systemUserData); 
-                        
+                    var userId = GetUserId(context, systemUserData);
+
 
                     var validatePassportRequest = IsPassportDataValid(passportRequest);
 
                     if (!validatePassportRequest.Succeeded)
-                        return Results.BadRequest(validatePassportRequest.Message);  
+                        return Results.BadRequest(validatePassportRequest.Message);
 
                     var checkPassportExists = customerProfileData.CheckPassportExists(passportRequest.PassportNumber ?? "");
 
@@ -89,14 +86,14 @@ namespace SkyVault.WebApi.Workloads
                         return Results.BadRequest("Passport number is already existing");
 
                     var savedprofile = customerProfileData.SaveProfile(passportRequest, userId, _correlationId);
-                    
+
                     savedCustomerProfile = new SaveUpdateCustomerProfileResponse(
                         savedprofile.Value!.Id.ToString(),
                         savedprofile.Value.Passports.First().Id.ToString());
 
                     return Results.Created<SaveUpdateCustomerProfileResponse>("AddPassport", savedCustomerProfile);
                 }
-                else 
+                else
                 {
                     var customer_profile_data = new CustomerProfileData(dbContext);
 
@@ -119,7 +116,7 @@ namespace SkyVault.WebApi.Workloads
                     return Results.Ok(savedCustomerProfile);
                 }
 
-                
+
             }
             catch (Exception e)
             {
@@ -140,7 +137,7 @@ namespace SkyVault.WebApi.Workloads
         {
             try
             {
-            
+
                 _correlationId = CorrelationHandler.Get(context);
 
                 var passportData = new PassportData(dbContext);
@@ -176,13 +173,13 @@ namespace SkyVault.WebApi.Workloads
             }
             catch (Exception e)
             {
-                
+
                 e.LogException(_correlationId);
                 return Results.Problem(
                                         new ProblemDetails().ToProblemDetails(
                                             "Sorry! Couldn't able to get passports", "30550615-0005", _correlationId));
             }
-            
+
 
         }
 
@@ -225,13 +222,13 @@ namespace SkyVault.WebApi.Workloads
                                         new ProblemDetails().ToProblemDetails(
                                             "Sorry! Couldn't able to update passport", "30550615-0006", _correlationId));
             }
-            
+
         }
 
         public static IResult GetVisaByCustomerProfileId(
                 [FromRoute] string profileId,
                 SkyvaultContext dbContext,
-                HttpContext context, CacheService cacheService) 
+                HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -268,7 +265,7 @@ namespace SkyVault.WebApi.Workloads
                 )).ToArray();
 
                 return Results.Ok(response);
-             
+
             }
             catch (Exception e)
             {
@@ -276,7 +273,7 @@ namespace SkyVault.WebApi.Workloads
                 return Results.Problem(
                                     new ValidationProblemDetails().ToValidationProblemDetails(
                                         "Sorry! Couldn't able to retrive VISA", "30550615-0008", _correlationId));
-                
+
             }
         }
 
@@ -310,7 +307,7 @@ namespace SkyVault.WebApi.Workloads
                 var resultValue = result.Value;
                 var visaCode = getVisaCode(resultValue!);
 
-                return Results.Ok(new AddVISAResponse(resultValue!.Id.ToString(), visaCode));    
+                return Results.Ok(new AddVISAResponse(resultValue!.Id.ToString(), visaCode));
             }
             catch (Exception e)
             {
@@ -319,10 +316,10 @@ namespace SkyVault.WebApi.Workloads
                                         new ProblemDetails().ToProblemDetails(
                                             "Sorry! Coudn't add VISA", "30550615-0009", _correlationId));
             }
-            
+
         }
 
-        public static IResult UpdateVisa([FromRoute] string visaId,[FromBody] VisaReqeust visaReqeust,
+        public static IResult UpdateVisa([FromRoute] string visaId, [FromBody] VisaReqeust visaReqeust,
             SkyvaultContext dbContext,
             HttpContext context, CacheService cacheService)
         {
@@ -342,7 +339,7 @@ namespace SkyVault.WebApi.Workloads
                                 cacheService,
                                 visaReqeust.CustomerProfileId!
                              );
-                    
+
                 var result = visaData.UpdateVisa(visaId, visaReqeust, _correlationId);
 
                 if (!result.Succeeded)
@@ -359,7 +356,7 @@ namespace SkyVault.WebApi.Workloads
                                             new ProblemDetails().ToProblemDetails(
                                             "Sorry! Couldn't update VISA", "30550615-0010", _correlationId));
             }
-            
+
         }
 
         public static IResult UpdateComMethod(
@@ -375,14 +372,15 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                if (comMethodRequest.PrefCommId == "3" && !Regex.IsMatch(comMethodRequest.WhatsAppNumber, @"^\+?\d+$")) 
+                if (comMethodRequest.PrefCommId == "3" && !Regex.IsMatch(comMethodRequest.WhatsAppNumber, @"^\+?\d+$"))
                 {
                     return Results.Problem(
                                         new ValidationProblemDetails().ToValidationProblemDetails(
                                                                 "WhatsAppNumber can only contain numbers", "", _correlationId));
                 }
 
-                if (comMethodRequest.PrefCommId == "2" && !Regex.IsMatch(comMethodRequest.EmailAddress, @"^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")) {
+                if (comMethodRequest.PrefCommId == "2" && !Regex.IsMatch(comMethodRequest.EmailAddress, @"^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"))
+                {
                     return Results.Problem(
                                         new ValidationProblemDetails().ToValidationProblemDetails(
                                                                 "Invalid Email Address", "", _correlationId));
@@ -407,20 +405,20 @@ namespace SkyVault.WebApi.Workloads
             }
             catch (Exception e)
             {
-                
+
                 e.LogException(_correlationId);
                 return Results.Problem(
                                             new ProblemDetails().ToProblemDetails(
                                             "Sorry! Preffered commiunication method did not updated", "30550615-0011", _correlationId));
             }
-            
+
         }
 
         public static IResult GetCommMethod(
                         [FromBody] GetComMethodRequest comReqeust,
                         SkyvaultContext dbContext,
-                        HttpContext context, 
-                        CacheService cacheService) 
+                        HttpContext context,
+                        CacheService cacheService)
         {
             try
             {
@@ -446,7 +444,7 @@ namespace SkyVault.WebApi.Workloads
 
                 return Results.Ok(result.Value);
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 e.LogException(_correlationId);
                 return Results.Problem(
@@ -454,7 +452,7 @@ namespace SkyVault.WebApi.Workloads
                                             "Sorry! Couldn't get preffered commiunication method", "30550615-0012", _correlationId));
             }
 
-            
+
         }
 
         public static IResult DeleteVisa(
@@ -462,7 +460,7 @@ namespace SkyVault.WebApi.Workloads
             SkyvaultContext dbContext,
             HttpContext context,
             CacheService cacheService
-            ) 
+            )
         {
             try
             {
@@ -477,7 +475,7 @@ namespace SkyVault.WebApi.Workloads
                     var customerProfileData = new CustomerProfileData(dbContext);
                     var customerProfileId = customerProfileData.GetCustomerProfileIdByVisaId(deletingVisa, _correlationId);
 
-                    if(!customerProfileId.Succeeded)
+                    if (!customerProfileId.Succeeded)
                         return Results.Problem(
                                             new ValidationProblemDetails().ToValidationProblemDetails(
                                                 customerProfileId.Message, customerProfileId.ErrorCode, _correlationId));
@@ -489,7 +487,7 @@ namespace SkyVault.WebApi.Workloads
                         customerProfileData,
                         cacheService,
                         customerProfileId.Value.ToString()
-    
+
                     );
 
                     var result = visaData.DeleteVisa(deletingVisa, _correlationId);
@@ -513,15 +511,15 @@ namespace SkyVault.WebApi.Workloads
                                             new ProblemDetails().ToProblemDetails(
                                             "Sorry! Couldn't delete VISA", "30550615-0014", _correlationId));
 
-            }          
+            }
 
         }
 
         public static IResult AddFFN(
-            [FromBody] FFNRequest ffnRequest, 
-            SkyvaultContext dbContext, 
+            [FromBody] FFNRequest ffnRequest,
+            SkyvaultContext dbContext,
             HttpContext context,
-            CacheService cacheService) 
+            CacheService cacheService)
         {
             try
             {
@@ -570,10 +568,10 @@ namespace SkyVault.WebApi.Workloads
         }
 
         public static IResult UpdateFFN(
-            [FromRoute] string ffId, 
-            [FromBody] FFNRequest ffnRequest, 
-            SkyvaultContext dbContext, 
-            HttpContext context, CacheService cacheService) 
+            [FromRoute] string ffId,
+            [FromBody] FFNRequest ffnRequest,
+            SkyvaultContext dbContext,
+            HttpContext context, CacheService cacheService)
         {
             try
             {
@@ -621,11 +619,11 @@ namespace SkyVault.WebApi.Workloads
         }
 
         public static IResult DeleteFFN(
-            [FromRoute] string ffId, 
-            [FromBody] FFNRequest ffnRequest, 
-            SkyvaultContext dbContext, 
+            [FromRoute] string ffId,
+            [FromBody] FFNRequest ffnRequest,
+            SkyvaultContext dbContext,
             HttpContext context,
-            CacheService cacheService) 
+            CacheService cacheService)
         {
             try
             {
@@ -672,11 +670,11 @@ namespace SkyVault.WebApi.Workloads
         }
 
         public static IResult GetFFNByCustomerId(
-            [FromRoute] string profileId, 
-            SkyvaultContext dbContext, 
+            [FromRoute] string profileId,
+            SkyvaultContext dbContext,
             HttpContext context,
             CacheService cacheService
-            ) 
+            )
         {
             try
             {
@@ -721,15 +719,15 @@ namespace SkyVault.WebApi.Workloads
 
         }
 
-        public static IResult GetFamilyMembers([FromRoute] string profileId, 
-            SkyvaultContext dbContext, 
+        public static IResult GetFamilyMembers([FromRoute] string profileId,
+            SkyvaultContext dbContext,
             CacheService cacheService,
-            HttpContext context) 
+            HttpContext context)
         {
             _correlationId = CorrelationHandler.Get(context);
             var customerProfileData = new CustomerProfileData(dbContext);
 
-            if (int.TryParse(profileId, out int custId)) 
+            if (int.TryParse(profileId, out int custId))
             {
                 var systemUserData = new SystemUserData(dbContext);
 
@@ -759,10 +757,11 @@ namespace SkyVault.WebApi.Workloads
 
         private static SkyResult<bool> IsPassportDataValid(PassportRequest passportRequest)
         {
-            if (String.IsNullOrEmpty(passportRequest.CountryId)) 
+            if (String.IsNullOrEmpty(passportRequest.CountryId))
             {
                 return new SkyResult<bool>().Fail("Country Id is required", "", "");
-            } else if(String.IsNullOrEmpty(passportRequest.DateOfBirth))
+            }
+            else if (String.IsNullOrEmpty(passportRequest.DateOfBirth))
             {
                 return new SkyResult<bool>().Fail("Date of Birth is required", "", "");
             }
@@ -799,8 +798,8 @@ namespace SkyVault.WebApi.Workloads
         }
 
         private static void GetUserIdForCustomerProfile(
-            HttpContext context, 
-            SystemUserData systemUserData, 
+            HttpContext context,
+            SystemUserData systemUserData,
             CustomerProfileData customerProfileData,
             CacheService cacheService,
             string customerProfileId
@@ -840,7 +839,7 @@ namespace SkyVault.WebApi.Workloads
         private static int GetUserId(
             HttpContext context,
             SystemUserData systemUserData
-            ) 
+            )
         {
             var userUpn = context.User.Identity!.Name;
 
