@@ -3,14 +3,12 @@ using DotNetEnv;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
-using SkyVault.WebApi.Authentication;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Endpoints;
@@ -40,7 +38,7 @@ public static class Program
         });
 
         builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database");
-        builder.Services.AddAutoMapper(typeof(Program).Assembly,typeof(MappingProfile).Assembly);
+        builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(MappingProfile).Assembly);
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options =>
     {
@@ -92,9 +90,9 @@ public static class Program
 
         var app = builder.Build();
         app.UseMiddleware<CorrelationIdMiddleware>();
-        //app.UseMiddleware<BasicAuthMiddleware>();
         app.MapLoginEndpoints();
         app.MapCustomEndpoints();
+        app.MapMessageEndpoints();
         app.MapProfileEndpoints();
         app.UseCors(MyAllowSpecificOrigins);
         app.UseAuthentication();
