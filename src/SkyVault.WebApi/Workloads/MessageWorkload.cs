@@ -27,67 +27,75 @@ namespace SkyVault.WebApi.Workloads
 
         /***
          * The file is uploading from the frontend with a pre-signed URL.
-         * Since frontend may be compromised, validate file extensions again here.
+         * Since frontend may be compromised, validate file extensions again here is mandetory.
          * On any failure, delete already uploaded file from the storage.
          */
-        public async static Task<IResult> UpdateBirthdayFile(
+        public async static Task<IResult> UpdateAttachmentFile(
             [FromBody] UpdateBirthdayFileRequest request,
             SkyvaultContext dbContext,
             HttpContext context
         )
-        {
-            var storageService = new StorageService();
-
-            try
             {
-                var systemUserData = new SystemUserData(dbContext);
-                var userIdentifier = context.User.Identity!.Name;
+                    var storageService = new StorageService();
 
-                if (string.IsNullOrEmpty(request.FileName))
-                {
-                    return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-                        "FileName Not Found", "30550615-0003", _correlationId
-                    ));
+                    try
+                    {
+                        var systemUserData = new SystemUserData(dbContext);
+                        var userIdentifier = context.User.Identity?.Name;
+
+                        if (!Enum.IsDefined(typeof(MessageType), request.MessageType))
+                        {
+                            return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                                "Invalid MessageType", "30550615-0004", _correlationId
+                            ));
+                        }
+
+                        if (request.MessageType == MessageType.Birthday && string.IsNullOrEmpty(request.FileName))
+                        {
+                            return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                                "FileName Not Found", "30550615-0003", _correlationId
+                            ));
+                        }
+
+                        if (!string.IsNullOrEmpty(request.FileName))
+                        {
+                            var allowedExtensions = new HashSet<string> { ".jpg", ".jpeg", ".png" };
+                            var fileExtension = Path.GetExtension(request.FileName).ToLowerInvariant();
+
+                            if (!allowedExtensions.Contains(fileExtension))
+                            {
+                                return await DeleteFileAndReturnProblem(storageService, request.FileName, "Invalid file format. Only JPG and PNG are allowed.", "30550615-0004");
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(userIdentifier))
+                        {
+                            return await DeleteFileAndReturnProblem(storageService, request.FileName, "Unauthorized action", "30550615-0005");
+                        }
+
+                        var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+
+                        if (!userId.Succeeded)
+                        {
+                            await storageService.DeleteFileAsync(request.FileName, MessageType.Birthday);
+                            return Results.Unauthorized();
+                        }
+
+                        var messageService = new MessageService(dbContext);
+                        var response = await messageService.UpdateMessage(
+                            userId.Value, request.MessageType, request.FileName, null);
+
+                        return Results.Created("Successfully Updated", response);
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.LogException(_correlationId);
+                        await storageService.DeleteFileAsync(request.FileName, Payloads.CommonPayloads.MessageType.Birthday);
+                        return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                            "Image did not upload successfully", "30550615-0003", _correlationId
+                        ));
+                    }
                 }
-
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-                var fileExtension = Path.GetExtension(request.FileName).ToLowerInvariant();
-
-                if (!allowedExtensions.Contains(fileExtension))
-                {
-                    await DeleteFileAndReturnProblem(storageService, request.FileName, "Invalid file format. Only JPG and PNG are allowed.", "30550615-0004");
-                }
-
-                if (string.IsNullOrEmpty(userIdentifier))
-                {
-                    await DeleteFileAndReturnProblem(storageService, request.FileName, "Unauthorized action", "30550615-0005");
-                }
-
-                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
-
-                if (!userId.Succeeded)
-                {
-                    await storageService.DeleteFileAsync(request.FileName, Payloads.CommonPayloads.MessageType.Birthday);
-
-                    return Results.Unauthorized();
-                }
-
-                MessageService messageService = new MessageService(dbContext);
-
-                var response = await messageService.UpdateMessage(
-                    userId.Value, Payloads.CommonPayloads.MessageType.Birthday, request.FileName, null);
-
-                return Results.Created("Successfully Updated", response);
-            }
-            catch (Exception ex)
-            {
-                ex.LogException(_correlationId);
-                await storageService.DeleteFileAsync(request.FileName, Payloads.CommonPayloads.MessageType.Birthday);
-                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-                    "Image did not upload successfully", "30550615-0003", _correlationId
-                ));
-            }
-        }
 
         public async static Task<IResult> GetMessage(
             [FromQuery] string messageType,

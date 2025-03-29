@@ -10,7 +10,7 @@
                 .Produces(StatusCodes.Status401Unauthorized);
 
 
-            app.MapPost("/UpdateBirthdayFile", Workloads.MessageWorkload.UpdateBirthdayFile)
+            app.MapPost("/UpdateAttachmentFile", Workloads.MessageWorkload.UpdateAttachmentFile)
                 .RequireAuthorization()
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
