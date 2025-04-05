@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend.Models;
@@ -14,23 +15,30 @@ namespace SkyVault.WebApi.Backend
             _db = db;
         }
 
-        public async Task<SkyResult<string>> UpdateMessage(int userId, MessageType messageType, string? fileName, string? content)
+        public async Task<SkyResult<string>> UpdateMessage(
+            int userId,
+            MessageType messageType,
+            string? fileName,
+            string? content,
+            PreferedCommiunicationMethod? commiunicationMethod)
         {
             try
             {
-                // Deactivate previous templates of the same MessageType
-                var previousTemplates = await _db.NotificationTemplates
-                    .Where(nt => nt.NotificationType == (int)messageType && nt.Active)
-                    .ToListAsync();
-
-                previousTemplates.ForEach(template =>
+                // Only deactivate existing templates for non-scheduled messages
+                if (messageType != MessageType.Promotion && messageType != MessageType.Emergency)
                 {
-                    template.Active = false;
-                    template.UpdatedAt = DateTime.UtcNow;
-                    template.UpdatedBy = userId;
-                });
+                    var previousTemplates = await _db.NotificationTemplates
+                        .Where(nt => nt.NotificationType == (int)messageType && nt.Active)
+                        .ToListAsync();
 
-                // Create new template
+                    foreach (var template in previousTemplates)
+                    {
+                        template.Active = false;
+                        template.UpdatedAt = DateTime.UtcNow;
+                        template.UpdatedBy = userId;
+                    }
+                }
+
                 var newTemplate = new NotificationTemplate
                 {
                     Content = content,
@@ -48,9 +56,11 @@ namespace SkyVault.WebApi.Backend
             }
             catch (Exception ex)
             {
+                ex.LogException("");
                 return new SkyResult<string>().Fail(ex.Message, "500", null);
             }
         }
+
 
         /***
          * This Function should return date in the response which match to the Sri Lankan Standard Time Zone
@@ -83,5 +93,7 @@ namespace SkyVault.WebApi.Backend
 
             return new SkyResult<Message>().SucceededWithValue(message);
         }
+
+
     }
 }

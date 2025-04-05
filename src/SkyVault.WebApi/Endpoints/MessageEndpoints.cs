@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using SkyVault.WebApi.Filters;
+﻿using SkyVault.WebApi.Filters;
 
 namespace SkyVault.WebApi.Endpoints
 {
@@ -25,6 +24,12 @@ namespace SkyVault.WebApi.Endpoints
                 .Produces(StatusCodes.Status401Unauthorized);
 
             app.MapGet("/GetMessage", Workloads.MessageWorkload.GetMessage)
+                .RequireAuthorization()
+                .AddEndpointFilter<AdminOnlyFilter>()
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/SaveAndSendPromotion", Workloads.MessageWorkload.SaveAndSendPromotion)
                 .RequireAuthorization()
                 .AddEndpointFilter<AdminOnlyFilter>()
                 .Produces(StatusCodes.Status200OK)
