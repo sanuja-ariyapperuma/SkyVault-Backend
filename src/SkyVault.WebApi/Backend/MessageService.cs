@@ -15,7 +15,7 @@ namespace SkyVault.WebApi.Backend
             _db = db;
         }
 
-        public async Task<SkyResult<string>> UpdateMessage(
+        public async Task<SkyResult<int>> UpdateMessage(
             int userId,
             MessageType messageType,
             string? fileName,
@@ -52,15 +52,36 @@ namespace SkyVault.WebApi.Backend
                 _db.NotificationTemplates.Add(newTemplate);
                 await _db.SaveChangesAsync();
 
-                return new SkyResult<string>().SucceededWithValue("Message updated successfully.");
+                return new SkyResult<int>().SucceededWithValue(newTemplate.Id);
             }
             catch (Exception ex)
             {
                 ex.LogException("");
-                return new SkyResult<string>().Fail(ex.Message, "500", null);
+                return new SkyResult<int>().Fail(ex.Message, "500", null);
             }
         }
 
+        public async Task<SkyResult<string>> DeleteNotificationTemplateById(int templateId)
+        {
+            try
+            {
+                var template = await _db.NotificationTemplates.FindAsync(templateId);
+                if (template == null)
+                {
+                    return new SkyResult<string>().Fail("NotificationTemplate not found.", "404", null);
+                }
+
+                _db.NotificationTemplates.Remove(template);
+                await _db.SaveChangesAsync();
+
+                return new SkyResult<string>().SucceededWithValue("Deleted");
+            }
+            catch (Exception ex)
+            {
+                ex.LogException(ex.Message);
+                return new SkyResult<string>().Fail("Something went wrong when deleting template", "500", null);
+            }
+        }
 
         /***
          * This Function should return date in the response which match to the Sri Lankan Standard Time Zone

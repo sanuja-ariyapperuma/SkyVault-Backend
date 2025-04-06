@@ -72,6 +72,11 @@ public static class Program
         builder.Services.AddScoped<CacheService>();
         builder.Services.AddHttpContextAccessor();
 
+        builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
+        {
+            client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("AZURE_FUNCTION_BASE_URL"));
+        });
+
         Log.Logger = new LoggerConfiguration()
             .WriteTo.ApplicationInsights(
             new TelemetryConfiguration { InstrumentationKey = builder.Configuration["AzureAppInsight:InstrumentKey"] },

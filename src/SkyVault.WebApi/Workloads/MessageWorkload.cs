@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web.UI.Areas.MicrosoftIdentity.Pages.Account;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
-using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
@@ -120,9 +118,10 @@ namespace SkyVault.WebApi.Workloads
         }
 
         public async static Task<IResult> SaveAndSendPromotion(
-        [FromBody] BroadcastMessageRequest request,
-        SkyvaultContext dbContext,
-        HttpContext context)
+            [FromBody] BroadcastMessageRequest request,
+            SkyvaultContext dbContext,
+            HttpContext context,
+            IApiClient apiClient)
         {
             var systemUserData = new SystemUserData(dbContext);
             var messageService = new MessageService(dbContext);
@@ -139,11 +138,15 @@ namespace SkyVault.WebApi.Workloads
                 var messageType = request.IsEmergency ? MessageType.Emergency : MessageType.Promotion;
                 var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
 
-                var content = $"{request.Subject} | {request.Content}";
+                if (!userId.Succeeded)
+                {
+                    return await HandleErrorWithFileCleanup(storageService, request.FileName, "Unauthorized action", "30550615-0005");
+                }
 
+                var content = $"{request.Subject} | {request.Content}";
                 var response = await messageService.UpdateMessage(
                     userId.Value, messageType, request.FileName, content, parsedBroadcastType);
-                
+
                 if (!response.Succeeded)
                 {
                     return Results.Problem(new ProblemDetails
@@ -155,6 +158,18 @@ namespace SkyVault.WebApi.Workloads
                     });
                 }
 
+                try
+                {
+                    await apiClient.PostBroardcastMessageAsync(response.Value, parsedBroadcastType.ToString());
+                }
+                catch (Exception ex)
+                {
+                    await messageService.DeleteNotificationTemplateById(response.Value);
+                    ex.LogException(_correlationId);
+                    return await HandleErrorWithFileCleanup(storageService, request.FileName,
+                        "An error occurred while processing the request.", "30550615-0010");
+                }
+
                 return Results.Ok("Broadcast Initiated Successfully");
             }
             catch (Exception ex)
@@ -164,6 +179,7 @@ namespace SkyVault.WebApi.Workloads
                     "An error occurred while processing the request.", "30550615-0010");
             }
         }
+
 
         private static async Task<IResult> DeleteFileAndReturnProblem(StorageService storageService, string fileName, string detail, string errorCode)
         {
