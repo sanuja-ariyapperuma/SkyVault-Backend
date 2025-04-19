@@ -35,6 +35,18 @@ namespace SkyVault.WebApi.Endpoints
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
+            app.MapPost("/UpdatePassportExpireMessage", Workloads.MessageWorkload.UpdatePassportExpiryMessage)
+                .RequireAuthorization()
+                .AddEndpointFilter<AdminOnlyFilter>()
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
+            app.MapPost("/UpdateVisaExpireMessage", Workloads.MessageWorkload.UpdateVisaExpiryMessage)
+                .RequireAuthorization()
+                .AddEndpointFilter<AdminOnlyFilter>()
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
 
         }
     }

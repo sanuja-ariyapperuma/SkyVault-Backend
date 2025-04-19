@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using Azure.Identity;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -10,10 +11,12 @@ namespace SkyVault.WebApi.Backend
     public class ApiClient : IApiClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
 
-        public ApiClient(HttpClient httpClient)
+        public ApiClient(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            _configuration = configuration;
         }
 
         public async Task<string> PostBroardcastMessageAsync(int templateId, string promotionalType)
@@ -24,7 +27,9 @@ namespace SkyVault.WebApi.Backend
                 PromotionType = promotionalType
             };
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await GetCredentialsAsync());
+            var credentials = await GetCredentialsAsync();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials);
 
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
@@ -35,9 +40,15 @@ namespace SkyVault.WebApi.Backend
 
         private async Task<string> GetCredentialsAsync() 
         {
+            var tenantId = _configuration["AzureAD:TenantId"];
+            var clientId = _configuration["AzureAD:ClientId"];
+            var clientSecret = _configuration["AzureAD:ClientSecret"];
+
+            var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
             var scope = "api://371a1a76-a0cc-46f3-8318-8f91058f3cef/.default";
-            var credential = new DefaultAzureCredential();
-            var token = await credential.GetTokenAsync(new TokenRequestContext(new[] { scope }));
+
+            var token = await clientSecretCredential.GetTokenAsync(new TokenRequestContext(new[] { scope }));
 
             return token.Token;
         }

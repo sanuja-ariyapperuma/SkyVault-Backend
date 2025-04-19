@@ -180,6 +180,105 @@ namespace SkyVault.WebApi.Workloads
             }
         }
 
+        public async static Task<IResult> UpdatePassportExpiryMessage(
+            [FromBody] PassportVisaExpireMessageRequest request,
+            SkyvaultContext dbContext,
+            HttpContext context
+        )
+        {
+            try
+            {
+                var systemUserData = new SystemUserData(dbContext);
+                var messageService = new MessageService(dbContext);
+                var userIdentifier = context.User.Identity?.Name;
+
+                // Use the updated validation method
+                var validationResult = ValidatePassportAndVisaContent(request.Content, isVisa: false);
+                if (validationResult is not null)
+                {
+                    return validationResult;
+                }
+
+                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+                var messageType = MessageType.PassportExpiry;
+
+                if (!userId.Succeeded)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var response = await messageService.UpdateMessage(
+                    userId.Value, messageType, null, request.Content, PreferedCommiunicationMethod.Email);
+
+                // Check if the response indicates success
+                if (!response.Succeeded)
+                {
+                    return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                        response.Message, response.ErrorCode ?? "30550615-0016", _correlationId
+                    ));
+                }
+
+                return Results.Created("Successfully Updated", "");
+            }
+            catch (Exception ex)
+            {
+                ex.LogException(_correlationId);
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Passport Message Save Not Succeeded", "30550615-0003", _correlationId
+                ));
+            }
+        }
+
+        public async static Task<IResult> UpdateVisaExpiryMessage(
+            [FromBody] PassportVisaExpireMessageRequest request,
+            SkyvaultContext dbContext,
+            HttpContext context
+        )
+        {
+            try
+            {
+                var systemUserData = new SystemUserData(dbContext);
+                var messageService = new MessageService(dbContext);
+                var userIdentifier = context.User.Identity?.Name;
+
+                // Use the updated validation method
+                var validationResult = ValidatePassportAndVisaContent(request.Content, isVisa: true);
+                if (validationResult is not null)
+                {
+                    return validationResult;
+                }
+
+                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+                var messageType = MessageType.VisaExpiry;
+
+                if (!userId.Succeeded)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var response = await messageService.UpdateMessage(
+                    userId.Value, messageType, null, request.Content, PreferedCommiunicationMethod.Email);
+
+                // Check if the response indicates success
+                if (!response.Succeeded)
+                {
+                    return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                        response.Message, response.ErrorCode ?? "30550615-0016", _correlationId
+                    ));
+                }
+
+                return Results.Created("Successfully Updated", "");
+            }
+            catch (Exception ex)
+            {
+                ex.LogException(_correlationId);
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Visa Message Save Not Succeeded", "30550615-0003", _correlationId
+                ));
+            }
+        }
+
+        #region Private Methods
 
         private static async Task<IResult> DeleteFileAndReturnProblem(StorageService storageService, string fileName, string detail, string errorCode)
         {
@@ -224,5 +323,57 @@ namespace SkyVault.WebApi.Workloads
 
             return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(message, errorCode, _correlationId));
         }
+
+        private static IResult? ValidatePassportAndVisaContent(string content, bool isVisa)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Content cannot be null or empty.", "30550615-0009", _correlationId
+                ));
+            }
+
+            var pipeCount = content.Count(c => c == '|');
+            if (pipeCount != 1)
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Content must contain exactly one pipe ('|') character.", "30550615-0018", _correlationId
+                ));
+            }
+
+            var contentParts = content.Split('|', 2);
+            if (contentParts.Length < 2 || string.IsNullOrWhiteSpace(contentParts[1]))
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Email body cannot be null or empty.", "30550615-0014", _correlationId
+                ));
+            }
+
+            if (contentParts[0].Length > 60)
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Email subject cannot exceed 60 characters.", "30550615-0013", _correlationId
+                ));
+            }
+
+            if (contentParts[1].Length > 1000)
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Email body cannot exceed 1000 characters.", "30550615-0015", _correlationId
+                ));
+            }
+
+            // Apply "country_name" validation only for Visa
+            if (isVisa && !contentParts[1].Contains("country_name", StringComparison.OrdinalIgnoreCase))
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Email body must contain the string 'country_name'.", "30550615-0017", _correlationId
+                ));
+            }
+
+            return null;
+        }
+
+        #endregion
     }
 }
