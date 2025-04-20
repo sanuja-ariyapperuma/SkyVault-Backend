@@ -3,6 +3,7 @@ using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend.Models;
+using SkyVault.WebApi.Helper;
 
 namespace SkyVault.WebApi.Backend
 {
@@ -115,6 +116,70 @@ namespace SkyVault.WebApi.Backend
             return new SkyResult<Message>().SucceededWithValue(message);
         }
 
+        public async Task<SkyResult<AllMessagesPaginatedResponse>> GetAllMessages(int page) 
+        {
+            // Get the total count of records (without pagination)
+            var totalCount = await _db.NotificationTemplates
+                .OrderByDescending(nt => nt.Active)
+                .ThenBy(nt => nt.NotificationType == 1 ? 0
+                      : nt.NotificationType == 2 ? 1
+                      : nt.NotificationType == 3 ? 2
+                      : nt.NotificationType == 5 ? 3
+                      : nt.NotificationType == 4 ? 4
+                      : 5)
+                .CountAsync();
 
+            // Calculate the total number of pages
+            int pageSize = 10;
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            // Fetch the paginated data
+            var allMessages = await _db.NotificationTemplates
+                .OrderByDescending(nt => nt.Active)
+                .ThenBy(nt => nt.NotificationType == 1 ? 0
+                      : nt.NotificationType == 2 ? 1
+                      : nt.NotificationType == 3 ? 2
+                      : nt.NotificationType == 5 ? 3
+                      : nt.NotificationType == 4 ? 4
+                      : 5)
+                .ThenByDescending(nt => nt.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // You can now return the data and include the page info
+            var response = new AllMessagesPaginatedResponse(
+                CurrentPage: page,
+                TotalPages: totalPages,
+                TotalMessages: totalCount,
+                Messages: [.. allMessages.Select(nt => new MessageSummary(
+                    nt.Id,
+                    nt.NotificationType,
+                    nt.Active,
+                    Helpers.SummarizeText(nt.Content) 
+                ))]
+            );
+
+            return new SkyResult<AllMessagesPaginatedResponse>().SucceededWithValue(response);
+        }
+
+        public async Task<SkyResult<NotificationTemplate>> GetNotificationTemplateById(int templateId) 
+        {
+            var notificationTemplate = await _db.NotificationTemplates
+                .AsNoTracking()
+                .Include(nt => nt.CreatedByUser)
+                .Include(nt => nt.UpdatedByUser)
+                .Include(nt => nt.NotificationTypeNavigation)
+                .Include(nt => nt.CommunicationMethod)
+                .FirstOrDefaultAsync(nt => nt.Id == templateId);
+
+            if (notificationTemplate == null) 
+            {
+                return new SkyResult<NotificationTemplate>().Fail("NotificationTemplate not found.", "404", null);
+            }
+
+            return new SkyResult<NotificationTemplate>().SucceededWithValue(notificationTemplate);
+        }
+    
     }
 }

@@ -2,6 +2,7 @@
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
+using SkyVault.Payloads.ResponsePayloads;
 using SkyVault.WebApi.Backend;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Helper;
@@ -278,6 +279,68 @@ namespace SkyVault.WebApi.Workloads
             }
         }
 
+        public async static Task<IResult> GetAllMessages(
+            SkyvaultContext dbContext, 
+            HttpContext context,
+            [FromQuery] int page = 1) 
+        {
+            var messageService = new MessageService(dbContext);
+
+            var response = await messageService.GetAllMessages(page);
+
+            if (!response.Succeeded)
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Error retriving messages", "" ?? "30550615-0016", _correlationId
+                ));
+            }
+
+            return Results.Ok(response.Value);
+        }
+
+        public async static Task<IResult> GetMessageById(
+            SkyvaultContext dbContext,
+            HttpContext context,
+            [FromQuery] int messageId)
+        {
+            if (messageId <= 0) 
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Invalid messageId", "30550615-0015", _correlationId
+                ));
+            }
+
+            var messageService = new MessageService(dbContext);
+
+            var response = await messageService.GetNotificationTemplateById(messageId);
+
+            if (!response.Succeeded)
+            {
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Error retriving notification", "" ?? "30550615-0016", _correlationId
+                ));
+            }
+
+            var responseValue = response.Value!;
+            var subjectAndContent = responseValue.Content?.Split('|', StringSplitOptions.RemoveEmptyEntries);
+            
+            var responseObject = new MessageHistoryDetailedResponse(
+                responseValue.Id,
+                subjectAndContent != null ? subjectAndContent[0] : "",
+                subjectAndContent != null ? subjectAndContent[1] : "" ,
+                responseValue.NotificationTypeNavigation.TypeName,
+                GetFileUrl(responseValue.File, responseValue.NotificationType),
+                responseValue.Active,
+                ConvertToSriLankanTime(responseValue.CreatedAt),
+                FormatUsersNameWithEmail(responseValue.CreatedByUser),
+                ConvertToSriLankanTime(responseValue.UpdatedAt),
+                FormatUsersNameWithEmail(responseValue.UpdatedByUser),
+                responseValue.CommunicationMethod.CommTitle
+            );
+
+            return Results.Ok(responseObject);
+        }
+
         #region Private Methods
 
         private static async Task<IResult> DeleteFileAndReturnProblem(StorageService storageService, string fileName, string detail, string errorCode)
@@ -373,6 +436,57 @@ namespace SkyVault.WebApi.Workloads
 
             return null;
         }
+
+        private static string FormatUsersNameWithEmail(SystemUser? user) 
+        {
+            if (user == null) 
+                return string.Empty;
+
+            return $"{user.FirstName} {user.LastName} ({user.SamProfileId})";
+        }
+
+        private static string GetFileUrl(string? fileName, int messageTypeId) 
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return string.Empty;
+
+            var storageService = new StorageService();
+
+            switch (messageTypeId)
+            {
+                case 1:
+                    return storageService.GetFileUrl(fileName, MessageType.Birthday);
+                case 2:
+                    return storageService.GetFileUrl(fileName, MessageType.PassportExpiry);
+                case 3:
+                    return storageService.GetFileUrl(fileName, MessageType.VisaExpiry);
+                case 4:
+                    return storageService.GetFileUrl(fileName, MessageType.Promotion);
+                case 5:
+                    return storageService.GetFileUrl(fileName, MessageType.Emergency);
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string ConvertToSriLankanTime(DateTime? time) 
+        {
+            if (time.HasValue)
+            {
+                var sriLankaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Sri Lanka Standard Time");
+                var sriLankaDate = TimeZoneInfo.ConvertTimeFromUtc(time.Value, sriLankaTimeZone);
+                var formatted = sriLankaDate.ToString("yyyy-MM-dd hh:mm tt");
+
+                return formatted;
+            }
+            else 
+            {
+                return "";
+            }
+
+            
+        }
+
 
         #endregion
     }
