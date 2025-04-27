@@ -1,6 +1,0 @@
-.FamilyMemberList {
-  @apply flex flex-col;
-}
-.SubHeading {
-  @apply font-semibold text-primary-color text-xl mb-2;
-}
