@@ -1,4 +1,6 @@
-﻿namespace SkyVault.Payloads.RequestPayloads
+﻿using SkyVault.Payloads.CommonPayloads;
+
+namespace SkyVault.Payloads.RequestPayloads
 {
-    public record UpdateBirthdayFileRequest(string FileName);
+    public record UpdateBirthdayFileRequest(string FileName, MessageType MessageType);
 }

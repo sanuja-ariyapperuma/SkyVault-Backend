@@ -10,6 +10,7 @@ namespace SkyVault.WebApi.Backend.Seeds
             new NotificationType { Id = 2, TypeName = "PassportExpiry"},
             new NotificationType { Id = 3, TypeName = "VisaExpiry"},
             new NotificationType { Id = 4, TypeName = "Custom"},
+            new NotificationType { Id = 5, TypeName = "Emergency"},
         ];
     }
 }

@@ -72,6 +72,15 @@ public static class Program
         builder.Services.AddScoped<CacheService>();
         builder.Services.AddHttpContextAccessor();
 
+        builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
+        {
+            client.BaseAddress = new Uri(Environment.GetEnvironmentVariable("AZURE_FUNCTION_BASE_URL"));
+        });
+
+        builder.Services.AddControllers();
+        builder.Services.AddHttpClient<IApiClient, ApiClient>();
+        builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
         Log.Logger = new LoggerConfiguration()
             .WriteTo.ApplicationInsights(
             new TelemetryConfiguration { InstrumentationKey = builder.Configuration["AzureAppInsight:InstrumentKey"] },
@@ -94,6 +103,7 @@ public static class Program
         app.MapCustomEndpoints();
         app.MapMessageEndpoints();
         app.MapProfileEndpoints();
+        app.MapTransferProfileEndpoints();
         app.UseCors(MyAllowSpecificOrigins);
         app.UseAuthentication();
         app.UseAuthorization();

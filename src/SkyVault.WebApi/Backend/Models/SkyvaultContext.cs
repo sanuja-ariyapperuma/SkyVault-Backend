@@ -211,6 +211,7 @@ public partial class SkyvaultContext : DbContext
                 .HasForeignKey(d => d.NotificationType)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_notification_templates_notification_types");
+
         });
 
         modelBuilder.Entity<NotificationType>(entity =>

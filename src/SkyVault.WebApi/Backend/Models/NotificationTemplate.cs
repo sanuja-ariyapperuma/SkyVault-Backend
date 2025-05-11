@@ -24,6 +24,11 @@ public partial class NotificationTemplate
 
     public DateTime? UpdatedAt { get; set; }
 
+    [ForeignKey(nameof(CommunicationMethod))]
+    public int CommunicationMethodId { get; set; }
+
+    public virtual CommunicationMethod CommunicationMethod { get; set; } = null!;
+
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
     public virtual NotificationType NotificationTypeNavigation { get; set; } = null!;
