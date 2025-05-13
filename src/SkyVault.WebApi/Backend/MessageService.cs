@@ -21,7 +21,7 @@ namespace SkyVault.WebApi.Backend
             MessageType messageType,
             string? fileName,
             string? content,
-            PreferedCommiunicationMethod? commiunicationMethod)
+            PreferedCommiunicationMethod commiunicationMethod)
         {
             try
             {
@@ -40,6 +40,10 @@ namespace SkyVault.WebApi.Backend
                     }
                 }
 
+                var dbCommunicationMethod = await _db.CommunicationMethods
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cm => cm.CommTitle == commiunicationMethod.ToString());
+
                 var newTemplate = new NotificationTemplate
                 {
                     Content = content,
@@ -47,7 +51,8 @@ namespace SkyVault.WebApi.Backend
                     NotificationType = (int)messageType,
                     CreatedBy = userId,
                     CreatedAt = DateTime.UtcNow,
-                    Active = true
+                    Active = true,
+                    CommunicationMethodId = dbCommunicationMethod?.Id ?? 0,
                 };
 
                 _db.NotificationTemplates.Add(newTemplate);
