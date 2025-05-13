@@ -112,11 +112,10 @@ namespace SkyVault.WebApi.Workloads
             MessageService messageService = new MessageService(dbContext);
             var response = await messageService.GetMessage(parsedMessageType);
 
+
             if (!response.Succeeded)
             {
-                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
-                    response.Message, "30550615-0007", _correlationId
-                ));
+                return Results.NotFound("No message found");
             }
 
             return Results.Ok(response.Value);
