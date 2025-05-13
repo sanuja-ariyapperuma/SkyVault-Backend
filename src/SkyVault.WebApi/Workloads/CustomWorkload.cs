@@ -11,6 +11,7 @@ namespace SkyVault.WebApi.Workloads;
 
 public static class CustomWorkload
 {
+    //Error Code vFxlOv
     public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
         IMapper mapper, IMemoryCache cache, IConfiguration configuration, HttpContext context)
     {
@@ -45,7 +46,7 @@ public static class CustomWorkload
 
             return Results.Problem(new ProblemDetails().ToProblemDetails(
                 "An unexpected error occurred. Please try again later.",
-                "2adb05bf-0000", correlationId));
+                "vFxlOv-0001", correlationId));
         }
     }
 
@@ -64,7 +65,7 @@ public static class CustomWorkload
             {
                 return Results.Problem(new ProblemDetails().ToProblemDetails(
                     "Database cannot be connected",
-                    correlationId,
+                    "vFxlOv-0000",
                     correlationId));
             }
         }
@@ -74,7 +75,7 @@ public static class CustomWorkload
 
             return Results.Problem(new ProblemDetails().ToProblemDetails(
                 "An error occurred while checking the database connection",
-                correlationId,
+                "vFxlOv-0000",
                 correlationId));
         }
     }

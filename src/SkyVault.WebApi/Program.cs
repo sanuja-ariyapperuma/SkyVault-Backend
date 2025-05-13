@@ -1,8 +1,6 @@
 
 using DotNetEnv;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -15,7 +13,6 @@ using SkyVault.WebApi.Endpoints;
 using SkyVault.WebApi.MappingProfiles;
 using SkyVault.WebApi.Middlewares;
 using System.Globalization;
-using System.Text.Json;
 
 namespace SkyVault.WebApi;
 
@@ -23,12 +20,13 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        var MyAllowSpecificOrigins = "AllowLocalhost";
-
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddHttpContextAccessor();
 
         Env.Load();
+
+        var env = builder.Environment.EnvironmentName;
+        var isDevOrLocal = env == "Development" || env == "Local";
 
 
         builder.Services.AddDbContext<SkyvaultContext>(options =>
@@ -57,18 +55,26 @@ public static class Program
 
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(MyAllowSpecificOrigins,
-                builder =>
+            options.AddPolicy("DefaultCorsPolicy", corsBuilder =>
+            {
+                if (isDevOrLocal)
                 {
-                    builder.WithOrigins("http://localhost:5173", "https://travelchannelcrm.com", "https://www.travelchannelcrm.com")
-                           .AllowAnyHeader()
-                           .AllowAnyMethod()
-                           .AllowCredentials();
-                });
+                    corsBuilder.WithOrigins("http://localhost:5173")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                }
+                else
+                {
+                    corsBuilder.WithOrigins("https://travelchannelcrm.com", "https://www.travelchannelcrm.com")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                }
+            });
         });
 
         builder.Services.AddMemoryCache();
-
         builder.Services.AddScoped<CacheService>();
         builder.Services.AddHttpContextAccessor();
 
@@ -82,18 +88,13 @@ public static class Program
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.ApplicationInsights(
-            new TelemetryConfiguration { InstrumentationKey = builder.Configuration["AzureAppInsight:InstrumentKey"] },
-            TelemetryConverter.Traces
-            )
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .WriteTo.File(builder.Configuration["Logging:FilePath"]!, rollingInterval: RollingInterval.Day)
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .CreateLogger();
 
-        Log.Information($"{builder.Environment.EnvironmentName} : API is starting up");
+        Log.Information($"{env} : API is starting up");
 
         builder.Host.UseSerilog();
 
@@ -104,10 +105,10 @@ public static class Program
         app.MapMessageEndpoints();
         app.MapProfileEndpoints();
         app.MapTransferProfileEndpoints();
-        app.UseCors(MyAllowSpecificOrigins);
+        app.UseCors("DefaultCorsPolicy");
         app.UseAuthentication();
         app.UseAuthorization();
-        //app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddleware<ExceptionMiddleware>();
 
         var supportedCultures = new[] { new CultureInfo("en-GB") };
 
@@ -116,26 +117,6 @@ public static class Program
             DefaultRequestCulture = new RequestCulture("en-GB"),
             SupportedCultures = supportedCultures,
             SupportedUICultures = supportedCultures
-        });
-
-        app.MapHealthChecks("/api/health", new HealthCheckOptions
-        {
-            ResponseWriter = async (context, report) =>
-            {
-                context.Response.ContentType = "application/json";
-                var result = JsonSerializer.Serialize(new
-                {
-                    status = report.Status.ToString(),
-                    checks = report.Entries.Select(e => new
-                    {
-                        name = e.Key,
-                        status = e.Value.Status.ToString(),
-                        exception = e.Value.Exception != null ? e.Value.Exception.Message : null,
-                        duration = e.Value.Duration.TotalMilliseconds
-                    })
-                });
-                await context.Response.WriteAsync(result);
-            }
         });
 
         app.Run();

@@ -4,7 +4,7 @@ internal static class CustomEndpointExtension
 {
     public static void MapCustomEndpoints(this WebApplication app)
     {
-        app.MapGet("/api-check", Workloads.CustomWorkload.HealthCheckAsync)
+        app.MapGet("/api/health", Workloads.CustomWorkload.HealthCheckAsync)
             .Produces(StatusCodes.Status200OK);
 
         app.MapPost("/customerProfileCommonData", Workloads.CustomWorkload.GetProfilePageDefinitionData)
