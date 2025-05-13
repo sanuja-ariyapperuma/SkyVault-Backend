@@ -59,7 +59,7 @@ namespace SkyVault.WebApi.Workloads
                     ));
                 }
 
-                if (!string.IsNullOrEmpty(request.FileName) && IsFileExtentionAllowed(request.FileName))
+                if (!string.IsNullOrEmpty(request.FileName) && !IsFileExtentionAllowed(request.FileName))
                 {
                     return await DeleteFileAndReturnProblem(storageService, request.FileName, "Invalid file format. Only JPG and PNG are allowed.", "30550615-0004");
                 }
@@ -78,8 +78,12 @@ namespace SkyVault.WebApi.Workloads
                 }
 
 
-                //var response = await messageService.UpdateMessage(
-                //    userId.Value, request.MessageType, request.FileName, null);
+                var response = await messageService.UpdateMessage(
+                    userId.Value, 
+                    request.MessageType, 
+                    request.FileName, 
+                    null,
+                    PreferedCommiunicationMethod.Email);
 
                 return Results.Created("Successfully Updated", "");
             }
