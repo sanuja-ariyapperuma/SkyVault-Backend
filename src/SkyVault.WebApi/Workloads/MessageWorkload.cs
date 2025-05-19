@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Azure;
+using Microsoft.AspNetCore.Mvc;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
@@ -342,6 +344,23 @@ namespace SkyVault.WebApi.Workloads
             );
 
             return Results.Ok(responseObject);
+        }
+
+        public async static Task<IResult> EmailAccountStatus(SkyvaultContext dbContext,
+            HttpContext context, IApiClient apiClient)
+        {
+            try
+            {
+                var emailAccountInfor = await apiClient.GetEmailAccountInformation();
+                return Results.Ok(emailAccountInfor);
+            }
+            catch (Exception ex)
+            { 
+                ex.LogException(_correlationId);
+                return Results.Problem(new ValidationProblemDetails().ToValidationProblemDetails(
+                    "Error retriving email account information", "30550615-0016", _correlationId
+                ));
+            }
         }
 
         #region Private Methods

@@ -1,6 +1,8 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
+using SkyVault.Payloads.ResponsePayloads;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,6 +19,37 @@ namespace SkyVault.WebApi.Backend
         {
             _httpClient = httpClient;
             _configuration = configuration;
+        }
+
+        public async Task<EmailAccountInfo> GetEmailAccountInformation()
+        {
+            var credentials = await GetCredentialsAsync();
+
+            var functionKey = Environment.GetEnvironmentVariable("AzureFunctionKey");
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (string.Equals(environment, "Production", StringComparison.OrdinalIgnoreCase) &&
+                    string.IsNullOrEmpty(functionKey))
+            {
+                throw new InvalidOperationException("AzureFunctionKey not found");
+            }
+
+            _httpClient.DefaultRequestHeaders.Add("x-functions-key", functionKey);
+            var response = await _httpClient.GetAsync("/api/GetAccountInformtaionFunction");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            using var doc = JsonDocument.Parse(json);
+            var dataElement = doc.RootElement.GetProperty("data");
+
+            var emailAccountInfo = JsonSerializer.Deserialize<EmailAccountInfo>(
+                dataElement.GetRawText(),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            return emailAccountInfo!;
+
         }
 
         public async Task<string> PostBroardcastMessageAsync(int templateId, string promotionalType)
@@ -38,19 +71,23 @@ namespace SkyVault.WebApi.Backend
             return await response.Content.ReadAsStringAsync();
         }
 
-        private async Task<string> GetCredentialsAsync() 
+
+
+        private async Task<string> GetCredentialsAsync()
         {
-            var tenantId = _configuration["AzureAD:TenantId"];
-            var clientId = _configuration["AzureAD:ClientId"];
-            var clientSecret = _configuration["AzureAD:ClientSecret"];
+            
+                var tenantId = _configuration["AzureAD:TenantId"];
+                var clientId = _configuration["AzureAD:ClientId"];
+                var clientSecret = _configuration["AzureAD:ClientSecret"];  // This is getting expired in 5/18/2027 (remember to add the value of the client secret not the secret id)
 
             var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
 
-            var scope = "api://371a1a76-a0cc-46f3-8318-8f91058f3cef/.default";
+                var scope = $"api://{clientId}/.default";
 
-            var token = await clientSecretCredential.GetTokenAsync(new TokenRequestContext(new[] { scope }));
+                var token = await clientSecretCredential.GetTokenAsync(new TokenRequestContext(new[] { scope }));
 
-            return token.Token;
+                return token.Token;
+            
         }
     }
 }

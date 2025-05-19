@@ -59,6 +59,12 @@ namespace SkyVault.WebApi.Endpoints
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
 
+            app.MapGet("/EmailAccountStatus", Workloads.MessageWorkload.EmailAccountStatus)
+                .RequireAuthorization()
+                .AddEndpointFilter<AdminOnlyFilter>()
+                .Produces(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status401Unauthorized);
+
 
         }
     }
