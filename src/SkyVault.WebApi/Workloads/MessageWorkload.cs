@@ -140,11 +140,13 @@ namespace SkyVault.WebApi.Workloads
                 if (validationResult is not null)
                     return validationResult;
 
-                var parsedBroadcastType = Enum.Parse<PreferedCommiunicationMethod>(request.BroadcastType, true);
+                if (!Enum.TryParse<PreferedCommiunicationMethod>(request.BroadcastType, true, out var parsedBroadcastType))
+                    return Results.BadRequest("Invalid Broadcast Type");
+
                 var messageType = request.IsEmergency ? MessageType.Emergency : MessageType.Promotion;
                 var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
 
-                if (!userId.Succeeded)
+                if (!String.IsNullOrEmpty(request.FileName) && !userId.Succeeded)
                 {
                     return await HandleErrorWithFileCleanup(storageService, request.FileName, "Unauthorized action", "30550615-0005");
                 }
@@ -173,7 +175,7 @@ namespace SkyVault.WebApi.Workloads
                     await messageService.DeleteNotificationTemplateById(response.Value);
                     ex.LogException(_correlationId);
                     return await HandleErrorWithFileCleanup(storageService, request.FileName,
-                        "An error occurred while processing the request.", "30550615-0010");
+                        "An error occurred while processing the request.", "30550615-0011");
                 }
 
                 return Results.Ok("Broadcast Initiated Successfully");
