@@ -23,7 +23,6 @@ namespace SkyVault.WebApi.Backend
 
         public async Task<EmailAccountInfo> GetEmailAccountInformation()
         {
-            var credentials = await GetCredentialsAsync();
 
             var functionKey = Environment.GetEnvironmentVariable("AzureFunctionKey");
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -60,9 +59,17 @@ namespace SkyVault.WebApi.Backend
                 PromotionType = promotionalType
             };
 
-            var credentials = await GetCredentialsAsync();
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials);
+            var functionKey = Environment.GetEnvironmentVariable("AzureFunctionKey");
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (string.Equals(environment, "Production", StringComparison.OrdinalIgnoreCase) &&
+                    string.IsNullOrEmpty(functionKey))
+            {
+                throw new InvalidOperationException("AzureFunctionKey not found");
+            }
+
+            _httpClient.DefaultRequestHeaders.Add("x-functions-key", functionKey);
 
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
@@ -73,21 +80,21 @@ namespace SkyVault.WebApi.Backend
 
 
 
-        private async Task<string> GetCredentialsAsync()
-        {
+        //private async Task<string> GetCredentialsAsync()
+        //{
             
-                var tenantId = _configuration["AzureAD:TenantId"];
-                var clientId = _configuration["AzureAD:ClientId"];
-                var clientSecret = _configuration["AzureAD:ClientSecret"];  // This is getting expired in 5/18/2027 (remember to add the value of the client secret not the secret id)
+        //        var tenantId = _configuration["AzureAD:TenantId"];
+        //        var clientId = _configuration["AzureAD:ClientId"];
+        //        var clientSecret = _configuration["AzureAD:ClientSecret"];  // This is getting expired in 5/18/2027 (remember to add the value of the client secret not the secret id)
 
-            var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+        //    var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
 
-                var scope = $"api://{clientId}/.default";
+        //        var scope = $"api://{clientId}/.default";
 
-                var token = await clientSecretCredential.GetTokenAsync(new TokenRequestContext(new[] { scope }));
+        //        var token = await clientSecretCredential.GetTokenAsync(new TokenRequestContext(new[] { scope }));
 
-                return token.Token;
+        //        return token.Token;
             
-        }
+        //}
     }
 }

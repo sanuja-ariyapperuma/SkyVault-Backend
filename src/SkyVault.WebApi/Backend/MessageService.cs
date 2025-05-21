@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Identity;
+using Microsoft.EntityFrameworkCore;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.ResponsePayloads;
@@ -67,26 +68,26 @@ namespace SkyVault.WebApi.Backend
             }
         }
 
-        public async Task<SkyResult<string>> DeleteNotificationTemplateById(int templateId)
+        public async Task DeleteMessageByTemplateId(int templateId)
         {
-            try
+            var template = await _db.NotificationTemplates.FindAsync(templateId);
+            if (template != null)
             {
-                var template = await _db.NotificationTemplates.FindAsync(templateId);
-                if (template == null)
-                {
-                    return new SkyResult<string>().Fail("NotificationTemplate not found.", "404", null);
-                }
-
                 _db.NotificationTemplates.Remove(template);
                 await _db.SaveChangesAsync();
+            }
+        }
 
-                return new SkyResult<string>().SucceededWithValue("Deleted");
-            }
-            catch (Exception ex)
-            {
-                ex.LogException(ex.Message);
-                return new SkyResult<string>().Fail("Something went wrong when deleting template", "500", null);
-            }
+        public async Task<SkyResult<string>> DeleteNotificationTemplateById(int templateId)
+        {
+                var template = await _db.NotificationTemplates.FindAsync(templateId);
+                if (template != null)
+                {
+                    _db.NotificationTemplates.Remove(template);
+                    await _db.SaveChangesAsync();
+                }
+
+                return new SkyResult<string>().SucceededWithValue("Deleted");  
         }
 
         /***
