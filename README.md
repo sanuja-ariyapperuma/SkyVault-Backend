@@ -25,8 +25,12 @@ In this repository only the backend API source code can be found.
     * Visa expiry alerts
     * Birthday wishes
     * Travel offers and urgent announcements
+*  **User Roles** – There are three different user roles used in the system.  
+    * Super Admin – Have the authority to perform critical changes. Can assign customer profiles to users
+    * Admin – Have the authority to edit / delete customer profiles
+    * Staff - Can view / edit (only for limited time) records but only belongs to him or her
 
-  > Notifications are sent via an external Azure Function hosted separately.
+  >   Notifications are sent via an external Azure Function hosted separately.
 * **Portfolio-Only Project** – Code is not intended for public use, modification, or distribution.
 
 ---
