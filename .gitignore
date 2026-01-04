@@ -395,4 +395,14 @@ FodyWeavers.xsd
 *.msp
 
 # JetBrains Rider
+.idea/
 *.sln.iml
+
+# macOS
+.DS_Store
+
+# Environment Variables
+.env
+
+# Local Development Settings
+appsettings.Development.json
