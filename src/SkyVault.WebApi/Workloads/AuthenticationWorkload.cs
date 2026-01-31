@@ -73,7 +73,7 @@ internal static class AuthenticationWorkload
         var encodedCookieData = Convert.ToBase64String(Encoding.UTF8.GetBytes(serializedCookieData));
 
         // Set the access token in a cookie
-        context.Response.Cookies.Append("TravelChannel", encodedCookieData, cookieOptions);
+        context.Response.Cookies.Append("SkyVault", encodedCookieData, cookieOptions);
 
         return Results.Ok();
     }

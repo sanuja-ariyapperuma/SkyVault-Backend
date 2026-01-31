@@ -15,6 +15,7 @@ public sealed class CorrelationIdMiddleware(RequestDelegate next)
         }
 
         context.Items[CorrelationIdHeaderKey] = correlationId;
+        context.Response.Headers[CorrelationIdHeaderKey] = correlationId;
 
         await next(context);
     }

@@ -1,5 +1,6 @@
 ﻿using SkyVault.Exceptions;
 using System.Net;
+using System.Text.Json;
 
 namespace SkyVault.WebApi.Middlewares
 {
@@ -26,12 +27,21 @@ namespace SkyVault.WebApi.Middlewares
         {
             var correlationId = (context.Items["X-Correlation-ID"] ??= "Not Available") as string;
 
-            context.Response.ContentType = "text/plain";
+            context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            return context.Response.WriteAsync("An unexpected exception had occured. " +
-                                               "Details of the exception has been sent to the developers for further investigation. CorrelationId: " +
-                                               correlationId);
+            var response = new
+            {
+                error = "An unexpected exception has occurred. Details of the exception have been sent to the developers for further investigation.",
+                correlationId = correlationId
+            };
+
+            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            return context.Response.WriteAsync(jsonResponse);
         }
     }
 }
