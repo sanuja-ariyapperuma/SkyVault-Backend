@@ -8,7 +8,7 @@ internal static class CustomEndpointExtension
             .Produces(StatusCodes.Status200OK);
 
         app.MapPost("/customerProfileCommonData", Workloads.CustomWorkload.GetProfilePageDefinitionData)
-            .RequireAuthorization()
+            //.RequireAuthorization()
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
     }

@@ -43,22 +43,25 @@ public static class Program
         // Database Context
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
-            // Checking for DB_CONNECTION_STRING from .env or DefaultConnection from appsettings
-            var connectionString = builder.Configuration["DB_CONNECTION_STRING"] 
-                                   ?? builder.Configuration.GetConnectionString("DefaultConnection");
+            // Explicitly prioritize DB_CONNECTION_STRING environment variable
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
+                                   ?? builder.Configuration["DB_CONNECTION_STRING"]
+                                   ?? builder.Configuration.GetConnectionString("DefaultConnection")
+                                   ?? throw new InvalidOperationException("No database connection string configured. Set DB_CONNECTION_STRING environment variable or configure DefaultConnection.");
             
+            Log.Information($"Using connection string: Server={ExtractServerFromConnectionString(connectionString)}");
             options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
         });
 
-        builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database");
+        builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database", timeout: TimeSpan.FromSeconds(10));
         builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(MappingProfile).Assembly);
         
         // Azure AD Authentication
-        // AddMicrosoftIdentityWebApi binds the "AzureAd" section to MicrosoftIdentityOptions.
+        // AddMicrosoftIdentityWebApi binds the "AzureAD" section to MicrosoftIdentityOptions.
         // Ensure your .env variables use double underscores for nesting, e.g., AZUREAD__TENANTID
         // Use Configuration to get connection string (supports .env via AZUREAD__... or direct keys if mapped)
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+            .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAD"));
 
         // Configure additional TokenValidationParameters
         builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -73,25 +76,76 @@ public static class Program
         {
             options.AddPolicy("DefaultCorsPolicy", corsBuilder =>
             {
-                corsBuilder.AllowAnyHeader()
-                           .AllowAnyMethod()
-                           .AllowCredentials();
+                corsBuilder.WithExposedHeaders("X-Correlation-ID")
+                           .WithHeaders("Authorization", "Content-Type", "Accept", "X-Correlation-ID")
+                           .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
 
                 if (isDevOrLocal)
                 {
-                    corsBuilder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+                    corsBuilder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+                               .AllowCredentials();
                 }
                 else
                 {
                     var allowedOrigins = CorsHelper.GetAllowedOrigins();
-                    corsBuilder.WithOrigins(allowedOrigins);
+                    corsBuilder.WithOrigins(allowedOrigins)
+                               .AllowCredentials();
                 }
             });
         });
 
-        builder.Services.AddMemoryCache();
+        builder.Services.AddMemoryCache(options =>
+        {
+            // Limit the cache size to prevent unbounded memory growth
+            options.SizeLimit = 1024; // Number of entries (adjust as needed)
+
+            // Default expiration for entries (can be overridden per entry)
+            options.CompactionPercentage = 0.05; // Remove 5% of entries when limit is reached
+
+            // Set a sliding expiration default (optional)
+            // options.SlidingExpiration = TimeSpan.FromMinutes(5);
+        });
         builder.Services.AddScoped<CacheService>();
-        builder.Services.AddHttpContextAccessor();
+
+        // Add OpenAPI/Swagger support (development only)
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "SkyVault API",
+                    Version = "v1",
+                    Description = "SkyVault backend API"
+                });
+                
+                // Add JWT Bearer authentication to Swagger
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Description = "Please enter JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "bearer"
+                });
+                
+                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+        }
 
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
@@ -101,19 +155,34 @@ public static class Program
                 client.BaseAddress = new Uri(baseUrl);
             }
         });
-
-        builder.Services.AddControllers();
         
         var app = builder.Build();
         
-        app.UseMiddleware<ExceptionMiddleware>();
+        // Correlation ID should be first so all downstream logs/middleware get the ID
         app.UseMiddleware<CorrelationIdMiddleware>();
+        app.UseMiddleware<AuthExceptionMiddleware>();
+        app.UseMiddleware<ExceptionMiddleware>();
+        
+        // Request localization should be before routing/auth
+        app.UseRequestLocalization(new RequestLocalizationOptions
+        {
+            DefaultRequestCulture = new RequestCulture("en-GB"),
+            SupportedCultures = new[] { new CultureInfo("en-GB") },
+            SupportedUICultures = new[] { new CultureInfo("en-GB") }
+        });
         
         // CORS must be before Authentication and Authorization
         app.UseCors("DefaultCorsPolicy");
         
         app.UseAuthentication();
         app.UseAuthorization();
+
+        // Swagger UI (development only)
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
         
         /* Route Mapping Start*/
         app.MapLoginEndpoints();
@@ -126,22 +195,27 @@ public static class Program
         app.MapGet("/secure", () => "Hello from protected API")
             .RequireAuthorization();
         
-        var supportedCultures = new[] { new CultureInfo("en-GB") };
-
-        app.UseRequestLocalization(new RequestLocalizationOptions
-        {
-            DefaultRequestCulture = new RequestCulture("en-GB"),
-            SupportedCultures = supportedCultures,
-            SupportedUICultures = supportedCultures
-        });
-
-        app.Start();
-
+        Log.Information("API starting up. Listening on:");
         foreach (var url in app.Urls)
         {
-            Log.Information($"Listening on: {url}");
+            Log.Information($"  {url}");
         }
 
-        app.WaitForShutdown();
+        app.Run();
+    }
+    
+    // Helper method to extract server info from connection string for logging
+    private static string ExtractServerFromConnectionString(string connectionString)
+    {
+        try
+        {
+            var parts = connectionString.Split(';');
+            var serverPart = parts.FirstOrDefault(p => p.StartsWith("Server="));
+            return serverPart ?? "unknown";
+        }
+        catch
+        {
+            return "unknown";
+        }
     }
 }
