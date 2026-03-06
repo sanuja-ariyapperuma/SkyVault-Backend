@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.4
     container_name: skyvault_mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
@@ -26,18 +26,22 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: skyvault_api
+    env_file:
+      - src/SkyVault.WebApi/.env
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - ASPNETCORE_URLS=http://+:5000
+      - MYSQL_USER=${MYSQL_USER:-skyvault_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-skyvault_pass}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-skyvault_dev}
       - DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-skyvault_dev};User=${MYSQL_USER:-skyvault_user};Password=${MYSQL_PASSWORD:-skyvault_pass};
-      - AZUREAD__INSTANCE=${AZUREAD__INSTANCE:-https://login.microsoftonline.com/}
-      - AZUREAD__TENANTID=${AZUREAD__TENANTID:-}
-      - AZUREAD__CLIENTID=${AZUREAD__CLIENTID:-}
-      - AZUREAD__CLIENTSECRET=${AZUREAD__CLIENTSECRET:-}
-      - AZUREAD__CALLBACKPATH=${AZUREAD__CALLBACKPATH:-/signin-oidc}
+      - AZUREAD__INSTANCE=${AZUREAD__INSTANCE}
+      - AZUREAD__TENANTID=${AZUREAD__TENANTID}
+      - AZUREAD__CLIENTID=${AZUREAD__CLIENTID}
+      - AZUREAD__AUDIENCE=${AZUREAD__AUDIENCE}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8080}
       - LOGGING__FILEPATH=${LOGGING__FILEPATH:-/app/logs/app.log}
       - AUTHORIZATION__APIKEY=${AUTHORIZATION__APIKEY:-dev-api-key-12345}
@@ -53,7 +57,7 @@ services:
       - skyvault_network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health/migrations"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 10s
       timeout: 5s
       retries: 30

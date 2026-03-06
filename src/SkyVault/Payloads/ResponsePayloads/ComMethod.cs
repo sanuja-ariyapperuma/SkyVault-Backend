@@ -1,4 +1,4 @@
-﻿namespace SkyVault.Payloads.ResponsePayloads
+namespace SkyVault.Payloads.ResponsePayloads
 {
     public class ComMethod
     {

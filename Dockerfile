@@ -1,5 +1,5 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy project files
@@ -11,6 +11,9 @@ RUN dotnet restore "SkyVault.WebApi/SkyVault.WebApi.csproj"
 
 # Copy all source code
 COPY src/ .
+
+# Copy .env file from SkyVault.WebApi for DotNetEnv.Load()
+COPY src/SkyVault.WebApi/.env .env
 
 # Install EF Core CLI in build stage
 RUN dotnet tool install --global dotnet-ef
@@ -24,16 +27,19 @@ FROM build AS publish
 RUN dotnet publish "SkyVault.WebApi/SkyVault.WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage - use aspnet for production
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Install mysql-client for database connectivity checks
+# Install mysql-client and curl for database connectivity checks and health checks
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends default-mysql-client && \
+    apt-get install -y --no-install-recommends default-mysql-client curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy published application
 COPY --from=publish /app/publish .
+
+# Copy .env file for runtime
+COPY --from=build /src/.env .env
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh .

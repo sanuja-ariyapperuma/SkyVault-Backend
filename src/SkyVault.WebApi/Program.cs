@@ -14,6 +14,8 @@ using SkyVault.WebApi.Helper;
 using SkyVault.WebApi.MappingProfiles;
 using SkyVault.WebApi.Middlewares;
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SkyVault.WebApi;
 
@@ -26,9 +28,12 @@ public static class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configure Serilog
+        // Clear default configuration sources and add only environment variables
+        builder.Configuration.Sources.Clear();
+        builder.Configuration.AddEnvironmentVariables();
+
+        // Configure Serilog using environment variables
         Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(builder.Configuration)
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .Enrich.FromLogContext()
@@ -40,18 +45,32 @@ public static class Program
         var env = builder.Environment.EnvironmentName;
         Log.Information($"{env} : API is starting up");
 
+        // Dump Entra ID configuration from environment variables
+        Log.Information("=== Entra ID Configuration ===");
+        Log.Information($"Instance: {Environment.GetEnvironmentVariable("AZUREAD__INSTANCE")}");
+        Log.Information($"TenantId: {Environment.GetEnvironmentVariable("AZUREAD__TENANTID")}");
+        Log.Information($"ClientId: {Environment.GetEnvironmentVariable("AZUREAD__CLIENTID")}");
+        Log.Information($"Audience: {Environment.GetEnvironmentVariable("AZUREAD__AUDIENCE")}");
+        Log.Information("================================");
+
         var isDevOrLocal = builder.Environment.IsDevelopment() || env == "Local";
 
         // Database Context
         builder.Services.AddDbContext<SkyvaultContext>(options =>
         {
-            // Explicitly prioritize DB_CONNECTION_STRING environment variable
-            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") 
-                                   ?? builder.Configuration["DB_CONNECTION_STRING"]
-                                   ?? builder.Configuration.GetConnectionString("DefaultConnection")
-                                   ?? throw new InvalidOperationException("No database connection string configured. Set DB_CONNECTION_STRING environment variable or configure DefaultConnection.");
+            // Build connection string from individual MySQL environment variables
+            var mysqlHost = Environment.GetEnvironmentVariable("MYSQL_HOST") ?? "mysql";
+            var mysqlPort = Environment.GetEnvironmentVariable("MYSQL_PORT") ?? "3306";
+            var mysqlDatabase = Environment.GetEnvironmentVariable("MYSQL_DATABASE")
+                                   ?? throw new InvalidOperationException("No database name configured. Set MYSQL_DATABASE environment variable.");
+            var mysqlUser = Environment.GetEnvironmentVariable("MYSQL_USER")
+                                   ?? throw new InvalidOperationException("No database user configured. Set MYSQL_USER environment variable.");
+            var mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_PASSWORD")
+                                   ?? throw new InvalidOperationException("No database password configured. Set MYSQL_PASSWORD environment variable.");
             
-            Log.Information($"Using connection string: Server={ExtractServerFromConnectionString(connectionString)}");
+            var connectionString = $"Server={mysqlHost};Port={mysqlPort};Database={mysqlDatabase};User={mysqlUser};Password={mysqlPassword};";
+            
+            Log.Information($"Using connection string: Server={mysqlHost}, Port={mysqlPort}, Database={mysqlDatabase}");
             options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
         });
 
@@ -61,13 +80,30 @@ public static class Program
         builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(MappingProfile).Assembly);
         
         // Azure AD Authentication
-        // AddMicrosoftIdentityWebApi binds the "AzureAD" section to MicrosoftIdentityOptions.
-        // Ensure your .env variables use double underscores for nesting, e.g., AZUREAD__TENANTID
-        // Use Configuration to get connection string (supports .env via AZUREAD__... or direct keys if mapped)
+        // Configure Azure AD from environment variables
+        var azureAdConfig = new Dictionary<string, string?>
+        {
+            ["Instance"] = Environment.GetEnvironmentVariable("AZUREAD__INSTANCE") ?? "",
+            ["TenantId"] = Environment.GetEnvironmentVariable("AZUREAD__TENANTID") ?? "",
+            ["ClientId"] = Environment.GetEnvironmentVariable("AZUREAD__CLIENTID") ?? "",
+            ["Audience"] = Environment.GetEnvironmentVariable("AZUREAD__AUDIENCE") ?? ""
+        };
+        
+        // Log Azure AD configuration values
+        Log.Information("=== Azure AD Configuration ===");
+        foreach (var config in azureAdConfig)
+        {
+            var displayValue = string.IsNullOrEmpty(config.Value) ? "NULL" : config.Value;
+            Log.Information($"{config.Key}: {displayValue}");
+        }
+        Log.Information("==============================");
+        
+        builder.Configuration.AddInMemoryCollection(azureAdConfig);
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAD"));
 
-        // Configure additional TokenValidationParameters
+        builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
+        // Configure TokenValidationParameters
         builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
         {
             options.TokenValidationParameters.ValidateIssuer = true;
@@ -138,7 +174,7 @@ public static class Program
 
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
-            var baseUrl = builder.Configuration["AZURE_FUNCTION_BASE_URL"];
+            var baseUrl = Environment.GetEnvironmentVariable("AZURE_FUNCTION_BASE_URL");
             if (!string.IsNullOrEmpty(baseUrl))
             {
                 client.BaseAddress = new Uri(baseUrl);
@@ -174,6 +210,7 @@ public static class Program
         }
         
         /* Route Mapping Start*/
+        app.MapHealthChecks("/health");
         app.MapLoginEndpoints();
         app.MapCustomEndpoints();
         app.MapMessageEndpoints();
@@ -183,6 +220,51 @@ public static class Program
         
         app.MapGet("/secure", () => "Hello from protected API")
             .RequireAuthorization();
+        
+        // Debug endpoint to test JWT decoding without authentication
+        app.MapPost("/debug-token", (HttpContext context) =>
+        {
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            var token = authHeader?.Split(" ").Last();
+            
+            if (string.IsNullOrEmpty(token))
+            {
+                return Results.BadRequest(new { error = "No token provided" });
+            }
+            
+            try
+            {
+                // Decode token without validation (for debugging only)
+                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                
+                var tokenInfo = new
+                {
+                    Header = new
+                    {
+                        Algorithm = jwtToken.Header.Alg,
+                        Type = jwtToken.Header.Typ,
+                        Kid = jwtToken.Header.Kid
+                    },
+                    Payload = new
+                    {
+                        Issuer = jwtToken.Issuer,
+                        Audience = jwtToken.Audiences,
+                        Subject = jwtToken.Subject,
+                        IssuedAt = jwtToken.IssuedAt,
+                        Expires = jwtToken.ValidTo,
+                        NotBefore = jwtToken.ValidFrom,
+                        Claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value)
+                    }
+                };
+                
+                return Results.Ok(tokenInfo);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest(new { error = "Failed to decode token", message = ex.Message });
+            }
+        });
         
         Log.Information("API starting up. Listening on:");
         foreach (var url in app.Urls)

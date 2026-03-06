@@ -1,4 +1,4 @@
-﻿namespace SkyVault.Payloads.RequestPayloads
+namespace SkyVault.Payloads.RequestPayloads
 {
     public class GetComMethodRequest
     {
