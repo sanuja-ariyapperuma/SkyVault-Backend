@@ -1,9 +1,7 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Identity.Web;
 using Serilog;
 using Serilog.Events;
@@ -13,9 +11,9 @@ using SkyVault.WebApi.Endpoints;
 using SkyVault.WebApi.Helper;
 using SkyVault.WebApi.MappingProfiles;
 using SkyVault.WebApi.Middlewares;
+using SkyVault.WebApi.Services;
 using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Azure.Identity;
 
 namespace SkyVault.WebApi;
 
@@ -31,6 +29,18 @@ public static class Program
         // Clear default configuration sources and add only environment variables
         builder.Configuration.Sources.Clear();
         builder.Configuration.AddEnvironmentVariables();
+        
+        // Add Azure Key Vault for production
+        if (!builder.Environment.IsDevelopment())
+        {
+            var keyVaultUri = Environment.GetEnvironmentVariable("KEYVAULT_URI");
+            if (!string.IsNullOrEmpty(keyVaultUri))
+            {
+                builder.Configuration.AddAzureKeyVault(
+                    new Uri(keyVaultUri),
+                    new DefaultAzureCredential());
+            }
+        }
 
         // Configure Serilog using environment variables
         Log.Logger = new LoggerConfiguration()
@@ -55,23 +65,27 @@ public static class Program
 
         var isDevOrLocal = builder.Environment.IsDevelopment() || env == "Local";
 
+        // Register database connection service
+        builder.Services.AddSingleton<IDatabaseConnectionService, DatabaseConnectionService>();
+
         // Database Context
-        builder.Services.AddDbContext<SkyvaultContext>(options =>
+        builder.Services.AddDbContext<SkyvaultContext>((serviceProvider, options) =>
         {
-            // Build connection string from individual MySQL environment variables
-            var mysqlHost = Environment.GetEnvironmentVariable("MYSQL_HOST") ?? "mysql";
-            var mysqlPort = Environment.GetEnvironmentVariable("MYSQL_PORT") ?? "3306";
-            var mysqlDatabase = Environment.GetEnvironmentVariable("MYSQL_DATABASE")
-                                   ?? throw new InvalidOperationException("No database name configured. Set MYSQL_DATABASE environment variable.");
-            var mysqlUser = Environment.GetEnvironmentVariable("MYSQL_USER")
-                                   ?? throw new InvalidOperationException("No database user configured. Set MYSQL_USER environment variable.");
-            var mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_PASSWORD")
-                                   ?? throw new InvalidOperationException("No database password configured. Set MYSQL_PASSWORD environment variable.");
+            var dbConnectionService = serviceProvider.GetRequiredService<IDatabaseConnectionService>();
+            var connectionString = dbConnectionService.GetConnectionString();
             
-            var connectionString = $"Server={mysqlHost};Port={mysqlPort};Database={mysqlDatabase};User={mysqlUser};Password={mysqlPassword};";
-            
-            Log.Information($"Using connection string: Server={mysqlHost}, Port={mysqlPort}, Database={mysqlDatabase}");
-            options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
+            if (dbConnectionService.UseManagedIdentity)
+            {
+                // For Azure SQL/MySQL with Managed Identity
+                options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
+                Log.Information("Using Azure SQL with Managed Identity");
+            }
+            else
+            {
+                // For local MySQL development
+                options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
+                Log.Information($"Using MySQL connection: Server={Environment.GetEnvironmentVariable("MYSQL_HOST")}, Database={Environment.GetEnvironmentVariable("MYSQL_DATABASE")}");
+            }
         });
 
         builder.Services.AddHealthChecks()
