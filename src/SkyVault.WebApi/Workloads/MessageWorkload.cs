@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+using Azure.Core;
 using Azure;
 using Microsoft.AspNetCore.Mvc;
 using SkyVault.Exceptions;
@@ -71,7 +71,7 @@ namespace SkyVault.WebApi.Workloads
                     return await DeleteFileAndReturnProblem(storageService, request.FileName, "Unauthorized action", "30550615-0005");
                 }
 
-                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+                var userId = systemUserData.GetUserIdByUpn(userIdentifier ?? "", _correlationId);
 
                 if (!userId.Succeeded)
                 {
@@ -144,7 +144,7 @@ namespace SkyVault.WebApi.Workloads
                     return Results.BadRequest("Invalid Broadcast Type");
 
                 var messageType = request.IsEmergency ? MessageType.Emergency : MessageType.Promotion;
-                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+                var userId = systemUserData.GetUserIdByUpn(userIdentifier ?? "", _correlationId);
 
                 if (!String.IsNullOrEmpty(request.FileName) && !userId.Succeeded)
                 {
@@ -207,7 +207,7 @@ namespace SkyVault.WebApi.Workloads
                     return validationResult;
                 }
 
-                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+                var userId = systemUserData.GetUserIdByUpn(userIdentifier ?? "", _correlationId);
                 var messageType = MessageType.PassportExpiry;
 
                 if (!userId.Succeeded)
@@ -256,7 +256,7 @@ namespace SkyVault.WebApi.Workloads
                     return validationResult;
                 }
 
-                var userId = systemUserData.GetUserIdByUpn(userIdentifier, _correlationId);
+                var userId = systemUserData.GetUserIdByUpn(userIdentifier ?? "", _correlationId);
                 var messageType = MessageType.VisaExpiry;
 
                 if (!userId.Succeeded)

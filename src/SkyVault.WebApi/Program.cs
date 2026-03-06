@@ -1,7 +1,9 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Identity.Web;
 using Serilog;
 using Serilog.Events;
@@ -53,7 +55,9 @@ public static class Program
             options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
         });
 
-        builder.Services.AddHealthChecks().AddDbContextCheck<SkyvaultContext>(name: "Database", timeout: TimeSpan.FromSeconds(10));
+        builder.Services.AddHealthChecks()
+            .AddDbContextCheck<SkyvaultContext>(name: "Database");
+        
         builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(MappingProfile).Assembly);
         
         // Azure AD Authentication
@@ -113,7 +117,7 @@ public static class Program
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
                 {
                     Title = "SkyVault API",
                     Version = "v1",
@@ -121,28 +125,13 @@ public static class Program
                 });
                 
                 // Add JWT Bearer authentication to Swagger
-                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
                 {
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    In = Microsoft.OpenApi.ParameterLocation.Header,
                     Description = "Please enter JWT with Bearer into field",
                     Name = "Authorization",
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Type = Microsoft.OpenApi.SecuritySchemeType.Http,
                     Scheme = "bearer"
-                });
-                
-                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-                {
-                    {
-                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-                        {
-                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                            {
-                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
                 });
             });
         }

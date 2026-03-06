@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.WebApi.Backend.Models;
 using SkyVault.WebApi.Backend;
@@ -28,7 +28,7 @@ namespace SkyVault.WebApi.Workloads
             {
                 staffListResponse.Add(new StaffMemberResponse(
                     staff.Id,
-                    StaffDescription(staff.FirstName, staff.LastName, staff.UserRole)
+                    StaffDescription(staff.FirstName ?? "", staff.LastName ?? "", staff.UserRole ?? "")
                 ));
             }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SkyVault.WebApi.Backend.Models;
 
@@ -22,7 +22,7 @@ namespace SkyVault.WebApi.Backend
         public List<Salutation> GetSalutations()
         {
             const string key = "Salutations";
-            if (!_cache.TryGetValue(key, out List<Salutation> salutations))
+            if (!_cache.TryGetValue(key, out List<Salutation>? salutations))
             {
                 salutations = _commonData.GetSalutations();
                 if (salutations.Count > 0)
@@ -31,13 +31,13 @@ namespace SkyVault.WebApi.Backend
                     _logger.LogDebug("Cached {Count} salutations", salutations.Count);
                 }
             }
-            return salutations;
+            return salutations ?? new List<Salutation>();
         }
 
         public List<Country> GetCountries()
         {
             const string key = "Countries";
-            if (!_cache.TryGetValue(key, out List<Country> countries))
+            if (!_cache.TryGetValue(key, out List<Country>? countries))
             {
                 countries = _commonData.GetCountries();
                 if (countries.Count > 0)
@@ -46,13 +46,13 @@ namespace SkyVault.WebApi.Backend
                     _logger.LogDebug("Cached {Count} countries", countries.Count);
                 }
             }
-            return countries;
+            return countries ?? new List<Country>();
         }
 
         public List<Nationality> GetNationalities()
         {
             const string key = "Nationalities";
-            if (!_cache.TryGetValue(key, out List<Nationality> nationalities))
+            if (!_cache.TryGetValue(key, out List<Nationality>? nationalities))
             {
                 nationalities = _commonData.GetNationalities();
                 if (nationalities.Count > 0)
@@ -61,26 +61,26 @@ namespace SkyVault.WebApi.Backend
                     _logger.LogDebug("Cached {Count} nationalities", nationalities.Count);
                 }
             }
-            return nationalities;
+            return nationalities ?? new List<Nationality>();
         }
 
         public SkyResult<string> GetUserRole(string upn)
         {
             const string key = "UserRoles";
-            if (!_cache.TryGetValue(key, out Dictionary<string, string> userRoles))
+            if (!_cache.TryGetValue(key, out Dictionary<string, string>? userRoles))
             {
                 userRoles = new Dictionary<string, string>();
                 SetShortCache(key, userRoles);
             }
 
-            if (userRoles!.TryGetValue(upn, out string role))
+            if (userRoles?.TryGetValue(upn, out string? role) == true)
                 return new SkyResult<string>().SucceededWithValue(role);
 
             var userRole = _systemUserData.GetUserRoleByUpn(upn, null);
 
-            if (userRole.Succeeded)
+            if (userRole.Succeeded && userRoles != null)
             {
-                userRoles[upn] = userRole.Value!;
+                userRoles[upn] = userRole.Value ?? "";
                 SetShortCache(key, userRoles);
                 _logger.LogDebug("Cached role for UPN: {Upn}", upn);
             }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using SkyVault.Exceptions;
@@ -13,7 +13,7 @@ public static class CustomWorkload
 {
     //Error Code vFxlOv
     public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
-        IMapper mapper, IMemoryCache cache, IConfiguration configuration, HttpContext context)
+        IMapper mapper, IMemoryCache cache, IConfiguration configuration, HttpContext context, CacheService cacheService)
     {
         var correlationId = context.Items["X-Correlation-ID"]?.ToString();
 
@@ -24,9 +24,6 @@ public static class CustomWorkload
 
         try
         {
-
-            var cacheService = new CacheService(cache, dbContext);
-
             salutations = cacheService.GetSalutations();
             countries = cacheService.GetCountries();
             nationalities = cacheService.GetNationalities();

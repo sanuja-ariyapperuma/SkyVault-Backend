@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SkyVault.Payloads.CommonPayloads;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
@@ -48,8 +48,8 @@ namespace SkyVault.WebApi.Backend
                 LastName = passportRequest.LastName!,
                 OtherNames = passportRequest.OtherNames,
                 CountryId = Convert.ToInt32(passportRequest.CountryId),
-                DateOfBirth = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
-                ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate, "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                DateOfBirth = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.DateOfBirth ?? "", "dd/MM/yyyy", CultureInfo.InvariantCulture)),
+                ExpiryDate = DateOnly.FromDateTime(DateTime.ParseExact(passportRequest.ExpiryDate ?? "", "dd/MM/yyyy", CultureInfo.InvariantCulture)),
                 Gender = passportRequest.Gender!,
                 IsPrimary = passportRequest.IsPrimary!,
                 NationalityId = Convert.ToInt32(passportRequest.NationalityId)
@@ -155,9 +155,9 @@ namespace SkyVault.WebApi.Backend
                 familyMembers.Add(new FamilyMembersResponse
                 (
                     parent!.Id,
-                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
-                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
-                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.LastName ?? "",
+                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.OtherNames ?? "",
+                    parent.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.PassportNumber ?? "",
                     true
                 ));
 
@@ -165,9 +165,9 @@ namespace SkyVault.WebApi.Backend
                 familyMembers.AddRange(parent.InverseParent.Select(child => new FamilyMembersResponse
                 (
                     child.Id,
-                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
-                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
-                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.LastName ?? "",
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.OtherNames ?? "",
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.PassportNumber ?? "",
                     false
                 )).OrderBy(a => a.OtherNames));
             }
@@ -175,9 +175,9 @@ namespace SkyVault.WebApi.Backend
             {
                 var customerQuery = db.CustomerProfiles
                     .Include(cp => cp.Parent)
-                        .ThenInclude(p => p.Passports)
+                        .ThenInclude(p => p!.Passports)
                     .Include(p => p.Parent)
-                        .ThenInclude(parent => parent.InverseParent)
+                        .ThenInclude(parent => parent!.InverseParent)
                         .ThenInclude(child => child.Passports)
                     .Where(cp => cp.Id == customerId);
 
@@ -187,9 +187,9 @@ namespace SkyVault.WebApi.Backend
                 familyMembers.Add(new FamilyMembersResponse
                 (
                     result[0].Parent!.Id,
-                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
-                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
-                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.LastName ?? "",
+                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.OtherNames ?? "",
+                    result[0].Parent!.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.PassportNumber ?? "",
                     true
                 ));
 
@@ -197,9 +197,9 @@ namespace SkyVault.WebApi.Backend
                 familyMembers.AddRange(result[0].Parent!.InverseParent.Select(child => new FamilyMembersResponse
                 (
                     child.Id,
-                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.LastName,
-                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.OtherNames ?? "",
-                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")!.PassportNumber,
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.LastName ?? "",
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.OtherNames ?? "",
+                    child.Passports.FirstOrDefault(p => p.IsPrimary == "1")?.PassportNumber ?? "",
                     false
                 )).OrderBy(a => a.OtherNames));
             }

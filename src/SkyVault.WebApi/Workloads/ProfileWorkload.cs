@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.RequestPayloads;
 using SkyVault.Payloads.ResponsePayloads;
@@ -372,14 +372,14 @@ namespace SkyVault.WebApi.Workloads
 
                 var systemUserData = new SystemUserData(dbContext);
 
-                if (comMethodRequest.PrefCommId == "3" && !Regex.IsMatch(comMethodRequest.WhatsAppNumber, @"^\+?\d+$"))
+                if (comMethodRequest.PrefCommId == "3" && !Regex.IsMatch(comMethodRequest.WhatsAppNumber ?? "", @"^\+?\d+$"))
                 {
                     return Results.Problem(
                                         new ValidationProblemDetails().ToValidationProblemDetails(
                                                                 "WhatsAppNumber can only contain numbers", "", _correlationId));
                 }
 
-                if (comMethodRequest.PrefCommId == "2" && !Regex.IsMatch(comMethodRequest.EmailAddress, @"^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"))
+                if (comMethodRequest.PrefCommId == "2" && !Regex.IsMatch(comMethodRequest.EmailAddress ?? "", @"^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"))
                 {
                     return Results.Problem(
                                         new ValidationProblemDetails().ToValidationProblemDetails(
@@ -855,14 +855,14 @@ namespace SkyVault.WebApi.Workloads
         {
             return String.Concat(
                             "SR DOCS YY HK1-P-",
-                            p.Country.CountryCode.ToUpper(), "-",
+                            p.Country?.CountryCode?.ToUpper() ?? "", "-",
                             p.PassportNumber, "-",
-                            p.Nationality.NationalityCode, "-",
+                            p.Nationality?.NationalityCode ?? "", "-",
                             convertDateToCustomFormat(p.DateOfBirth), "-",
                             p.Gender, "-",
                             convertDateToCustomFormat(p.ExpiryDate), "-",
                             p.LastName.ToUpper(), "-",
-                            p.OtherNames.ToUpper().Replace(" ", "-"), "-", "H/P1"
+                            p.OtherNames?.ToUpper().Replace(" ", "-") ?? "", "-", "H/P1"
                         );
         }
 

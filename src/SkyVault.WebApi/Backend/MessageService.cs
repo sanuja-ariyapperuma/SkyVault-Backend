@@ -1,4 +1,4 @@
-﻿using Azure.Identity;
+using Azure.Identity;
 using Microsoft.EntityFrameworkCore;
 using SkyVault.Exceptions;
 using SkyVault.Payloads.CommonPayloads;
@@ -114,7 +114,7 @@ namespace SkyVault.WebApi.Backend
             var message = new Message
             {
                 Content = template.Content,
-                FileUrl = storageService.GetFileUrl(template.File, MessageType.Birthday),
+                FileUrl = storageService.GetFileUrl(template.File ?? "", MessageType.Birthday),
                 CreatedAt = createdAtColombo,
                 CreatedBy = $"{template.CreatedByUser.FirstName} {template.CreatedByUser.LastName} ({template.CreatedByUser.SamProfileId})"
             };
@@ -162,7 +162,7 @@ namespace SkyVault.WebApi.Backend
                     nt.Id,
                     nt.NotificationType,
                     nt.Active,
-                    Helpers.SummarizeText(nt.Content) 
+                    Helpers.SummarizeText(nt.Content ?? "") 
                 ))]
             );
 

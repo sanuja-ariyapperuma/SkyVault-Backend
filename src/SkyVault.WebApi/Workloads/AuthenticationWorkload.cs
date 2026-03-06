@@ -34,8 +34,8 @@ internal static class AuthenticationWorkload
         var systemUserData = new SystemUserData(dbContext);
 
 
-        var firstname = context.User.FindFirst("name")?.Value;
-        var lastName = context.User.FindFirst(ClaimTypes.Surname)?.Value;
+        var firstname = context.User.FindFirst("name")?.Value ?? "";
+        var lastName = context.User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
 
         Payloads.CommonPayloads.SystemUserRole userRole = request.UserRole switch
         {
@@ -62,10 +62,14 @@ internal static class AuthenticationWorkload
         };
 
         var sysUser = result.Value;
+        
+        if (sysUser == null)
+            return Results.Problem(new ProblemDetails().ToProblemDetails("User not found",
+                "", correlationId));
 
         var cookieData = new AuthenticatedUser(
-            $"{sysUser.FirstName} {sysUser.LastName}",
-            sysUser.UserRole!.ToString(),
+            $"{sysUser.FirstName ?? ""} {sysUser.LastName ?? ""}",
+            sysUser.UserRole?.ToString() ?? "",
             accessToken!
         );
 
