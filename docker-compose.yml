@@ -37,6 +37,8 @@ services:
       - MYSQL_USER=${MYSQL_USER:-skyvault_user}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-skyvault_pass}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-skyvault_dev}
+      - MYSQL_HOST=skyvault_mysql
+      - MYSQL_PORT=3306
       - DB_CONNECTION_STRING=Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-skyvault_dev};User=${MYSQL_USER:-skyvault_user};Password=${MYSQL_PASSWORD:-skyvault_pass};
       - AZUREAD__INSTANCE=${AZUREAD__INSTANCE}
       - AZUREAD__TENANTID=${AZUREAD__TENANTID}

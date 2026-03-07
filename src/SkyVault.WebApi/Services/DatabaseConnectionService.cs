@@ -5,51 +5,83 @@ namespace SkyVault.WebApi.Services;
 
 public class DatabaseConnectionService : IDatabaseConnectionService
 {
+    private static readonly string MySqlPortDefault = "3306";
+    private static readonly string MySqlHostDefault = "mysql";
+    
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
+    private readonly bool _useManagedIdentity;
 
     public DatabaseConnectionService(IConfiguration configuration, IWebHostEnvironment environment)
     {
         _configuration = configuration;
         _environment = environment;
+        _useManagedIdentity = CalculateUseManagedIdentity();
     }
+    
+    private bool CalculateUseManagedIdentity() => 
+        _environment.IsProduction() || 
+        !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("AZUREAD__CLIENTID")) ||
+        !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KEYVAULT_URI"));
 
-    public bool UseManagedIdentity => _environment.IsProduction() || 
-                                   !string.IsNullOrEmpty(_configuration["AZURE_CLIENT_ID"]) ||
-                                   !string.IsNullOrEmpty(_configuration["AZURE_DB_SERVER"]);
+    public bool UseManagedIdentity => _useManagedIdentity;
 
-    public DatabaseProvider GetProvider()
-    {
-        if (UseManagedIdentity)
-        {
-            return DatabaseProvider.SqlServer;
-        }
-        return DatabaseProvider.MySql;
-    }
+    public DatabaseProvider GetProvider() => DatabaseProvider.MySql;
 
     public string GetConnectionString()
     {
-        if (UseManagedIdentity)
-        {
-            // For Azure Database with Managed Identity
-            var server = _configuration["AZURE_DB_SERVER"] ?? throw new InvalidOperationException("Azure DB server not configured. Set AZURE_DB_SERVER environment variable.");
-            var database = _configuration["AZURE_DB_DATABASE"] ?? throw new InvalidOperationException("Azure DB name not configured. Set AZURE_DB_DATABASE environment variable.");
+        var connectionConfig = _useManagedIdentity 
+            ? GetProductionConnectionConfig() 
+            : GetDevelopmentConnectionConfig();
             
-            return $"Server={server};Database={database};Authentication=Active Directory Default;";
-        }
-        else
+        return BuildConnectionString(connectionConfig);
+    }
+    
+    private ConnectionConfig GetProductionConnectionConfig()
+    {
+        return new ConnectionConfig
         {
-            // Local development with .env file
-            var mysqlHost = Environment.GetEnvironmentVariable("MYSQL_HOST") ?? "mysql";
-            var mysqlPort = Environment.GetEnvironmentVariable("MYSQL_PORT") ?? "3306";
-            var mysqlDatabase = Environment.GetEnvironmentVariable("MYSQL_DATABASE")
-                                   ?? throw new InvalidOperationException("No database name configured. Set MYSQL_DATABASE environment variable.");
-            var mysqlUser = Environment.GetEnvironmentVariable("MYSQL_USER")
-                                   ?? throw new InvalidOperationException("No database user configured. Set MYSQL_USER environment variable.");
-            var mysqlPassword = Environment.GetEnvironmentVariable("MYSQL_PASSWORD")
-                                   ?? throw new InvalidOperationException("No database password configured. Set MYSQL_PASSWORD environment variable.");
-            
-            return $"Server={mysqlHost};Port={mysqlPort};Database={mysqlDatabase};User={mysqlUser};Password={mysqlPassword};";
-        }
+            Host = GetRequiredEnvironmentVariable("MYSQL_HOST", "production"),
+            Port = Environment.GetEnvironmentVariable("MYSQL_PORT") ?? MySqlPortDefault,
+            Database = GetRequiredEnvironmentVariable("MYSQL_DATABASE", "production"),
+            User = GetRequiredConfigurationValue("MYSQL_USER", "Azure Key Vault"),
+            Password = GetRequiredConfigurationValue("MYSQL_PASSWORD", "Azure Key Vault")
+        };
+    }
+    
+    private ConnectionConfig GetDevelopmentConnectionConfig()
+    {
+        return new ConnectionConfig
+        {
+            Host = Environment.GetEnvironmentVariable("MYSQL_HOST") ?? MySqlHostDefault,
+            Port = Environment.GetEnvironmentVariable("MYSQL_PORT") ?? MySqlPortDefault,
+            Database = GetRequiredEnvironmentVariable("MYSQL_DATABASE"),
+            User = GetRequiredEnvironmentVariable("MYSQL_USER"),
+            Password = GetRequiredEnvironmentVariable("MYSQL_PASSWORD")
+        };
+    }
+    
+    private static string BuildConnectionString(ConnectionConfig config) => 
+        $"Server={config.Host};Port={config.Port};Database={config.Database};User={config.User};Password={config.Password};";
+    
+    private string GetRequiredEnvironmentVariable(string variableName, string? context = null)
+    {
+        var value = Environment.GetEnvironmentVariable(variableName);
+        var contextMsg = string.IsNullOrEmpty(context) ? "" : $" for {context}";
+        return value ?? throw new InvalidOperationException($"{variableName} environment variable not set{contextMsg}.");
+    }
+    
+    private string GetRequiredConfigurationValue(string key, string source)
+    {
+        return _configuration[key] ?? throw new InvalidOperationException($"{key} secret not found in {source}.");
+    }
+    
+    private class ConnectionConfig
+    {
+        public string Host { get; init; } = string.Empty;
+        public string Port { get; init; } = string.Empty;
+        public string Database { get; init; } = string.Empty;
+        public string User { get; init; } = string.Empty;
+        public string Password { get; init; } = string.Empty;
     }
 }

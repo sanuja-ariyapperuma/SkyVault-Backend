@@ -74,16 +74,15 @@ public static class Program
             var dbConnectionService = serviceProvider.GetRequiredService<IDatabaseConnectionService>();
             var connectionString = dbConnectionService.GetConnectionString();
             
+            // Always use MySQL (both for local development and Azure Database for MySQL)
+            options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
+            
             if (dbConnectionService.UseManagedIdentity)
             {
-                // For Azure SQL/MySQL with Managed Identity
-                options.UseSqlServer(connectionString, sqlOptions => sqlOptions.EnableRetryOnFailure());
-                Log.Information("Using Azure SQL with Managed Identity");
+                Log.Information("Using Azure Database for MySQL with credentials from Azure Key Vault");
             }
             else
             {
-                // For local MySQL development
-                options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0)));
                 Log.Information($"Using MySQL connection: Server={Environment.GetEnvironmentVariable("MYSQL_HOST")}, Database={Environment.GetEnvironmentVariable("MYSQL_DATABASE")}");
             }
         });
