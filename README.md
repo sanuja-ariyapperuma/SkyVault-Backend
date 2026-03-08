@@ -51,9 +51,50 @@ In this repository only the backend API source code can be found.
 
 
 ---
-## Cloud Architecture
+## ☁️ Azure Cloud Architecture
 
-![HostingArchitecture](docs/Diagrams/architecture_updated.png)
+![HostingArchitecture](docs/Diagrams/azurearchitecture.png)
+
+### Azure-Native Design
+
+The SkyVault solution is designed to host easily on Azure with enterprise-grade security and scalability. The architecture leverages Azure's native capabilities to provide seamless integration with existing Microsoft ecosystems.
+
+#### **Authentication & User Management**
+- **Microsoft Entra ID Integration** - Users can log in with the same credentials they use for Microsoft 365
+- **Tenant-Based Access** - Application is configured under designated Azure tenant
+- **Role-Based Assignment** - Tenant users are assigned to the application with appropriate permissions
+
+#### **Resource Organization**
+- **Dedicated Subscription** - All SkyVault resources hosted in a separate subscription for billing clarity
+- **Resource Group Isolation** - Logical grouping of all related Azure resources
+- **Cost Management** - Simplified billing and resource tracking through dedicated subscription
+
+#### **Infrastructure as Code**
+- **Bicep Templates** - Complete IaC solution available for automated provisioning
+- **Declarative Deployment** - Infrastructure defined as code for consistency and repeatability
+- **Environment Parity** - Easy replication across development, staging, and production environments
+
+#### **Security Architecture**
+- **Managed Identity Communication** - All Azure services communicate using managed identities
+- **Key Vault Integration** - Secure credential storage and retrieval
+- **Database Security Pattern**:
+  - App Service and Azure Functions authenticate to Key Vault using managed identity
+  - Database credentials retrieved from Key Vault
+  - Normal connection string used for MySQL database connectivity
+- **Network Isolation** - Database has no internet access, only allows inbound traffic from App Service and Azure Functions
+
+#### **Deployment & Scalability**
+- **Container Registry** - Application images stored in Azure Container Registry
+- **Rapid Scaling** - Easy to spin up new app instances or complete resource sets
+- **Consistent Deployment** - Same container image ensures identical environments across deployments
+
+#### **Azure Service Integration**
+- **App Service** - Hosts the main application with auto-scaling capabilities
+- **Azure Database for MySQL** - Isolated database with restricted network access
+- **Key Vault** - Centralized secret management
+- **Azure Functions** - Separate microservice for notifications and background processing
+- **Azure Container Registry** - Image repository for deployment consistency
+
 ---
 ## ER Diagram
 
