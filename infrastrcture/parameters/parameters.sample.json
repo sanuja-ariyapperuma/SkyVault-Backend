@@ -7,5 +7,7 @@
   "azureAdInstance": { "value": "" },
   "azureAdTenantId": { "value": "" },
   "azureAdClientId": { "value": "" },
-  "azureAdAudience": { "value": "" }
+  "azureAdAudience": { "value": "" },
+  "principalId": {"value":  ""},
+  "environment": {"value":  ""}
 }

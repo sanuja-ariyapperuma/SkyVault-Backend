@@ -22,13 +22,12 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
 resource appService 'Microsoft.Web/sites@2022-03-01' = {
   name: '${prefix}-api'
   location: location
-  kind: 'app,linux,container'
+  kind: 'app,linux'
   identity: { type: 'SystemAssigned' }
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'DOTNETCORE|7.0'
       minTlsVersion: '1.2'
       appSettings: [
         { name: 'AZUREAD__INSTANCE', value: azureAdInstance }
@@ -46,19 +45,6 @@ resource appService 'Microsoft.Web/sites@2022-03-01' = {
   }
 }
 
-// Grant App Service access to Key Vault
-resource kvAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2023-02-01' = {
-  name: '${keyVaultId}/add'
-  properties: {
-    accessPolicies: [
-      {
-        tenantId: subscription().tenantId
-        objectId: appService.identity.principalId
-        permissions: { secrets: ['get'] }
-      }
-    ]
-  }
-  dependsOn: [appService]
-}
-
 output outboundIpAddresses string = appService.properties.outboundIpAddresses
+output appServiceIdentityPrincipalId string = appService.identity.principalId
+output appServiceName string = appService.name

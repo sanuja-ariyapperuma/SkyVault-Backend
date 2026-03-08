@@ -8,7 +8,7 @@ param mysqlPassword string
 resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
   name: '${prefix}-mysql'
   location: location
-  sku: { name: 'Standard_B1ms', tier: 'Burstable', capacity: 1 }
+  sku: { name: 'Standard_B1ms', tier: 'Burstable' }
   properties: {
     administratorLogin: mysqlUser
     administratorLoginPassword: mysqlPassword

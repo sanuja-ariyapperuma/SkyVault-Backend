@@ -1,0 +1,1024 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.41.2.15936",
+      "templateHash": "2022641613591847348"
+    }
+  },
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "defaultValue": "skyvault",
+      "metadata": {
+        "description": "Name prefix for all resources"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "mysqlUser": {
+      "type": "string",
+      "metadata": {
+        "description": "MySQL appuser username"
+      }
+    },
+    "mysqlPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "MySQL appuser password"
+      }
+    },
+    "mysqlDatabase": {
+      "type": "string",
+      "defaultValue": "skyvault_db",
+      "metadata": {
+        "description": "MySQL database name"
+      }
+    },
+    "principalId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Principal Id"
+      }
+    },
+    "azureAdInstance": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD environment variables"
+      }
+    },
+    "azureAdTenantId": {
+      "type": "string"
+    },
+    "azureAdClientId": {
+      "type": "string"
+    },
+    "azureAdAudience": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "dev",
+      "metadata": {
+        "description": "Environment name"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "kvDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "principalId": {
+            "value": "[parameters('principalId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "12104998802502277110"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "principalId": {
+              "type": "string"
+            },
+            "appServicePrincipalId": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "variables": {
+            "kvName": "[format('{0}kv{1}', parameters('prefix'), uniqueString(resourceGroup().id))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[variables('kvName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "enableRbacAuthorization": true,
+                "enabledForTemplateDeployment": true,
+                "sku": {
+                  "family": "A",
+                  "name": "standard"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]",
+              "name": "[guid(resourceId('Microsoft.KeyVault/vaults', variables('kvName')), parameters('principalId'), 'kv-secrets-officer')]",
+              "properties": {
+                "principalId": "[parameters('principalId')]",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]"
+              ]
+            },
+            {
+              "condition": "[not(equals(parameters('appServicePrincipalId'), ''))]",
+              "type": "Microsoft.KeyVault/vaults/accessPolicies",
+              "apiVersion": "2023-02-01",
+              "name": "[format('{0}/{1}', variables('kvName'), 'add')]",
+              "properties": {
+                "accessPolicies": [
+                  {
+                    "tenantId": "[subscription().tenantId]",
+                    "objectId": "[parameters('appServicePrincipalId')]",
+                    "permissions": {
+                      "secrets": [
+                        "get"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "keyVaultName": {
+              "type": "string",
+              "value": "[variables('kvName')]"
+            },
+            "keyVaultId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "secretDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "keyVaultName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'kvDeploy'), '2025-04-01').outputs.keyVaultName.value]"
+          },
+          "mysqlUser": {
+            "value": "[parameters('mysqlUser')]"
+          },
+          "mysqlPassword": {
+            "value": "[parameters('mysqlPassword')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "12665555942891972651"
+            }
+          },
+          "parameters": {
+            "keyVaultName": {
+              "type": "string"
+            },
+            "mysqlUser": {
+              "type": "string"
+            },
+            "mysqlPassword": {
+              "type": "securestring"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-02-01",
+              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'mysql-user')]",
+              "properties": {
+                "value": "[parameters('mysqlUser')]"
+              }
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-02-01",
+              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'mysql-password')]",
+              "properties": {
+                "value": "[parameters('mysqlPassword')]"
+              }
+            }
+          ],
+          "outputs": {
+            "mysqlUserSecretUri": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'mysql-user'), '2023-02-01').secretUriWithVersion]"
+            },
+            "mysqlPasswordSecretUri": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'mysql-password'), '2023-02-01').secretUriWithVersion]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'kvDeploy')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "mysqlDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "mysqlUser": {
+            "value": "[parameters('mysqlUser')]"
+          },
+          "mysqlPassword": {
+            "value": "[parameters('mysqlPassword')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "7616480784321136865"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Prefix for resources"
+              }
+            },
+            "location": {
+              "type": "string"
+            },
+            "mysqlUser": {
+              "type": "string"
+            },
+            "mysqlPassword": {
+              "type": "securestring"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DBforMySQL/flexibleServers",
+              "apiVersion": "2023-06-30",
+              "name": "[format('{0}-mysql', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_B1ms",
+                "tier": "Burstable"
+              },
+              "properties": {
+                "administratorLogin": "[parameters('mysqlUser')]",
+                "administratorLoginPassword": "[parameters('mysqlPassword')]",
+                "storage": {
+                  "storageSizeGB": 20
+                },
+                "backup": {
+                  "backupRetentionDays": 7
+                },
+                "highAvailability": {
+                  "mode": "Disabled"
+                },
+                "network": {
+                  "publicNetworkAccess": "Enabled"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "mysqlHost": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.DBforMySQL/flexibleServers', format('{0}-mysql', parameters('prefix'))), '2023-06-30').fullyQualifiedDomainName]"
+            },
+            "mysqlServerName": {
+              "type": "string",
+              "value": "[format('{0}-mysql', parameters('prefix'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "aiDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "609449635878322343"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Prefix for resources"
+              }
+            },
+            "location": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Insights/components",
+              "apiVersion": "2020-02-02",
+              "name": "[format('{0}-ai', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "kind": "web",
+              "properties": {
+                "Application_Type": "web"
+              }
+            }
+          ],
+          "outputs": {
+            "instrumentationKey": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Insights/components', format('{0}-ai', parameters('prefix'))), '2020-02-02').InstrumentationKey]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "acrDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "1196374116137176268"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Prefix for resources"
+              }
+            },
+            "location": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2022-12-01",
+              "name": "[format('{0}acr{1}', parameters('prefix'), uniqueString(resourceGroup().id))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Basic"
+              },
+              "properties": {
+                "adminUserEnabled": true
+              }
+            }
+          ],
+          "outputs": {
+            "acrName": {
+              "type": "string",
+              "value": "[format('{0}acr{1}', parameters('prefix'), uniqueString(resourceGroup().id))]"
+            },
+            "acrLoginServer": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', format('{0}acr{1}', parameters('prefix'), uniqueString(resourceGroup().id))), '2022-12-01').loginServer]"
+            },
+            "acrId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ContainerRegistry/registries', format('{0}acr{1}', parameters('prefix'), uniqueString(resourceGroup().id)))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "appDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "azureAdInstance": {
+            "value": "[parameters('azureAdInstance')]"
+          },
+          "azureAdTenantId": {
+            "value": "[parameters('azureAdTenantId')]"
+          },
+          "azureAdClientId": {
+            "value": "[parameters('azureAdClientId')]"
+          },
+          "azureAdAudience": {
+            "value": "[parameters('azureAdAudience')]"
+          },
+          "keyVaultId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'kvDeploy'), '2025-04-01').outputs.keyVaultId.value]"
+          },
+          "kvUserSecretUri": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'secretDeploy'), '2025-04-01').outputs.mysqlUserSecretUri.value]"
+          },
+          "kvPasswordSecretUri": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'secretDeploy'), '2025-04-01').outputs.mysqlPasswordSecretUri.value]"
+          },
+          "mysqlHost": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'mysqlDeploy'), '2025-04-01').outputs.mysqlHost.value]"
+          },
+          "mysqlDatabase": {
+            "value": "[parameters('mysqlDatabase')]"
+          },
+          "appInsightsKey": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'aiDeploy'), '2025-04-01').outputs.instrumentationKey.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "18187156148611807525"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Prefix for resources"
+              }
+            },
+            "location": {
+              "type": "string"
+            },
+            "azureAdInstance": {
+              "type": "string"
+            },
+            "azureAdTenantId": {
+              "type": "string"
+            },
+            "azureAdClientId": {
+              "type": "string"
+            },
+            "azureAdAudience": {
+              "type": "string"
+            },
+            "keyVaultId": {
+              "type": "string"
+            },
+            "kvUserSecretUri": {
+              "type": "string"
+            },
+            "kvPasswordSecretUri": {
+              "type": "string"
+            },
+            "mysqlHost": {
+              "type": "string"
+            },
+            "mysqlDatabase": {
+              "type": "string"
+            },
+            "appInsightsKey": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}-plan', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "B1",
+                "tier": "Basic"
+              },
+              "kind": "linux"
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}-api', parameters('prefix'))]",
+              "location": "[parameters('location')]",
+              "kind": "app,linux",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', format('{0}-plan', parameters('prefix')))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "minTlsVersion": "1.2",
+                  "appSettings": [
+                    {
+                      "name": "AZUREAD__INSTANCE",
+                      "value": "[parameters('azureAdInstance')]"
+                    },
+                    {
+                      "name": "AZUREAD__TENANTID",
+                      "value": "[parameters('azureAdTenantId')]"
+                    },
+                    {
+                      "name": "AZUREAD__CLIENTID",
+                      "value": "[parameters('azureAdClientId')]"
+                    },
+                    {
+                      "name": "AZUREAD__AUDIENCE",
+                      "value": "[parameters('azureAdAudience')]"
+                    },
+                    {
+                      "name": "MYSQL_DATABASE",
+                      "value": "[parameters('mysqlDatabase')]"
+                    },
+                    {
+                      "name": "MYSQL_HOST",
+                      "value": "[parameters('mysqlHost')]"
+                    },
+                    {
+                      "name": "MYSQL_PORT",
+                      "value": "3306"
+                    },
+                    {
+                      "name": "MYSQL_USER",
+                      "value": "[format('@Microsoft.KeyVault(SecretUri={0})', parameters('kvUserSecretUri'))]"
+                    },
+                    {
+                      "name": "MYSQL_PASSWORD",
+                      "value": "[format('@Microsoft.KeyVault(SecretUri={0})', parameters('kvPasswordSecretUri'))]"
+                    },
+                    {
+                      "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                      "value": "[parameters('appInsightsKey')]"
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', format('{0}-plan', parameters('prefix')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "outboundIpAddresses": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-api', parameters('prefix'))), '2022-03-01').outboundIpAddresses]"
+            },
+            "appServiceIdentityPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-api', parameters('prefix'))), '2022-03-01', 'full').identity.principalId]"
+            },
+            "appServiceName": {
+              "type": "string",
+              "value": "[format('{0}-api', parameters('prefix'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'aiDeploy')]",
+        "[resourceId('Microsoft.Resources/deployments', 'kvDeploy')]",
+        "[resourceId('Microsoft.Resources/deployments', 'mysqlDeploy')]",
+        "[resourceId('Microsoft.Resources/deployments', 'secretDeploy')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "storageDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "appServiceName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appDeploy'), '2025-04-01').outputs.appServiceName.value]"
+          },
+          "appOutboundIps": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appDeploy'), '2025-04-01').outputs.outboundIpAddresses.value]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "2572625316976959769"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Prefix for resources"
+              }
+            },
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for all resources"
+              }
+            },
+            "appServiceName": {
+              "type": "string",
+              "metadata": {
+                "description": "App Service name for network rules"
+              }
+            },
+            "appOutboundIps": {
+              "type": "string",
+              "metadata": {
+                "description": "App Service outbound IP addresses for network rules"
+              }
+            },
+            "environment": {
+              "type": "string",
+              "defaultValue": "dev",
+              "metadata": {
+                "description": "Environment name"
+              }
+            }
+          },
+          "variables": {
+            "storageAccountName": "[format('{0}{1}images', parameters('prefix'), parameters('environment'))]",
+            "blobContainerName": "images",
+            "outboundIpArray": "[split(parameters('appOutboundIps'), ',')]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "name": "[variables('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "accessTier": "Hot",
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true,
+                "allowBlobPublicAccess": false,
+                "networkAcls": {
+                  "copy": [
+                    {
+                      "name": "ipRules",
+                      "count": "[length(variables('outboundIpArray'))]",
+                      "input": {
+                        "value": "[trim(variables('outboundIpArray')[copyIndex('ipRules')])]",
+                        "action": "Allow"
+                      }
+                    }
+                  ],
+                  "defaultAction": "Deny",
+                  "bypass": "AzureServices",
+                  "virtualNetworkRules": []
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', variables('storageAccountName'), 'default')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}/{2}', variables('storageAccountName'), 'default', variables('blobContainerName'))]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), resourceId('Microsoft.Web/sites', parameters('appServiceName')), 'StorageBlobDataContributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('appServiceName')), '2022-03-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "storageAccountName": {
+              "type": "string",
+              "value": "[variables('storageAccountName')]"
+            },
+            "blobContainerName": {
+              "type": "string",
+              "value": "[variables('blobContainerName')]"
+            },
+            "storageAccountId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'appDeploy')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "kvUpdate",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "principalId": {
+            "value": "[parameters('principalId')]"
+          },
+          "appServicePrincipalId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appDeploy'), '2025-04-01').outputs.appServiceIdentityPrincipalId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "12104998802502277110"
+            }
+          },
+          "parameters": {
+            "prefix": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "principalId": {
+              "type": "string"
+            },
+            "appServicePrincipalId": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "variables": {
+            "kvName": "[format('{0}kv{1}', parameters('prefix'), uniqueString(resourceGroup().id))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[variables('kvName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "enableRbacAuthorization": true,
+                "enabledForTemplateDeployment": true,
+                "sku": {
+                  "family": "A",
+                  "name": "standard"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]",
+              "name": "[guid(resourceId('Microsoft.KeyVault/vaults', variables('kvName')), parameters('principalId'), 'kv-secrets-officer')]",
+              "properties": {
+                "principalId": "[parameters('principalId')]",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]"
+              ]
+            },
+            {
+              "condition": "[not(equals(parameters('appServicePrincipalId'), ''))]",
+              "type": "Microsoft.KeyVault/vaults/accessPolicies",
+              "apiVersion": "2023-02-01",
+              "name": "[format('{0}/{1}', variables('kvName'), 'add')]",
+              "properties": {
+                "accessPolicies": [
+                  {
+                    "tenantId": "[subscription().tenantId]",
+                    "objectId": "[parameters('appServicePrincipalId')]",
+                    "permissions": {
+                      "secrets": [
+                        "get"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "keyVaultName": {
+              "type": "string",
+              "value": "[variables('kvName')]"
+            },
+            "keyVaultId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults', variables('kvName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'appDeploy')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "mysqlFirewallDeploy",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "mysqlServerName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'mysqlDeploy'), '2025-04-01').outputs.mysqlServerName.value]"
+          },
+          "appOutboundIps": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'appDeploy'), '2025-04-01').outputs.outboundIpAddresses.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.41.2.15936",
+              "templateHash": "2647975876136624372"
+            }
+          },
+          "parameters": {
+            "mysqlServerName": {
+              "type": "string",
+              "metadata": {
+                "description": "MySQL server name"
+              }
+            },
+            "appOutboundIps": {
+              "type": "string",
+              "metadata": {
+                "description": "Comma-separated App Service outbound IPs"
+              }
+            }
+          },
+          "variables": {
+            "ipList": "[split(parameters('appOutboundIps'), ',')]"
+          },
+          "resources": [
+            {
+              "copy": {
+                "name": "mysqlFirewall",
+                "count": "[length(variables('ipList'))]"
+              },
+              "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+              "apiVersion": "2023-06-30",
+              "name": "[format('{0}/AllowAppSvcIP{1}', parameters('mysqlServerName'), copyIndex())]",
+              "properties": {
+                "startIpAddress": "[variables('ipList')[copyIndex()]]",
+                "endIpAddress": "[variables('ipList')[copyIndex()]]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'appDeploy')]",
+        "[resourceId('Microsoft.Resources/deployments', 'mysqlDeploy')]"
+      ]
+    }
+  ]
+}
