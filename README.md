@@ -107,23 +107,27 @@ The SkyVault solution is designed to host easily on Azure with enterprise-grade 
 > This project is not meant to be deployed or used. For portfolio purposes, here’s a high-level setup overview:
 
 1. Clone the repository.
-2. Configure Azure AD for authentication.
-3. Install MySQL / MariaDB or set up Azure Database for MySQL and configure EF Core.
-4. Run the project locally or deploy the API to Azure App Service.
-5. Configure external Azure Function for sending notifications.
+2. Register the API in desired tenant.
+3. Set environment variables accordingly.
+4. Use docker to spin-up run the app.
+5. Apply migrations and seeds
+6. API will be fully functional.
 
 ---
 
 ## 📧 Notifications
 
-The system can automatically send emails in these scenarios:
+The system is possible for:
 
-* Passport expiration
-* Visa expiration
-* Birthday wishes
-* Special offers or urgent travel notifications
+* Maintain customer information (Personal, Passport, Frequent Flyer, Visa)
+* Define Birthday wishes, notifications for clients
+* Broadcast marketing campaigns or special messages to client 
+
 
 > Email notifications rely on an external Azure Function hosted separately.
+
+
+👉  [SkyVault Cloud Functions](https://github.com/sanuja-ariyapperuma/Skyvault-CloudFunctions)
 
 ---
 
