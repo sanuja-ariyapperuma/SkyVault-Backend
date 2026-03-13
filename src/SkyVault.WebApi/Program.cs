@@ -231,53 +231,6 @@ public static class Program
         app.MapTransferProfileEndpoints();
         /* Route Mapping End*/
         
-        app.MapGet("/secure", () => "Hello from protected API")
-            .RequireAuthorization();
-        
-        // Debug endpoint to test JWT decoding without authentication
-        app.MapPost("/debug-token", (HttpContext context) =>
-        {
-            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-            var token = authHeader?.Split(" ").Last();
-            
-            if (string.IsNullOrEmpty(token))
-            {
-                return Results.BadRequest(new { error = "No token provided" });
-            }
-            
-            try
-            {
-                // Decode token without validation (for debugging only)
-                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadJwtToken(token);
-                
-                var tokenInfo = new
-                {
-                    Header = new
-                    {
-                        Algorithm = jwtToken.Header.Alg,
-                        Type = jwtToken.Header.Typ,
-                        Kid = jwtToken.Header.Kid
-                    },
-                    Payload = new
-                    {
-                        Issuer = jwtToken.Issuer,
-                        Audience = jwtToken.Audiences,
-                        Subject = jwtToken.Subject,
-                        IssuedAt = jwtToken.IssuedAt,
-                        Expires = jwtToken.ValidTo,
-                        NotBefore = jwtToken.ValidFrom,
-                        Claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value)
-                    }
-                };
-                
-                return Results.Ok(tokenInfo);
-            }
-            catch (Exception ex)
-            {
-                return Results.BadRequest(new { error = "Failed to decode token", message = ex.Message });
-            }
-        });
         
         Log.Information("API starting up. Listening on:");
         foreach (var url in app.Urls)
