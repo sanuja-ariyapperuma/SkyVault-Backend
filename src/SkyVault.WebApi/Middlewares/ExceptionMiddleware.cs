@@ -1,11 +1,14 @@
 ﻿using SkyVault.Exceptions;
+using SkyVault.Services;
 using System.Net;
 using System.Text.Json;
 
 namespace SkyVault.WebApi.Middlewares
 {
-    public sealed class ExceptionMiddleware(RequestDelegate next)
+    public sealed class ExceptionMiddleware(RequestDelegate next, ITelemetryService telemetryService)
     {
+        private readonly ITelemetryService _telemetryService = telemetryService;
+
         public async Task InvokeAsync(HttpContext httpContext)
         {
             try
@@ -16,8 +19,8 @@ namespace SkyVault.WebApi.Middlewares
             {
                 var correlationId = (httpContext.Items["X-Correlation-ID"] ??= "Not Available") as string;
 
-                //Send to central exception handler
-                ex.LogException(correlationId);
+                //Send to central exception handler with telemetry service
+                ex.LogException(correlationId, _telemetryService);
 
                 await HandleException(httpContext, ex);
             }

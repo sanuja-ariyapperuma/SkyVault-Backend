@@ -12,6 +12,7 @@ using SkyVault.WebApi.Helper;
 using SkyVault.WebApi.MappingProfiles;
 using SkyVault.WebApi.Middlewares;
 using SkyVault.WebApi.Services;
+using SkyVault.Services;
 using System.Globalization;
 using Azure.Identity;
 
@@ -43,12 +44,27 @@ public static class Program
         }
 
         // Configure Serilog using environment variables
-        Log.Logger = new LoggerConfiguration()
+        var loggerConfig = new LoggerConfiguration()
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
+            .WriteTo.Console();
+
+        // Add Application Insights sink if connection string is available
+        var appInsightsConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+        var isAppInsightsEnabled = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_ENABLED")?.ToLower() != "false";
+
+        if (!string.IsNullOrEmpty(appInsightsConnectionString) && isAppInsightsEnabled)
+        {
+            loggerConfig.WriteTo.ApplicationInsights(appInsightsConnectionString, TelemetryConverter.Traces);
+            Log.Information("Application Insights logging enabled");
+        }
+        else
+        {
+            Log.Information("Application Insights logging disabled - connection string not available or explicitly disabled");
+        }
+
+        Log.Logger = loggerConfig.CreateLogger();
 
         builder.Host.UseSerilog();
 
@@ -67,6 +83,9 @@ public static class Program
 
         // Register database connection service
         builder.Services.AddSingleton<IDatabaseConnectionService, DatabaseConnectionService>();
+
+        // Register telemetry service
+        builder.Services.AddSingleton<ITelemetryService, ApplicationInsightsTelemetryService>();
 
         // Database Context
         builder.Services.AddDbContext<SkyvaultContext>((serviceProvider, options) =>
@@ -198,6 +217,7 @@ public static class Program
         
         // Correlation ID should be first so all downstream logs/middleware get the ID
         app.UseMiddleware<CorrelationIdMiddleware>();
+        app.UseMiddleware<RequestTrackingMiddleware>();
         app.UseMiddleware<AuthExceptionMiddleware>();
         app.UseMiddleware<ExceptionMiddleware>();
         
