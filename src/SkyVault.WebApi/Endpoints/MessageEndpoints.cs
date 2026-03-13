@@ -1,4 +1,11 @@
 ﻿using SkyVault.WebApi.Filters;
+using SkyVault.Payloads.RequestPayloads;
+using SkyVault.Payloads.ResponsePayloads;
+using SkyVault.WebApi.Backend;
+using SkyVault.WebApi.Workloads;
+using SkyVault.WebApi.Backend.Models;
+using SkyVault.WebApi.Helper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SkyVault.WebApi.Endpoints
 {
@@ -10,7 +17,15 @@ namespace SkyVault.WebApi.Endpoints
          */
         public static void MapMessageEndpoints(this WebApplication app)
         {
-            app.MapPost("/GetPreSignedUrl", Workloads.MessageWorkload.GetPreSignedUrl)
+            app.MapPost("/GetPreSignedUrl", async ([FromBody] PreSignedUrlRequest request, SkyvaultContext dbContext, HttpContext context) =>
+            {
+                var result = await Workloads.MessageWorkload.GetPreSignedUrl(request, dbContext, context);
+                
+                if (!result.Succeeded)
+                    return Results.Problem(new ProblemDetails().ToProblemDetails(result.Message, result.ErrorCode, result.CorrelationId));
+                
+                return Results.Ok(result.Value);
+            })
                 .RequireAuthorization()
                 .AddEndpointFilter<AdminOnlyFilter>()
                 .Produces(StatusCodes.Status200OK)

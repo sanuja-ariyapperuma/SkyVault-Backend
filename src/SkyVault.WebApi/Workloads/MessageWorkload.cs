@@ -15,17 +15,29 @@ namespace SkyVault.WebApi.Workloads
     {
         private static string _correlationId = string.Empty;
 
-        public async static Task<IResult> GetPreSignedUrl(
+        public async static Task<SkyResult<PreSignedUrlResponse>> GetPreSignedUrl(
             [FromBody] PreSignedUrlRequest request,
             SkyvaultContext dbContext,
                 HttpContext context
             )
         {
+            var correlationId = context.Items["X-Correlation-ID"]?.ToString() ?? "";
 
-            StorageService storageService = new StorageService();
-            var preSignedUrl = await storageService.GetPreSignedUrlAsync(request.FileTypeEnum, request.MessageTypeEnum);
+            try
+            {
+                StorageService storageService = new StorageService();
+                var preSignedUrl = await storageService.GetPreSignedUrlAsync(request.FileTypeEnum, request.MessageTypeEnum);
 
-            return Results.Ok(preSignedUrl);
+                return new SkyResult<PreSignedUrlResponse>().SucceededWithValue(preSignedUrl);
+            }
+            catch (Exception e)
+            {
+                e.LogException(correlationId);
+                return new SkyResult<PreSignedUrlResponse>().Fail(
+                    "Failed to generate pre-signed URL", 
+                    "30550615-0012", 
+                    correlationId);
+            }
         }
 
         /***

@@ -12,10 +12,10 @@ namespace SkyVault.WebApi.Workloads;
 public static class CustomWorkload
 {
     //Error Code vFxlOv
-    public static IResult GetProfilePageDefinitionData(SkyvaultContext dbContext,
+    public static SkyResult<ProfileDefinitionResponse> GetProfilePageDefinitionData(SkyvaultContext dbContext,
         IMapper mapper, IMemoryCache cache, IConfiguration configuration, HttpContext context, CacheService cacheService)
     {
-        var correlationId = context.Items["X-Correlation-ID"]?.ToString();
+        var correlationId = context.Items["X-Correlation-ID"]?.ToString() ?? "";
 
         List<Salutation> salutations = [];
         List<Nationality> nationalities = [];
@@ -35,15 +35,15 @@ public static class CustomWorkload
                 mapper.Map<List<Payloads.CommonPayloads.Gender>>(gender),
                 mapper.Map<List<Payloads.CommonPayloads.Country>>(countries));
 
-            return Results.Ok(profileDefinition);
+            return new SkyResult<ProfileDefinitionResponse>().SucceededWithValue(profileDefinition);
         }
         catch (Exception e)
         {
             e.LogException(correlationId);
 
-            return Results.Problem(new ProblemDetails().ToProblemDetails(
+            return new SkyResult<ProfileDefinitionResponse>().Fail(
                 "An unexpected error occurred. Please try again later.",
-                "vFxlOv-0001", correlationId));
+                "vFxlOv-0001", correlationId);
         }
     }
 

@@ -13,45 +13,54 @@ namespace SkyVault.WebApi.Workloads;
 internal static class AuthenticationWorkload
 {
 
-    public static IResult AuthenticateUser(
+    public static SkyResult<bool> AuthenticateUser(
         [FromBody] LoginUserRequest request,
         HttpContext context,
         SkyvaultContext dbContext
         )
     {
         var accessToken = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-        var correlationId = context.Items["X-Correlation-ID"]?.ToString();
+        var correlationId = context.Items["X-Correlation-ID"]?.ToString() ?? "";
 
         if (request.Upn == null)
-            return Results.Problem(new ProblemDetails().ToProblemDetails("Cannot find the upn",
-                "", correlationId));
+            return new SkyResult<bool>().Fail("Cannot find the upn", "2ac5059f-0005", correlationId);
 
         if (request.UserRole == null)
-            return Results.Problem(new ProblemDetails().ToProblemDetails("Cannot find the user role",
-                "", correlationId));
+            return new SkyResult<bool>().Fail("Cannot find the user role", "2ac5059f-0006", correlationId);
 
         var systemUserData = new SystemUserData(dbContext);
-
 
         var firstname = context.User.FindFirst("name")?.Value ?? "";
         var lastName = context.User.FindFirst(ClaimTypes.Surname)?.Value ?? "";
 
-        Payloads.CommonPayloads.SystemUserRole userRole = request.UserRole switch
+        Payloads.CommonPayloads.SystemUserRole userRole;
+        
+        switch (request.UserRole)
         {
-            "SuperAdmin" => Payloads.CommonPayloads.SystemUserRole.SuperAdmin,
-            "Admin" => Payloads.CommonPayloads.SystemUserRole.Admin,
-            "Staff" => Payloads.CommonPayloads.SystemUserRole.Staff,
-            _ => throw new ArgumentException("Invalid role")
-        };
+            case "SuperAdmin":
+                userRole = Payloads.CommonPayloads.SystemUserRole.SuperAdmin;
+                break;
+            case "Admin":
+                userRole = Payloads.CommonPayloads.SystemUserRole.Admin;
+                break;
+            case "Staff":
+                userRole = Payloads.CommonPayloads.SystemUserRole.Staff;
+                break;
+            default:
+                return new SkyResult<bool>().Fail("Invalid role", "2ac5059f-0007", correlationId);
+        }
 
         var loginUser = new SystemUserCreateOrUpdateDto(request.Upn, firstname, lastName, userRole);
 
         var result = systemUserData.CreateOrGetUser(loginUser, correlationId);
 
         if (!result.Succeeded)
-            return Results.Problem(new ProblemDetails().ToProblemDetails(result.Message,
-                result.ErrorCode, result.CorrelationId));
+            return new SkyResult<bool>().Fail(result.Message, result.ErrorCode, result.CorrelationId);
+
+        var sysUser = result.Value;
+        
+        if (sysUser == null)
+            return new SkyResult<bool>().Fail("User not found", "2ac5059f-0008", correlationId);
 
         var cookieOptions = new CookieOptions
         {
@@ -60,12 +69,6 @@ internal static class AuthenticationWorkload
             SameSite = SameSiteMode.Lax, // Mitigates CSRF attacks
             Expires = DateTime.UtcNow.AddMinutes(60) // Match token expiry
         };
-
-        var sysUser = result.Value;
-        
-        if (sysUser == null)
-            return Results.Problem(new ProblemDetails().ToProblemDetails("User not found",
-                "", correlationId));
 
         var cookieData = new AuthenticatedUser(
             $"{sysUser.FirstName ?? ""} {sysUser.LastName ?? ""}",
@@ -79,6 +82,6 @@ internal static class AuthenticationWorkload
         // Set the access token in a cookie
         context.Response.Cookies.Append("SkyVault", encodedCookieData, cookieOptions);
 
-        return Results.Ok();
+        return new SkyResult<bool>().SucceededWithValue(true);
     }
 }
